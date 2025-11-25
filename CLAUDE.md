@@ -1,0 +1,2 @@
+- @docs\0-domain-definition-request.md 의 내용을 지침으로 사용하여 수행해줘.
+- @docs\0-domain-definition-request.md 의 내용을 지침으로 사용하여 수행해줘.
