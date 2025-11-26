@@ -58,14 +58,14 @@ JWT 기반 사용자 인증과 할일 관리, 휴지통, 국경일 조회 기능
 
 **완료 조건**:
 
-- [ ] PostgreSQL 서비스 실행 중
-- [ ] `igk_todolist_dev` 데이터베이스 생성 완료
-- [ ] 연결 문자열 확인: `postgresql://localhost:5432/igk_todolist_dev`
-- [ ] 관리 도구로 접속 가능
+- [x] PostgreSQL 서비스 실행 중
+- [x] `igk_todolist_dev` 데이터베이스 생성 완료
+- [x] 연결 문자열 확인: `postgresql://localhost:5432/igk_todolist_dev`
+- [x] 관리 도구로 접속 가능
 
 **의존성**:
 
-- [ ] 없음 (독립 작업)
+- [x] 없음 (독립 작업)
 
 **산출물**:
 
@@ -81,9 +81,12 @@ JWT 기반 사용자 인증과 할일 관리, 휴지통, 국경일 조회 기능
 **예상 시간**: 2시간
 **우선순위**: P0
 
+\*\* 사용 파일 \*\*
+
+- database/schema.sql
+
 **작업 내용**:
 
-- `backend/prisma/schema.sql` 파일 생성
 - User 테이블 정의 (userId, email, password, username, role, createdAt, updatedAt)
 - Todo 테이블 정의 (todoId, userId, title, content, startDate, dueDate, status, isCompleted, createdAt, updatedAt, deletedAt)
 - Holiday 테이블 정의 (holidayId, title, date, description, isRecurring, createdAt, updatedAt)
@@ -94,19 +97,19 @@ JWT 기반 사용자 인증과 할일 관리, 휴지통, 국경일 조회 기능
 
 **완료 조건**:
 
-- [ ] `schema.sql` 파일 작성 완료
-- [ ] UUID 기본 키 설정
-- [ ] 인덱스 설정 완료
-- [ ] 외래 키 제약 조건 설정
-- [ ] CHECK 제약 조건 추가
+- [x] `schema.sql` 파일 작성 완료
+- [x] UUID 기본 키 설정
+- [x] 인덱스 설정 완료
+- [x] 외래 키 제약 조건 설정
+- [x] CHECK 제약 조건 추가
 
 **의존성**:
 
-- [ ] Task 1.1 완료 (데이터베이스 생성)
+- [x] Task 1.1 완료 (데이터베이스 생성)
 
 **산출물**:
 
-- `backend/prisma/schema.sql`
+- `database/schema.sql`
 
 ---
 
@@ -125,14 +128,14 @@ JWT 기반 사용자 인증과 할일 관리, 휴지통, 국경일 조회 기능
 
 **완료 조건**:
 
-- [ ] 3개 테이블 생성 확인
-- [ ] 인덱스 6개 생성 확인
-- [ ] CHECK 제약 동작 확인 (잘못된 날짜 입력 시 에러)
-- [ ] UNIQUE 제약 동작 확인 (이메일 중복 시 에러)
+- [x] 3개 테이블 생성 확인
+- [x] 인덱스 6개 생성 확인
+- [x] CHECK 제약 동작 확인 (잘못된 날짜 입력 시 에러)
+- [x] UNIQUE 제약 동작 확인 (이메일 중복 시 에러)
 
 **의존성**:
 
-- [ ] Task 1.2 완료 (schema.sql 작성)
+- [x] Task 1.2 완료 (schema.sql 작성)
 
 **산출물**:
 
@@ -150,23 +153,18 @@ JWT 기반 사용자 인증과 할일 관리, 휴지통, 국경일 조회 기능
 **작업 내용**:
 
 - 2025년 주요 국경일 데이터 삽입
-- 신정(1/1), 설날(1/28-30), 삼일절(3/1), 어린이날(5/5), 석가탄신일(5/5), 현충일(6/6), 광복절(8/15), 추석(10/6-8), 개천절(10/3), 한글날(10/9), 크리스마스(12/25)
+- 신정(1/1), 삼일절(3/1), 어린이날(5/5), 석가탄신일(5/5), 현충일(6/6), 광복절(8/15), 추석(10/6-8), 개천절(10/3), 한글날(10/9), 크리스마스(12/25)
 - `isRecurring=true` 설정
 
 **완료 조건**:
 
-- [ ] 최소 10개 국경일 데이터 삽입
-- [ ] Holiday 테이블 조회로 확인
-- [ ] 날짜 정렬 확인
+- [x] 최소 10개 국경일 데이터 삽입
+- [x] Holiday 테이블 조회로 확인
+- [x] 날짜 정렬 확인
 
 **의존성**:
 
-- [ ] Task 1.3 완료 (테이블 생성)
-
-**산출물**:
-
-- 국경일 데이터 10+개
-- `seed-holidays.sql` (선택)
+- [x] Task 1.3 완료 (테이블 생성)
 
 ---
 
