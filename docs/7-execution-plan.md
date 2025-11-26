@@ -362,15 +362,15 @@ JWT 기반 사용자 인증과 할일 관리, 휴지통, 국경일 조회 기능
 
 **완료 조건**:
 
-- [ ] `authenticate` 미들웨어 작성
-- [ ] `requireAdmin` 미들웨어 작성
-- [ ] 토큰 없을 시 401 반환
-- [ ] 토큰 만료 시 401 반환
-- [ ] `req.user`에 userId, role 저장
+- [x] `authenticate` 미들웨어 작성
+- [x] `requireAdmin` 미들웨어 작성
+- [x] 토큰 없을 시 401 반환
+- [x] 토큰 만료 시 401 반환
+- [x] `req.user`에 userId, role 저장
 
 **의존성**:
 
-- [ ] Task 2.4 완료 (JWT 유틸리티)
+- [x] Task 2.4 완료 (JWT 유틸리티)
 
 **산출물**:
 
