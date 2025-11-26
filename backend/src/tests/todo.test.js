@@ -1,10 +1,23 @@
 const request = require('supertest');
 const app = require('../app');
-const db = require('../config/database');
-const jwt = require('jsonwebtoken');
+const { prisma } = require('../config/database');
+const jwtHelper = require('../utils/jwtHelper');
 
-jest.mock('../config/database');
-jest.mock('jsonwebtoken');
+jest.mock('../config/database', () => ({
+  prisma: {
+    todo: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    user: {
+      findUnique: jest.fn(),
+    }
+  },
+  testConnection: jest.fn()
+}));
+jest.mock('../utils/jwtHelper');
 
 describe('Todo API', () => {
   let token;
@@ -12,14 +25,14 @@ describe('Todo API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     token = 'valid-token';
-    jwt.verify.mockReturnValue({ userId: '1', role: 'user' });
+    jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'user' });
   });
 
   describe('GET /api/todos', () => {
     it('should return list of todos', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', title: 'Test Todo', status: 'active' }],
-      });
+      prisma.todo.findMany.mockResolvedValue([
+        { todoId: '1', title: 'Test Todo', status: 'active', userId: '1' }
+      ]);
 
       const res = await request(app)
         .get('/api/todos')
@@ -32,8 +45,8 @@ describe('Todo API', () => {
 
   describe('POST /api/todos', () => {
     it('should create a new todo', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', title: 'New Todo', status: 'active' }],
+      prisma.todo.create.mockResolvedValue({
+        todoId: '1', title: 'New Todo', status: 'active', userId: '1'
       });
 
       const res = await request(app)
@@ -58,12 +71,12 @@ describe('Todo API', () => {
       expect(res.statusCode).toBe(400);
     });
   });
-  
+
   describe('PUT /api/todos/:id', () => {
     it('should update a todo', async () => {
-       db.query.mockResolvedValueOnce({ rows: [{ todoId: '1', userId: '1' }] }); // check exists
-       db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', title: 'Updated Todo' }],
+       prisma.todo.findUnique.mockResolvedValue({ todoId: '1', userId: '1' });
+       prisma.todo.update.mockResolvedValue({
+        todoId: '1', title: 'Updated Todo', userId: '1'
       });
 
       const res = await request(app)
@@ -78,9 +91,9 @@ describe('Todo API', () => {
 
   describe('DELETE /api/todos/:id', () => {
     it('should soft delete a todo', async () => {
-       db.query.mockResolvedValueOnce({ rows: [{ todoId: '1', userId: '1' }] }); // check exists
-       db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', status: 'deleted' }],
+       prisma.todo.findUnique.mockResolvedValue({ todoId: '1', userId: '1' });
+       prisma.todo.update.mockResolvedValue({
+        todoId: '1', status: 'deleted', deletedAt: new Date()
       });
 
       const res = await request(app)
@@ -94,9 +107,9 @@ describe('Todo API', () => {
 
   describe('PATCH /api/todos/:id/complete', () => {
     it('should complete a todo', async () => {
-       db.query.mockResolvedValueOnce({ rows: [{ todoId: '1', userId: '1' }] }); // check exists
-       db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', status: 'completed', isCompleted: true }],
+       prisma.todo.findUnique.mockResolvedValue({ todoId: '1', userId: '1' });
+       prisma.todo.update.mockResolvedValue({
+        todoId: '1', status: 'completed', isCompleted: true
       });
 
       const res = await request(app)
@@ -110,9 +123,9 @@ describe('Todo API', () => {
 
   describe('PATCH /api/todos/:id/restore', () => {
     it('should restore a todo', async () => {
-       db.query.mockResolvedValueOnce({ rows: [{ todoId: '1', userId: '1' }] }); // check exists
-       db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', status: 'active' }],
+       prisma.todo.findUnique.mockResolvedValue({ todoId: '1', userId: '1' });
+       prisma.todo.update.mockResolvedValue({
+        todoId: '1', status: 'active', deletedAt: null
       });
 
       const res = await request(app)
@@ -126,9 +139,9 @@ describe('Todo API', () => {
 
   describe('GET /api/todos with filters', () => {
     it('should filter by status and search', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', title: 'Search Match' }],
-      });
+      prisma.todo.findMany.mockResolvedValue([
+        { todoId: '1', title: 'Search Match', userId: '1' }
+      ]);
 
       const res = await request(app)
         .get('/api/todos?status=active&search=Match')

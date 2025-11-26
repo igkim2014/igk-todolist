@@ -1,10 +1,20 @@
 const request = require('supertest');
 const app = require('../app');
-const db = require('../config/database');
-const jwt = require('jsonwebtoken');
+const { prisma } = require('../config/database');
+const jwtHelper = require('../utils/jwtHelper');
+const bcrypt = require('bcryptjs');
 
-jest.mock('../config/database');
-jest.mock('jsonwebtoken');
+jest.mock('../config/database', () => ({
+  prisma: {
+    user: {
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    }
+  },
+  testConnection: jest.fn()
+}));
+jest.mock('../utils/jwtHelper');
+jest.mock('bcryptjs');
 
 describe('User API', () => {
   let token;
@@ -12,13 +22,13 @@ describe('User API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     token = 'valid-token';
-    jwt.verify.mockReturnValue({ userId: '1', role: 'user' });
+    jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'user' });
   });
 
   describe('GET /api/users/me', () => {
     it('should return user profile', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ userId: '1', username: 'test' }],
+      prisma.user.findUnique.mockResolvedValue({
+        userId: '1', username: 'test', email: 'test@example.com', role: 'user'
       });
 
       const res = await request(app)
@@ -32,8 +42,15 @@ describe('User API', () => {
 
   describe('PATCH /api/users/me', () => {
     it('should update user profile', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ userId: '1', username: 'updated' }],
+      prisma.user.findUnique.mockResolvedValue({
+        userId: '1', username: 'test', email: 'test@example.com', role: 'user'
+      });
+
+      bcrypt.genSalt.mockResolvedValue('salt');
+      bcrypt.hash.mockResolvedValue('hashedPassword');
+
+      prisma.user.update.mockResolvedValue({
+        userId: '1', username: 'updated', email: 'test@example.com', role: 'user'
       });
 
       const res = await request(app)

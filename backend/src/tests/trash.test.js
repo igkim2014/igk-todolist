@@ -1,10 +1,19 @@
 const request = require('supertest');
 const app = require('../app');
-const db = require('../config/database');
-const jwt = require('jsonwebtoken');
+const { prisma } = require('../config/database');
+const jwtHelper = require('../utils/jwtHelper');
 
-jest.mock('../config/database');
-jest.mock('jsonwebtoken');
+jest.mock('../config/database', () => ({
+  prisma: {
+    todo: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      delete: jest.fn(),
+    }
+  },
+  testConnection: jest.fn()
+}));
+jest.mock('../utils/jwtHelper');
 
 describe('Trash API', () => {
   let token;
@@ -12,14 +21,14 @@ describe('Trash API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     token = 'valid-token';
-    jwt.verify.mockReturnValue({ userId: '1', role: 'user' });
+    jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'user' });
   });
 
   describe('GET /api/trash', () => {
     it('should return list of deleted todos', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1', title: 'Deleted Todo', status: 'deleted' }],
-      });
+      prisma.todo.findMany.mockResolvedValue([
+        { todoId: '1', title: 'Deleted Todo', status: 'deleted', userId: '1' }
+      ]);
 
       const res = await request(app)
         .get('/api/trash')
@@ -32,8 +41,14 @@ describe('Trash API', () => {
 
   describe('DELETE /api/trash/:id', () => {
     it('should permanently delete a todo', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ todoId: '1' }],
+      prisma.todo.findUnique.mockResolvedValue({
+        todoId: '1',
+        userId: '1',
+        status: 'deleted'
+      });
+
+      prisma.todo.delete.mockResolvedValue({
+        todoId: '1'
       });
 
       const res = await request(app)
@@ -42,16 +57,19 @@ describe('Trash API', () => {
 
       expect(res.statusCode).toBe(200);
     });
-    
+
     it('should fail if todo not found or not deleted', async () => {
-         db.query.mockResolvedValueOnce({ rows: [] }); // delete fails
-         db.query.mockResolvedValueOnce({ rows: [{ status: 'active' }] }); // check status
+      prisma.todo.findUnique.mockResolvedValue({
+        todoId: '1',
+        userId: '1',
+        status: 'active'
+      }); // check status
 
-         const res = await request(app)
-            .delete('/api/trash/1')
-            .set('Authorization', `Bearer ${token}`);
+      const res = await request(app)
+        .delete('/api/trash/1')
+        .set('Authorization', `Bearer ${token}`);
 
-         expect(res.statusCode).toBe(400);
+      expect(res.statusCode).toBe(400);
     });
   });
 });
