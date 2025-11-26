@@ -201,15 +201,15 @@ JWT 기반 사용자 인증과 할일 관리, 휴지통, 국경일 조회 기능
 
 **완료 조건**:
 
-- [ ] `package.json` 생성 완료
-- [ ] 필수 패키지 8개 설치 완료
-- [ ] `.env` 파일 작성 (DATABASE_URL, JWT_SECRET 등)
-- [ ] `.env.example` 파일 생성
-- [ ] `.gitignore` 설정 (node_modules, .env)
+- [x] `package.json` 생성 완료
+- [x] 필수 패키지 8개 설치 완료
+- [x] `.env` 파일 작성 (DATABASE_URL, JWT_SECRET 등)
+- [x] `.env.example` 파일 생성
+- [x] `.gitignore` 설정 (node_modules, .env)
 
 **의존성**:
 
-- [ ] Task 1.3 완료 (DB 준비)
+- [x] Task 1.3 완료 (DB 준비)
 
 **산출물**:
 
