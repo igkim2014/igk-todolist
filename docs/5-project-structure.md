@@ -30,10 +30,6 @@
 
 **원칙**: 각 모듈, 컴포넌트, 함수는 하나의 책임만 가지며, 서로 다른 관심사는 명확히 분리합니다.
 
-- UI 컴포넌트는 순수하게 렌더링만 담당
-- 데이터 fetching은 service 레이어에서 처리
-- 비즈니스 로직은 커스텀 훅이나 service에서 처리
-
 **체크리스트**:
 
 - [ ] 각 파일은 단일 책임을 가지는가?
@@ -45,10 +41,6 @@
 ### 1.2 DRY (Don't Repeat Yourself)
 
 **원칙**: 동일한 코드를 반복하지 말고 재사용 가능한 함수/컴포넌트로 추출합니다.
-
-- 3번 이상 반복되는 코드는 함수나 컴포넌트로 추출
-- 공통 유틸리티 함수는 utils/ 폴더에 정리
-- 공통 비즈니스 로직은 커스텀 훅이나 서비스로 추출
 
 **체크리스트**:
 
@@ -62,9 +54,34 @@
 
 **원칙**: 가능한 한 단순하게 작성합니다. 복잡한 추상화나 과도한 엔지니어링을 지양합니다.
 
-- MVP에 불필요한 추상화 계층 제거
-- 간단한 문제는 간단한 방법으로 해결
-- Factory 패턴, Strategy 패턴 등 복잡한 디자인 패턴은 필요할 때만 사용
+**예시**:
+
+```javascript
+// ❌ 나쁜 예: 과도한 추상화
+class TodoFactory {
+  createTodo(type, data) {
+    switch (type) {
+      case "simple":
+        return new SimpleTodo(data);
+      case "complex":
+        return new ComplexTodo(data);
+      default:
+        throw new Error("Unknown type");
+    }
+  }
+}
+
+// ✅ 좋은 예: 단순하게 (MVP에서는 불필요한 추상화 제거)
+function createTodo(data) {
+  return {
+    todoId: uuid(),
+    ...data,
+    status: "active",
+    isCompleted: false,
+    createdAt: new Date(),
+  };
+}
+```
 
 **체크리스트**:
 
@@ -188,11 +205,6 @@ Business Logic → Presentation (❌ 금지)
 
 **원칙**: 모듈 간 순환 의존성(Circular Dependency)을 절대 만들지 않습니다.
 
-**해결 방법**:
-- 공통 로직을 별도 모듈로 분리
-- Service 간 직접 호출 대신 Repository 계층 활용
-- 필요시 이벤트 기반 아키텍처 고려
-
 **체크리스트**:
 
 - [ ] 모듈 A가 B를 import하고, B가 A를 import하지 않는가?
@@ -205,13 +217,43 @@ Business Logic → Presentation (❌ 금지)
 
 **원칙**: 구체적인 구현이 아닌 인터페이스(또는 추상화)에 의존합니다. (TypeScript 사용 시)
 
-**TypeScript 사용 시**:
-- Service는 구체 Repository 대신 인터페이스에 의존
-- 의존성은 생성자를 통해 주입
-- 테스트 시 Mock 객체로 쉽게 대체 가능
+**예시 (TypeScript 사용 시)**:
+
+```typescript
+// ✅ 좋은 예: 인터페이스 기반
+// interfaces/ITodoRepository.ts
+export interface ITodoRepository {
+  findById(id: string): Promise<Todo>;
+  create(data: CreateTodoDto): Promise<Todo>;
+  update(id: string, data: UpdateTodoDto): Promise<Todo>;
+  delete(id: string): Promise<void>;
+}
+
+// repositories/PrismaTodoRepository.ts
+export class PrismaTodoRepository implements ITodoRepository {
+  async findById(id: string): Promise<Todo> {
+    return await prisma.todo.findUnique({ where: { todoId: id } });
+  }
+  // ...
+}
+
+// services/todoService.ts
+export class TodoService {
+  constructor(private todoRepository: ITodoRepository) {}
+
+  async getTodo(id: string): Promise<Todo> {
+    return await this.todoRepository.findById(id);
+  }
+}
+
+// 사용
+const todoRepository = new PrismaTodoRepository();
+const todoService = new TodoService(todoRepository);
+```
 
 **JavaScript 프로젝트의 경우**:
-- 명확한 모듈 분리와 JSDoc으로 대체 가능
+
+- TypeScript를 사용하지 않는 경우, 명확한 모듈 분리와 JSDoc으로 대체 가능
 - 의존성 주입보다는 명확한 레이어 분리에 집중
 
 **체크리스트** (TypeScript 사용 시):
@@ -251,6 +293,33 @@ Business Logic → Presentation (❌ 금지)
 | 유틸리티   | camelCase                      | `jwtHelper.js`, `passwordHelper.js`       |
 | 설정       | camelCase                      | `database.js`, `jwt.js`                   |
 
+**예시 구조**:
+
+```
+frontend/src/
+├── components/
+│   ├── TodoCard.jsx           ✅ PascalCase
+│   └── Button.jsx             ✅ PascalCase
+├── pages/
+│   └── LoginPage.jsx          ✅ PascalCase
+├── hooks/
+│   └── useTodos.js            ✅ camelCase + use prefix
+├── stores/
+│   └── todoStore.js           ✅ camelCase + Store suffix
+├── services/
+│   └── todoService.js         ✅ camelCase + Service suffix
+└── utils/
+    └── dateFormatter.js       ✅ camelCase
+
+backend/src/
+├── controllers/
+│   └── todoController.js      ✅ camelCase + Controller suffix
+├── services/
+│   └── todoService.js         ✅ camelCase + Service suffix
+└── repositories/
+    └── todoRepository.js      ✅ camelCase + Repository suffix
+```
+
 **체크리스트**:
 
 - [ ] 파일명이 규칙을 따르는가?
@@ -270,6 +339,35 @@ Business Logic → Presentation (❌ 금지)
 | 상수        | UPPER_SNAKE_CASE          | `API_BASE_URL`, `MAX_TODO_LENGTH`            |
 | Boolean     | `is`, `has`, `can` 접두사 | `isCompleted`, `hasPermission`, `canEdit`    |
 | 비동기 함수 | 동사 + 명사               | `fetchTodos()`, `saveTodo()`                 |
+
+**예시**:
+
+```javascript
+// ✅ 좋은 예
+const userName = "John Doe"; // camelCase
+const todoList = []; // camelCase
+const isCompleted = false; // Boolean with is prefix
+const MAX_RETRY_COUNT = 3; // UPPER_SNAKE_CASE for constant
+
+function getTodos() {
+  /* ... */
+} // 동사로 시작
+function createTodo(data) {
+  /* ... */
+} // 동사 + 명사
+async function fetchTodos() {
+  /* ... */
+} // 비동기 함수
+
+// ❌ 나쁜 예
+const UserName = "John"; // ❌ PascalCase (변수는 camelCase)
+const todo_list = []; // ❌ snake_case (JavaScript는 camelCase)
+const completed = false; // ❌ Boolean인데 is/has/can 없음
+const maxRetryCount = 3; // ❌ 상수인데 camelCase (UPPER_SNAKE_CASE 사용)
+function todos() {
+  /* ... */
+} // ❌ 명사만 (동사로 시작해야 함)
+```
 
 #### 함수 네이밍 패턴
 
@@ -306,6 +404,35 @@ Business Logic → Presentation (❌ 금지)
 | HOC               | `with{Feature}` 접두사        | `withAuth`, `withLoading`           |
 | Context           | PascalCase + `Context` 접미사 | `AuthContext`, `ThemeContext`       |
 
+**예시**:
+
+```javascript
+// ✅ 좋은 예
+function TodoCard({ todo }) {
+  /* ... */
+} // PascalCase
+function LoginPage() {
+  /* ... */
+} // PascalCase + Page
+function MainLayout({ children }) {
+  /* ... */
+} // PascalCase + Layout
+const withAuth = (Component) => {
+  /* ... */
+}; // with prefix for HOC
+
+// ❌ 나쁜 예
+function todoCard({ todo }) {
+  /* ... */
+} // ❌ camelCase (PascalCase 사용)
+function login_page() {
+  /* ... */
+} // ❌ snake_case
+function Todo_Card() {
+  /* ... */
+} // ❌ snake_case
+```
+
 **체크리스트**:
 
 - [ ] 컴포넌트명이 PascalCase인가?
@@ -318,16 +445,62 @@ Business Logic → Presentation (❌ 금지)
 
 **원칙**: 변경되지 않는 값은 UPPER_SNAKE_CASE를 사용하고, 파일 상단 또는 별도 상수 파일에 정의합니다.
 
-**상수 정의 위치**:
-- `constants/apiEndpoints.js` - API 엔드포인트 URL
-- `constants/validationRules.js` - 검증 규칙 (길이, 패턴 등)
-- `constants/todoStatus.js` - 상태 값들
-- `constants/colors.js` - 색상 값들
+**예시**:
 
-**주요 원칙**:
-- 매직 넘버(200, 3 등)를 상수로 추출
-- 하드코딩된 문자열('/api/todos', 'active' 등)을 상수로 정의
-- 관련 상수들은 객체로 그룹화
+```javascript
+// ✅ 좋은 예: constants/apiEndpoints.js
+export const API_BASE_URL =
+  process.env.REACT_APP_API_URL || "http://localhost:3000";
+export const API_ENDPOINTS = {
+  TODOS: "/api/todos",
+  TRASH: "/api/trash",
+  HOLIDAYS: "/api/holidays",
+  AUTH_LOGIN: "/api/auth/login",
+  AUTH_REGISTER: "/api/auth/register",
+};
+
+// constants/validationRules.js
+export const MIN_PASSWORD_LENGTH = 8;
+export const MAX_TODO_TITLE_LENGTH = 200;
+export const MAX_TODO_CONTENT_LENGTH = 1000;
+
+// constants/todoStatus.js
+export const TODO_STATUS = {
+  ACTIVE: "active",
+  COMPLETED: "completed",
+  DELETED: "deleted",
+};
+
+// ❌ 나쁜 예: 하드코딩
+function createTodo(data) {
+  if (data.title.length > 200) {
+    // ❌ 매직 넘버
+    throw new Error("Title too long");
+  }
+
+  return axios.post("/api/todos", {
+    // ❌ 하드코딩된 URL
+    ...data,
+    status: "active", // ❌ 하드코딩된 값
+  });
+}
+
+// ✅ 좋은 예: 상수 사용
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
+import { TODO_STATUS } from "../constants/todoStatus";
+import { MAX_TODO_TITLE_LENGTH } from "../constants/validationRules";
+
+function createTodo(data) {
+  if (data.title.length > MAX_TODO_TITLE_LENGTH) {
+    throw new Error("Title too long");
+  }
+
+  return axios.post(API_ENDPOINTS.TODOS, {
+    ...data,
+    status: TODO_STATUS.ACTIVE,
+  });
+}
+```
 
 **체크리스트**:
 
@@ -435,19 +608,118 @@ Business Logic → Presentation (❌ 금지)
 
 **원칙**: 각 함수/모듈을 독립적으로 테스트합니다. 외부 의존성은 Mock으로 대체합니다.
 
-**테스트 작성 가이드**:
-- **Arrange-Act-Assert 패턴** 사용
-- 외부 의존성(Repository, API 등)은 **Mock으로 대체**
-- 각 테스트는 **독립적으로 실행 가능**해야 함
-- beforeEach로 **Mock 초기화**
+#### 백엔드 테스트 예시 (Jest)
+
+```javascript
+// ✅ 좋은 예: services/todoService.test.js
+const todoService = require("./todoService");
+const todoRepository = require("../repositories/todoRepository");
+
+// Repository를 Mock으로 대체
+jest.mock("../repositories/todoRepository");
+
+describe("TodoService", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe("getTodosByUserId", () => {
+    it("should return active todos for a user", async () => {
+      // Arrange
+      const userId = "user-123";
+      const mockTodos = [
+        { todoId: "1", title: "Test Todo", status: "active" },
+        { todoId: "2", title: "Deleted Todo", status: "deleted" },
+      ];
+      todoRepository.findByUserId.mockResolvedValue(mockTodos);
+
+      // Act
+      const result = await todoService.getTodosByUserId(userId);
+
+      // Assert
+      expect(result).toHaveLength(1);
+      expect(result[0].status).toBe("active");
+      expect(todoRepository.findByUserId).toHaveBeenCalledWith(userId);
+    });
+
+    it("should return empty array when user has no todos", async () => {
+      // Arrange
+      const userId = "user-456";
+      todoRepository.findByUserId.mockResolvedValue([]);
+
+      // Act
+      const result = await todoService.getTodosByUserId(userId);
+
+      // Assert
+      expect(result).toEqual([]);
+    });
+  });
+});
+```
+
+#### 프론트엔드 테스트 예시 (React Testing Library)
+
+```javascript
+// ✅ 좋은 예: components/TodoCard.test.jsx
+import { render, screen, fireEvent } from "@testing-library/react";
+import TodoCard from "./TodoCard";
+
+describe("TodoCard", () => {
+  const mockTodo = {
+    todoId: "1",
+    title: "Test Todo",
+    content: "Test content",
+    dueDate: "2025-11-28",
+    isCompleted: false,
+  };
+
+  const mockOnComplete = jest.fn();
+  const mockOnDelete = jest.fn();
+
+  it("should render todo information", () => {
+    // Act
+    render(
+      <TodoCard
+        todo={mockTodo}
+        onComplete={mockOnComplete}
+        onDelete={mockOnDelete}
+      />
+    );
+
+    // Assert
+    expect(screen.getByText("Test Todo")).toBeInTheDocument();
+    expect(screen.getByText("Test content")).toBeInTheDocument();
+  });
+
+  it("should call onComplete when checkbox is clicked", () => {
+    // Arrange
+    render(
+      <TodoCard
+        todo={mockTodo}
+        onComplete={mockOnComplete}
+        onDelete={mockOnDelete}
+      />
+    );
+    const checkbox = screen.getByRole("checkbox");
+
+    // Act
+    fireEvent.click(checkbox);
+
+    // Assert
+    expect(mockOnComplete).toHaveBeenCalledWith("1");
+  });
+});
+```
 
 **테스트 네이밍 패턴**:
-- `describe("ComponentName or FunctionName", () => { ... })`
-- `it("should [expected behavior] when [condition]", () => { ... })`
 
-**주요 테스트 도구**:
-- 백엔드: Jest + supertest
-- 프론트엔드: Jest + React Testing Library
+```javascript
+describe("ComponentName or FunctionName", () => {
+  it("should [expected behavior] when [condition]", () => {
+    // test
+  });
+});
+```
 
 **체크리스트**:
 
@@ -462,21 +734,78 @@ Business Logic → Presentation (❌ 금지)
 
 **원칙**: 여러 모듈이 함께 동작하는지 테스트합니다. 주로 API 엔드포인트를 테스트합니다.
 
-**통합 테스트 범위**:
-- API 엔드포인트 (Controller + Service + Repository)
-- 데이터베이스 연동
-- 인증/인가 플로우
-- 에러 처리
+**예시 (Backend API Integration Test)**:
 
-**테스트 준비**:
-- beforeAll: 테스트용 사용자 생성, DB 초기화
-- afterAll: 테스트 데이터 정리, DB 연결 종료
-- 실제 데이터베이스 사용 (테스트 DB 권장)
+```javascript
+// ✅ 좋은 예: tests/integration/todoApi.test.js
+const request = require("supertest");
+const app = require("../../src/app");
+const { PrismaClient } = require("@prisma/client");
 
-**주요 테스트 케이스**:
-- 성공 케이스 (201 Created, 200 OK)
-- 실패 케이스 (401 Unauthorized, 400 Bad Request)
-- 권한 검증 (타인의 리소스 접근 시도)
+const prisma = new PrismaClient();
+
+describe("Todo API Integration Tests", () => {
+  let authToken;
+  let userId;
+
+  beforeAll(async () => {
+    // 테스트용 사용자 생성 및 로그인
+    const registerRes = await request(app).post("/api/auth/register").send({
+      email: "test@example.com",
+      password: "password123",
+      username: "Test User",
+    });
+
+    const loginRes = await request(app).post("/api/auth/login").send({
+      email: "test@example.com",
+      password: "password123",
+    });
+
+    authToken = loginRes.body.data.accessToken;
+    userId = loginRes.body.data.user.userId;
+  });
+
+  afterAll(async () => {
+    // 테스트 데이터 정리
+    await prisma.todo.deleteMany({ where: { userId } });
+    await prisma.user.delete({ where: { userId } });
+    await prisma.$disconnect();
+  });
+
+  describe("POST /api/todos", () => {
+    it("should create a new todo", async () => {
+      // Arrange
+      const newTodo = {
+        title: "Integration Test Todo",
+        content: "Test content",
+        startDate: "2025-11-25",
+        dueDate: "2025-11-28",
+      };
+
+      // Act
+      const response = await request(app)
+        .post("/api/todos")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send(newTodo);
+
+      // Assert
+      expect(response.status).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.title).toBe(newTodo.title);
+    });
+
+    it("should return 401 when not authenticated", async () => {
+      // Act
+      const response = await request(app)
+        .post("/api/todos")
+        .send({ title: "Test" });
+
+      // Assert
+      expect(response.status).toBe(401);
+    });
+  });
+});
+```
 
 **체크리스트**:
 
@@ -595,6 +924,27 @@ NODE_ENV=development
 CORS_ORIGIN=
 ```
 
+#### 환경 변수 사용 예시
+
+```javascript
+// ✅ 좋은 예: config/database.js
+require("dotenv").config();
+
+module.exports = {
+  databaseUrl: process.env.DATABASE_URL,
+};
+
+// ✅ 좋은 예: config/jwt.js
+module.exports = {
+  secret: process.env.JWT_SECRET,
+  accessTokenExpiry: process.env.JWT_ACCESS_TOKEN_EXPIRY || "15m",
+  refreshTokenExpiry: process.env.JWT_REFRESH_TOKEN_EXPIRY || "7d",
+};
+
+// ❌ 나쁜 예: 하드코딩
+const JWT_SECRET = "my-secret-key"; // ❌ 절대 하드코딩 금지!
+```
+
 #### `.gitignore` 설정
 
 ```
@@ -659,13 +1009,42 @@ vercel env add DATABASE_URL production
 ### 5.3 API 키 보호
 
 **원칙**:
+
 - 프론트엔드에서는 외부 API 키를 직접 사용하지 않습니다.
 - 백엔드를 통해 프록시하여 API 키를 보호합니다.
 
-**구현 방법**:
-- 프론트엔드: 백엔드 API 엔드포인트 호출
-- 백엔드: 환경 변수에서 API 키 읽어 외부 API 호출
-- API 키는 절대 클라이언트 코드에 포함하지 않음
+**예시**:
+
+```javascript
+// ❌ 나쁜 예: 프론트엔드에서 직접 API 키 사용
+// frontend/src/services/weatherService.js
+const API_KEY = "sk-1234567890abcdef"; // ❌ 노출 위험!
+
+export const getWeather = async (city) => {
+  const response = await fetch(
+    `https://api.weather.com?key=${API_KEY}&city=${city}`
+  );
+  return response.json();
+};
+
+// ✅ 좋은 예: 백엔드 프록시 사용
+// frontend/src/services/weatherService.js
+export const getWeather = async (city) => {
+  const response = await axios.get("/api/weather", { params: { city } });
+  return response.data;
+};
+
+// backend/src/controllers/weatherController.js
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY; // ✅ 환경 변수로 관리
+
+exports.getWeather = async (req, res) => {
+  const { city } = req.query;
+  const response = await axios.get(
+    `https://api.weather.com?key=${WEATHER_API_KEY}&city=${city}`
+  );
+  res.json(response.data);
+};
+```
 
 **체크리스트**:
 
@@ -679,15 +1058,37 @@ vercel env add DATABASE_URL production
 
 **원칙**: 허용된 Origin에서만 API 접근을 허용합니다.
 
-**설정 항목**:
-- `allowedOrigins`: 허용할 도메인 목록 (개발, 프로덕션)
-- `credentials`: 쿠키 허용 여부
-- `methods`: 허용할 HTTP 메서드
-- `allowedHeaders`: 허용할 헤더
+**예시**:
 
-**주요 설정**:
-- 개발: `http://localhost:5173` (Vite 기본 포트)
-- 프로덕션: Vercel 배포 도메인
+```javascript
+// ✅ 좋은 예: backend/src/middlewares/corsMiddleware.js
+const cors = require("cors");
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:5173", // 개발 환경
+  "https://whs-todolist.vercel.app", // 프로덕션
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // origin이 없는 경우 (같은 도메인) 또는 허용된 origin인 경우
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true, // 쿠키 허용
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+module.exports = cors(corsOptions);
+
+// app.js
+const corsMiddleware = require("./middlewares/corsMiddleware");
+app.use(corsMiddleware);
+```
 
 **체크리스트**:
 
@@ -702,14 +1103,37 @@ vercel env add DATABASE_URL production
 
 **원칙**: API 남용을 방지하기 위해 요청 횟수를 제한합니다.
 
-**제한 설정**:
-- **일반 API**: 15분당 100회 요청
-- **인증 API**: 15분당 5회 요청 (무차별 대입 공격 방지)
+**예시**:
 
-**구현 방법**:
-- express-rate-limit 미들웨어 사용
-- IP 주소 기반 제한
-- 인증 성공 시 카운트 제외 옵션 사용
+```javascript
+// ✅ 좋은 예: middlewares/rateLimitMiddleware.js
+const rateLimit = require("express-rate-limit");
+
+// 일반 API 제한
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 100, // 최대 100 요청
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// 인증 API 제한 (더 엄격)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15분
+  max: 5, // 최대 5 요청 (무차별 대입 공격 방지)
+  message: "Too many login attempts, please try again later.",
+  skipSuccessfulRequests: true, // 성공한 요청은 카운트하지 않음
+});
+
+module.exports = { generalLimiter, authLimiter };
+
+// routes/authRoutes.js
+const { authLimiter } = require("../middlewares/rateLimitMiddleware");
+
+router.post("/login", authLimiter, authController.login);
+router.post("/register", authLimiter, authController.register);
+```
 
 **체크리스트**:
 
@@ -722,9 +1146,56 @@ vercel env add DATABASE_URL production
 ### 5.6 로깅 전략
 
 **원칙**:
+
 - 적절한 로그 레벨을 사용합니다 (error, warn, info, debug).
 - 민감한 정보는 로그에 출력하지 않습니다.
 - 프로덕션 환경에서는 error와 warn만 로그합니다.
+
+**예시**:
+
+```javascript
+// ✅ 좋은 예: utils/logger.js
+const winston = require("winston");
+
+const logLevel = process.env.NODE_ENV === "production" ? "warn" : "debug";
+
+const logger = winston.createLogger({
+  level: logLevel,
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
+});
+
+// 민감한 정보 필터링
+const sanitize = (data) => {
+  const sanitized = { ...data };
+  if (sanitized.password) sanitized.password = "***";
+  if (sanitized.token) sanitized.token = "***";
+  return sanitized;
+};
+
+module.exports = { logger, sanitize };
+
+// 사용 예시
+const { logger, sanitize } = require("../utils/logger");
+
+// ✅ 좋은 예
+logger.info("User logged in", { userId: user.userId });
+logger.error("Database connection failed", { error: error.message });
+logger.debug("Request body", sanitize(req.body)); // 비밀번호 필터링
+
+// ❌ 나쁜 예
+console.log("User:", user); // ❌ 민감한 정보 포함 가능
+logger.info("Password:", req.body.password); // ❌ 절대 금지!
+```
 
 **로그 레벨 사용 가이드**:
 
@@ -734,16 +1205,6 @@ vercel env add DATABASE_URL production
 | `warn`  | 경고 (정상 동작하지만 주의) | `API rate limit approaching`     |
 | `info`  | 중요한 이벤트               | `User logged in`, `Todo created` |
 | `debug` | 디버깅 정보 (개발 환경만)   | `Request body`, `Query result`   |
-
-**민감한 정보 필터링**:
-- 비밀번호, 토큰은 절대 로그에 출력하지 않음
-- sanitize 함수로 민감 정보 마스킹
-- 로그 출력 전 데이터 검증
-
-**로깅 라이브러리**:
-- Winston (권장)
-- 파일 저장: error.log, combined.log
-- 환경별 로그 레벨 설정
 
 **체크리스트**:
 
@@ -951,86 +1412,314 @@ backend/
 
 ### 7.1 React 컴포넌트 작성 가이드
 
-**함수형 컴포넌트 사용**:
-- 클래스 컴포넌트 대신 함수형 컴포넌트 사용 (React 18 권장)
-- React Hooks 활용 (useState, useEffect, useMemo 등)
+#### 함수형 컴포넌트 사용
 
-**Props Destructuring**:
-- Props를 구조 분해하여 사용
-- 코드 가독성 향상
+```javascript
+// ✅ 좋은 예: 함수형 컴포넌트
+function TodoCard({ todo, onComplete, onDelete }) {
+  return (
+    <div className="todo-card">
+      <h3>{todo.title}</h3>
+      <p>{todo.content}</p>
+      <button onClick={() => onComplete(todo.todoId)}>Complete</button>
+      <button onClick={() => onDelete(todo.todoId)}>Delete</button>
+    </div>
+  );
+}
 
-**조건부 렌더링**:
-- Early return으로 null 체크
-- 삼항 연산자 또는 && 연산자 활용
-- 복잡한 조건은 별도 변수로 분리
+// ❌ 나쁜 예: 클래스 컴포넌트 (React 18에서는 함수형 권장)
+class TodoCard extends React.Component {
+  render() {
+    const { todo, onComplete, onDelete } = this.props;
+    return <div>...</div>;
+  }
+}
+```
+
+#### Props Destructuring
+
+```javascript
+// ✅ 좋은 예: Props를 구조 분해
+function TodoCard({ todo, onComplete, onDelete }) {
+  return <div>{todo.title}</div>;
+}
+
+// ❌ 나쁜 예: props 객체 직접 사용
+function TodoCard(props) {
+  return <div>{props.todo.title}</div>;
+}
+```
+
+#### 조건부 렌더링
+
+```javascript
+// ✅ 좋은 예: 명확한 조건부 렌더링
+function TodoCard({ todo }) {
+  if (!todo) {
+    return null;
+  }
+
+  return (
+    <div>
+      <h3>{todo.title}</h3>
+      {todo.isCompleted && <span className="badge">Completed</span>}
+      {todo.dueDate ? (
+        <p>Due: {formatDate(todo.dueDate)}</p>
+      ) : (
+        <p>No due date</p>
+      )}
+    </div>
+  );
+}
+```
 
 ---
 
 ### 7.2 Zustand 스토어 작성 가이드
 
-**스토어 구조**:
-- **State**: 전역 상태 정의 (todos, loading, error 등)
-- **Actions**: 상태 업데이트 함수 (fetchTodos, addTodo 등)
-- **Selectors**: 파생 상태 계산 (선택 사항)
+**예시**:
 
-**주요 패턴**:
-- `create()` 함수로 스토어 생성
-- `set()` 함수로 상태 업데이트
-- `get()` 함수로 현재 상태 읽기
-- 비동기 작업은 try-catch로 에러 처리
-- Service 계층을 통해 API 호출
+```javascript
+// ✅ 좋은 예: stores/todoStore.js
+import { create } from "zustand";
+import { todoService } from "../services/todoService";
 
-**상태 업데이트**:
-- Immutable 업데이트 패턴 사용
-- 배열 추가: `[newItem, ...state.items]`
-- 배열 삭제: `state.items.filter(item => item.id !== id)`
+export const useTodoStore = create((set, get) => ({
+  // State
+  todos: [],
+  loading: false,
+  error: null,
+
+  // Actions
+  fetchTodos: async () => {
+    set({ loading: true, error: null });
+    try {
+      const todos = await todoService.getTodos();
+      set({ todos, loading: false });
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  addTodo: async (todoData) => {
+    try {
+      const newTodo = await todoService.createTodo(todoData);
+      set((state) => ({ todos: [newTodo, ...state.todos] }));
+    } catch (error) {
+      set({ error: error.message });
+    }
+  },
+
+  deleteTodo: async (todoId) => {
+    try {
+      await todoService.deleteTodo(todoId);
+      set((state) => ({
+        todos: state.todos.filter((todo) => todo.todoId !== todoId),
+      }));
+    } catch (error) {
+      set({ error: error.message });
+    }
+  },
+
+  // Selectors (선택)
+  getActiveTodos: () => {
+    const { todos } = get();
+    return todos.filter((todo) => todo.status === "active");
+  },
+}));
+```
 
 ---
 
 ### 7.3 Prisma 사용 가이드
 
-**스키마 작성 원칙**:
-- `@id @default(uuid())`: UUID 자동 생성
-- `@unique`: 중복 방지 (email 등)
-- `@default(now())`: 타임스탬프 자동 생성
-- `@@index`: 성능 최적화를 위한 인덱스
-- `onDelete: Cascade`: 부모 삭제 시 자식도 삭제
+#### 스키마 작성
 
-**주요 모델**:
-- User: 사용자 정보
-- Todo: 할일 (User와 1:N 관계)
-- Holiday: 국경일
+```prisma
+// ✅ 좋은 예: prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
 
-**Repository 패턴**:
-- Prisma Client를 직접 사용하지 않고 Repository 계층으로 캡슐화
-- `findMany`, `findUnique`, `create`, `update`, `delete` 등 활용
-- Soft delete는 `update`로 status 변경
-- Hard delete는 `delete`로 완전 제거
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId    String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  username  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  todos     Todo[]
+
+  @@index([role])
+}
+
+model Todo {
+  todoId      String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  content     String?
+  startDate   DateTime?
+  dueDate     DateTime?
+  status      TodoStatus @default(ACTIVE)
+  isCompleted Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  @@index([userId, status])
+  @@index([dueDate])
+  @@index([deletedAt])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TodoStatus {
+  ACTIVE
+  COMPLETED
+  DELETED
+}
+```
+
+#### Repository 패턴 사용
+
+```javascript
+// ✅ 좋은 예: repositories/todoRepository.js
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+exports.findByUserId = async (userId, status = "active") => {
+  return await prisma.todo.findMany({
+    where: {
+      userId,
+      status,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+exports.create = async (data) => {
+  return await prisma.todo.create({
+    data,
+  });
+};
+
+exports.update = async (todoId, data) => {
+  return await prisma.todo.update({
+    where: { todoId },
+    data,
+  });
+};
+
+exports.softDelete = async (todoId) => {
+  return await prisma.todo.update({
+    where: { todoId },
+    data: {
+      status: "deleted",
+      deletedAt: new Date(),
+    },
+  });
+};
+
+exports.hardDelete = async (todoId) => {
+  return await prisma.todo.delete({
+    where: { todoId },
+  });
+};
+```
 
 ---
 
 ### 7.4 API 서비스 작성 가이드 (프론트엔드)
 
-**Axios 인스턴스 설정**:
-- baseURL 설정
-- 공통 헤더 설정 (Content-Type)
-- 요청/응답 인터셉터 활용
+**예시**:
 
-**요청 인터셉터**:
-- Access Token 자동 추가
-- Authorization 헤더 설정
+```javascript
+// ✅ 좋은 예: services/api.js (Axios 설정)
+import axios from "axios";
+import { API_BASE_URL } from "../constants/apiEndpoints";
+import { getAccessToken, setAccessToken } from "../utils/tokenManager";
 
-**응답 인터셉터**:
-- 401 에러 시 토큰 자동 갱신
-- Refresh Token으로 Access Token 재발급
-- 갱신 실패 시 로그인 페이지로 리다이렉트
-- 재시도 방지 (_retry 플래그)
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-**Service 레이어**:
-- 각 엔티티별 서비스 파일 (todoService, authService 등)
-- API 엔드포인트 상수 사용
-- response.data.data 형태로 데이터 반환
-- 에러는 상위 레이어(Store, Component)에서 처리
+// 요청 인터셉터: Access Token 추가
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// 응답 인터셉터: 토큰 만료 시 갱신
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const newToken = await refreshAccessToken();
+        setAccessToken(newToken);
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // 토큰 갱신 실패 시 로그아웃
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+
+// services/todoService.js
+import api from "./api";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
+
+export const getTodos = async (params) => {
+  const response = await api.get(API_ENDPOINTS.TODOS, { params });
+  return response.data.data;
+};
+
+export const createTodo = async (todoData) => {
+  const response = await api.post(API_ENDPOINTS.TODOS, todoData);
+  return response.data.data;
+};
+
+export const updateTodo = async (todoId, todoData) => {
+  const response = await api.put(`${API_ENDPOINTS.TODOS}/${todoId}`, todoData);
+  return response.data.data;
+};
+
+export const deleteTodo = async (todoId) => {
+  const response = await api.delete(`${API_ENDPOINTS.TODOS}/${todoId}`);
+  return response.data;
+};
+```
 
 ---
 
