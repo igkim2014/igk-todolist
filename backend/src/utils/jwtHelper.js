@@ -17,16 +17,37 @@ const generateRefreshToken = (payload) => {
   return jwt.sign(payload, SECRET, { expiresIn: REFRESH_EXPIRATION });
 };
 
-const verifyToken = (token) => {
+const verifyAccessToken = (token) => {
   try {
     return jwt.verify(token, SECRET);
   } catch (err) {
-    throw err;
+    if (err.name === 'TokenExpiredError') {
+      throw new Error('Access Token expired');
+    } else if (err.name === 'JsonWebTokenError') {
+      throw new Error('Invalid Access Token');
+    } else {
+      throw err;
+    }
+  }
+};
+
+const verifyRefreshToken = (token) => {
+  try {
+    return jwt.verify(token, SECRET);
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      throw new Error('Refresh Token expired');
+    } else if (err.name === 'JsonWebTokenError') {
+      throw new Error('Invalid Refresh Token');
+    } else {
+      throw err;
+    }
   }
 };
 
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
-  verifyToken,
+  verifyAccessToken,
+  verifyRefreshToken,
 };

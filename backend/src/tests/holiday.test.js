@@ -21,7 +21,7 @@ describe('Holiday API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     token = 'valid-token';
-    jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'user' });
+    jwtHelper.verifyAccessToken.mockReturnValue({ userId: '1', role: 'user' });
   });
 
   describe('GET /api/holidays', () => {
@@ -41,7 +41,7 @@ describe('Holiday API', () => {
 
   describe('POST /api/holidays', () => {
     it('should create a holiday if admin', async () => {
-      jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'admin' });
+      jwtHelper.verifyAccessToken.mockReturnValue({ userId: '1', role: 'admin' });
       prisma.holiday.create.mockResolvedValue({
         holidayId: '1', title: 'New Holiday', date: new Date('2025-01-01')
       });
@@ -55,7 +55,7 @@ describe('Holiday API', () => {
     });
 
     it('should fail if not admin', async () => {
-      jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'user' });
+      jwtHelper.verifyAccessToken.mockReturnValue({ userId: '1', role: 'user' });
 
       const res = await request(app)
         .post('/api/holidays')
@@ -68,7 +68,7 @@ describe('Holiday API', () => {
 
   describe('PUT /api/holidays/:id', () => {
       it('should update a holiday', async () => {
-          jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'admin' });
+          jwtHelper.verifyAccessToken.mockReturnValue({ userId: '1', role: 'admin' });
           prisma.holiday.update.mockResolvedValue({
               holidayId: '1', title: 'Updated Holiday', date: new Date('2025-01-02')
           });

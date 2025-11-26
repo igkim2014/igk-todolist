@@ -1,6 +1,6 @@
 const { prisma } = require('../config/database');
 const { hashPassword, comparePassword } = require('../utils/passwordHelper');
-const { generateAccessToken, generateRefreshToken, verifyToken } = require('../utils/jwtHelper');
+const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwtHelper');
 
 const register = async (email, password, username) => {
   // Check if user already exists
@@ -73,7 +73,7 @@ const login = async (email, password) => {
 
 const refreshAccessToken = async (refreshToken) => {
   try {
-    const decoded = verifyToken(refreshToken);
+    const decoded = verifyRefreshToken(refreshToken);
 
     // Check if user still exists
     const user = await prisma.user.findUnique({
@@ -89,10 +89,22 @@ const refreshAccessToken = async (refreshToken) => {
 
     return { accessToken: newAccessToken };
   } catch (err) {
-    const error = new Error('유효하지 않은 Refresh Token입니다');
-    error.statusCode = 401;
-    error.code = 'INVALID_TOKEN';
-    throw error;
+    if (err.message === 'Refresh Token expired') {
+      const error = new Error('Refresh Token expired');
+      error.statusCode = 401;
+      error.code = 'TOKEN_EXPIRED';
+      throw error;
+    } else if (err.message === 'Invalid Refresh Token') {
+      const error = new Error('Invalid Refresh Token');
+      error.statusCode = 401;
+      error.code = 'INVALID_TOKEN';
+      throw error;
+    } else {
+      const error = new Error('유효하지 않은 Refresh Token입니다');
+      error.statusCode = 401;
+      error.code = 'INVALID_TOKEN';
+      throw error;
+    }
   }
 };
 

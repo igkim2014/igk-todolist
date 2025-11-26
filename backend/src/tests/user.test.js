@@ -22,7 +22,7 @@ describe('User API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     token = 'valid-token';
-    jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'user' });
+    jwtHelper.verifyAccessToken.mockReturnValue({ userId: '1', role: 'user' });
   });
 
   describe('GET /api/users/me', () => {

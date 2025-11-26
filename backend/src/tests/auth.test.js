@@ -97,7 +97,7 @@ describe('Auth API', () => {
 
   describe('POST /api/auth/refresh', () => {
     it('should refresh access token', async () => {
-      jwtHelper.verifyToken.mockReturnValue({ userId: '1', email: 'test@example.com', role: 'user' });
+      jwtHelper.verifyRefreshToken.mockReturnValue({ userId: '1', email: 'test@example.com', role: 'user' });
       prisma.user.findUnique.mockResolvedValue({ userId: '1' });
       jwtHelper.generateAccessToken.mockReturnValue('new-token');
 
@@ -110,7 +110,7 @@ describe('Auth API', () => {
     });
 
     it('should return 401 if refresh token is invalid', async () => {
-      jwtHelper.verifyToken.mockImplementation(() => { throw new Error('Invalid token'); });
+      jwtHelper.verifyRefreshToken.mockImplementation(() => { throw new Error('Invalid token'); });
 
       const res = await request(app)
         .post('/api/auth/refresh')
@@ -122,7 +122,7 @@ describe('Auth API', () => {
 
   describe('POST /api/auth/logout', () => {
     it('should logout successfully', async () => {
-      jwtHelper.verifyToken.mockReturnValue({ userId: '1', role: 'user' });
+      jwtHelper.verifyAccessToken.mockReturnValue({ userId: '1', role: 'user' });
 
       const res = await request(app)
         .post('/api/auth/logout')

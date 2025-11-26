@@ -1,4 +1,4 @@
-const { verifyToken } = require('../utils/jwtHelper');
+const { verifyAccessToken } = require('../utils/jwtHelper');
 
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -16,16 +16,24 @@ const authenticate = (req, res, next) => {
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = verifyToken(token);
+    const decoded = verifyAccessToken(token);
     req.user = decoded;
     next();
   } catch (err) {
-    if (err.name === 'TokenExpiredError') {
+    if (err.message === 'Access Token expired') {
       return res.status(401).json({
         success: false,
         error: {
           code: 'TOKEN_EXPIRED',
           message: '토큰이 만료되었습니다',
+        },
+      });
+    } else if (err.message === 'Invalid Access Token') {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'INVALID_TOKEN',
+          message: '유효하지 않은 토큰입니다',
         },
       });
     }
