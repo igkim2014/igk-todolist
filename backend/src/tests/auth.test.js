@@ -1,10 +1,18 @@
 const request = require('supertest');
 const app = require('../app');
-const db = require('../config/database');
+const { prisma } = require('../config/database');
 const bcrypt = require('bcryptjs');
 const jwtHelper = require('../utils/jwtHelper');
 
-jest.mock('../config/database');
+jest.mock('../config/database', () => ({
+  prisma: {
+    user: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+    }
+  },
+  testConnection: jest.fn()
+}));
 jest.mock('bcryptjs');
 jest.mock('../utils/jwtHelper');
 
@@ -15,12 +23,12 @@ describe('Auth API', () => {
 
   describe('POST /api/auth/register', () => {
     it('should register a new user', async () => {
-      db.query.mockResolvedValueOnce({ rows: [] }); // Check email
+      prisma.user.findUnique.mockResolvedValue(null); // Check email doesn't exist
       bcrypt.genSalt.mockResolvedValue('salt');
       bcrypt.hash.mockResolvedValue('hashedPassword');
-      db.query.mockResolvedValueOnce({
-        rows: [{ userId: '1', email: 'test@example.com', username: 'test', role: 'user' }],
-      }); // Insert
+      prisma.user.create.mockResolvedValue({
+        userId: '1', email: 'test@example.com', username: 'test', role: 'user'
+      });
 
       const res = await request(app)
         .post('/api/auth/register')
@@ -36,7 +44,7 @@ describe('Auth API', () => {
     });
 
     it('should return 409 if email already exists', async () => {
-      db.query.mockResolvedValueOnce({ rows: [{ email: 'test@example.com' }] });
+      prisma.user.findUnique.mockResolvedValue({ email: 'test@example.com' });
 
       const res = await request(app)
         .post('/api/auth/register')
@@ -52,8 +60,8 @@ describe('Auth API', () => {
 
   describe('POST /api/auth/login', () => {
     it('should login user and return tokens', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ userId: '1', email: 'test@example.com', password: 'hashedPassword', role: 'user' }],
+      prisma.user.findUnique.mockResolvedValue({
+        userId: '1', email: 'test@example.com', password: 'hashedPassword', role: 'user'
       });
       bcrypt.compare.mockResolvedValue(true);
       jwtHelper.generateAccessToken.mockReturnValue('access-token');
@@ -71,8 +79,8 @@ describe('Auth API', () => {
     });
 
     it('should return 401 for invalid credentials', async () => {
-      db.query.mockResolvedValueOnce({
-        rows: [{ userId: '1', email: 'test@example.com', password: 'hashedPassword' }],
+      prisma.user.findUnique.mockResolvedValue({
+        userId: '1', email: 'test@example.com', password: 'hashedPassword'
       });
       bcrypt.compare.mockResolvedValue(false);
 
@@ -90,8 +98,8 @@ describe('Auth API', () => {
   describe('POST /api/auth/refresh', () => {
     it('should refresh access token', async () => {
       jwtHelper.verifyToken.mockReturnValue({ userId: '1', email: 'test@example.com', role: 'user' });
+      prisma.user.findUnique.mockResolvedValue({ userId: '1' });
       jwtHelper.generateAccessToken.mockReturnValue('new-token');
-      db.query.mockResolvedValueOnce({ rows: [{ userId: '1' }] });
 
       const res = await request(app)
         .post('/api/auth/refresh')
