@@ -1,0 +1,61 @@
+<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="800" fill="#F3F4F6"/>
+  
+  <!-- Card Container with Shadow -->
+  <g filter="url(#filter0_d)">
+    <rect x="200" y="100" width="400" height="560" rx="16" fill="white"/>
+  </g>
+
+  <!-- Logo Area -->
+  <text x="400" y="160" font-family="Arial, sans-serif" font-weight="bold" font-size="28" fill="#00C73C" text-anchor="middle">IGK-TodoList</text>
+  
+  <!-- Title -->
+  <text x="400" y="200" font-family="Arial, sans-serif" font-weight="bold" font-size="24" fill="#1F2937" text-anchor="middle">회원가입</text>
+
+  <!-- Username Field -->
+  <g transform="translate(240, 240)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151">사용자 이름</text>
+    <rect x="0" y="10" width="320" height="48" rx="8" fill="white" stroke="#D1D5DB" stroke-width="1"/>
+    <text x="16" y="39" font-family="Arial, sans-serif" font-size="14" fill="#9CA3AF">홍길동</text>
+  </g>
+
+  <!-- Email Field -->
+  <g transform="translate(240, 330)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151">이메일</text>
+    <rect x="0" y="10" width="320" height="48" rx="8" fill="white" stroke="#D1D5DB" stroke-width="1"/>
+    <text x="16" y="39" font-family="Arial, sans-serif" font-size="14" fill="#9CA3AF">user@example.com</text>
+  </g>
+
+  <!-- Password Field -->
+  <g transform="translate(240, 420)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#374151">비밀번호</text>
+    <rect x="0" y="10" width="320" height="48" rx="8" fill="white" stroke="#D1D5DB" stroke-width="1"/>
+    <text x="16" y="39" font-family="Arial, sans-serif" font-size="14" fill="#9CA3AF">●●●●●●●●</text>
+  </g>
+
+  <!-- Register Button -->
+  <g transform="translate(240, 510)" style="cursor: pointer;">
+    <rect width="320" height="50" rx="8" fill="#00C73C"/>
+    <text x="160" y="30" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">회원가입</text>
+  </g>
+
+  <!-- Login Link -->
+  <text x="400" y="600" font-family="Arial, sans-serif" font-size="14" fill="#6B7280" text-anchor="middle">
+    이미 계정이 있으신가요? <tspan fill="#00C73C" font-weight="bold" text-decoration="underline">로그인</tspan>
+  </text>
+
+  <!-- Defs for Shadow -->
+  <defs>
+    <filter id="filter0_d" x="180" y="80" width="440" height="600" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="4"/>
+      <feGaussianBlur stdDeviation="10"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+    </filter>
+  </defs>
+</svg>
