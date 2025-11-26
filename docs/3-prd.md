@@ -1,1424 +1,1216 @@
-# WHS-TodoList Product Requirements Document (PRD)
+# IGK-TodoList PRD (Product Requirements Document)
 
-**버전**: 1.0
-**작성일**: 2025-11-25
-**상태**: 최종
-**작성자**: Claude
-**참조 문서**:
-- [도메인 정의서](./1-domain-definition.md)
-- [PRD 입력 템플릿](./2-prd-input-template.md)
-- [스타일 가이드](./4-style-guide.md)
+## 문서 정보
+
+- **버전**: 1.0
+- **최종 수정일**: 2025-11-25
+- **상태**: Draft
+- **작성자**: Claude
+- **승인자**: -
+
+## 변경 이력
+
+| 버전 | 일자       | 변경 내용                                           | 작성자 |
+| ---- | ---------- | --------------------------------------------------- | ------ |
+| 1.0  | 2025-11-25 | PRD 초안 작성 (도메인 정의서 및 요구사항 수집 기반) | Claude |
 
 ---
 
 ## 목차
 
-1. [제품 개요](#1-제품-개요)
-2. [제품 비전 및 목표](#2-제품-비전-및-목표)
-3. [타겟 사용자](#3-타겟-사용자)
-4. [성공 지표 (KPI)](#4-성공-지표-kpi)
-5. [기능 요구사항](#5-기능-요구사항)
-6. [비기능 요구사항](#6-비기능-요구사항)
-7. [기술 스택](#7-기술-스택)
-8. [데이터 모델](#8-데이터-모델)
-9. [API 설계](#9-api-설계)
-10. [UI/UX 요구사항](#10-uiux-요구사항)
-11. [일정 및 마일스톤](#11-일정-및-마일스톤)
-12. [리스크 및 제약사항](#12-리스크-및-제약사항)
+1. [개요](#1-개요)
+2. [비즈니스 목표 및 전략](#2-비즈니스-목표-및-전략)
+3. [사용자 분석](#3-사용자-분석)
+4. [제품 기능](#4-제품-기능)
+5. [기술 요구사항](#5-기술-요구사항)
+6. [UI/UX 요구사항](#6-uiux-요구사항)
+7. [비기능 요구사항](#7-비기능-요구사항)
+8. [출시 계획](#8-출시-계획)
+9. [성공 지표](#9-성공-지표)
+10. [리스크 및 제약사항](#10-리스크-및-제약사항)
 
 ---
 
-## 1. 제품 개요
+## 1. 개요
 
-### 1.1 제품 설명
+### 1.1 프로젝트 배경
 
-**WHS-TodoList**는 사용자 인증 기반의 개인 할일 관리 애플리케이션으로, 사용자별 할일 목록과 공통 국경일 일정을 통합 관리하는 웹 애플리케이션입니다.
+사내 직원들이 각자 다른 방식(메모장, 엑셀, 종이 수첩 등)으로 할일을 관리하다 보니 체계적인 업무 관리가 어렵고, 중요한 할일을 놓치는 경우가 자주 발생하고 있습니다. 특히 국경일이나 회사 휴무일 등의 공통 일정을 개인이 따로 챙겨야 해서 불편합니다. 통합된 할일 관리 도구가 필요하다는 의견이 지속적으로 제기되어 본 프로젝트를 시작하게 되었습니다.
 
-### 1.2 핵심 가치
+### 1.2 제품 비전
 
-- **단순함**: 복잡하지 않고 직관적인 사용자 경험
-- **통합 관리**: 개인 할일과 국경일을 한 곳에서 관리
-- **복원 가능성**: 휴지통 기능을 통한 안전한 삭제 관리
-- **접근성**: 데스크톱과 모바일 모두 지원
+IGK-TodoList는 사용자 인증 기반의 개인 할일 관리 애플리케이션입니다. 사용자는 자신만의 할일 목록을 생성하고 관리할 수 있으며, 국경일과 같은 공통 일정도 함께 확인할 수 있습니다. 빠르고 직관적인 인터페이스를 통해 업무 효율성을 극대화합니다.
 
-### 1.3 주요 특징
+### 1.3 제품 목표
 
-1. **사용자 인증 시스템**: JWT 기반 안전한 인증
-2. **할일 관리**: 생성, 조회, 수정, 완료, 삭제, 복원
-3. **휴지통 기능**: 소프트 삭제를 통한 복구 가능
-4. **국경일 표시**: 공통 국경일 자동 표시
-5. **반응형 디자인**: 데스크톱 및 모바일 지원
+- **단순함**: 최소한의 기능만 명확하게 제공하여 처음 사용하는 사람도 3분 안에 사용 가능
+- **빠름**: 로딩 없이 즉각 반응하여 업무 흐름을 방해하지 않음
+- **통합**: 개인 할일과 공통 일정(국경일)을 하나의 플랫폼에서 관리
+- **안전**: 실수로 삭제한 할일도 휴지통에서 복구 가능
 
----
+### 1.4 경쟁 제품 분석
 
-## 2. 제품 비전 및 목표
+#### 주요 경쟁 제품
 
-### 2.1 제품 비전
+| 제품        | 장점                                        | 단점                                   |
+| ----------- | ------------------------------------------- | -------------------------------------- |
+| **Todoist** | 간단한 할일 추가, 빠른 체크 기능, 깔끔한 UI | 유료 플랜 비쌈, 팀 공유 기능 제한적    |
+| **Notion**  | 자유로운 구조화, 다양한 뷰                  | 너무 복잡함, 로딩 느림, 학습 곡선 높음 |
+| **Trello**  | 직관적인 칸반 보드, 드래그앤드롭            | 개인 할일 관리에는 과한 기능들, 무거움 |
+| **Excel**   | 익숙한 인터페이스, 필터링 정렬              | 모바일 접근 불편, 실시간 동기화 안 됨  |
 
-> "개인의 시간 관리를 돕고 생산성을 향상시키는 직관적인 할일 관리 플랫폼"
+#### 차별화 전략
 
-### 2.2 해결하려는 문제
-
-기존 할일 관리 앱들의 문제점:
-- 복잡한 UI로 인한 낮은 접근성
-- 국경일 등 공통 일정을 함께 관리하기 어려움
-- 실수로 삭제한 할일 복구 불가
-- 과도한 기능으로 인한 학습 곡선
-
-### 2.3 비즈니스 목표
-
-| 목표 | 설명 | 우선순위 |
-|------|------|----------|
-| **사용자 확보** | 1,000명의 가입자 확보 | High |
-| **포트폴리오** | 풀스택 개발 역량 증명 | High |
-| **학습** | 최신 웹 기술 스택 습득 | High |
-| **수익 창출** | 광고 기반 수익 모델 (2차) | Low |
+1. **국경일 자동 표시**: 공통 일정이 자동으로 표시되어 개인이 따로 챙길 필요 없음
+2. **사내 전용**: 외부 서비스 대비 보안 우려 없이 안전하게 업무 정보 관리
+3. **초고속 반응**: SPA 기반으로 페이지 전환 없이 즉각 반응
+4. **휴지통 기능**: 실수로 삭제한 할일 복구 가능
 
 ---
 
-## 3. 타겟 사용자
+## 2. 비즈니스 목표 및 전략
 
-### 3.1 주요 타겟 그룹
+### 2.1 출시 목표
 
-1. **직장인** - 업무 일정 관리
-2. **대학생** - 과제 및 시험 일정 관리
-3. **주부** - 가사 일정 관리
+- **MVP(최소 기능) 출시 목표**: 2026년 2월
+- **정식 v1.0 출시 목표**: 2026년 4월
 
-### 3.2 사용자 페르소나
+### 2.2 타겟 사용자
 
-#### 페르소나 1: 김철수 (직장인)
+- **1차 타겟**: 회사 직원 80명 (개발팀, 기획팀, 관리팀 등)
+- **확장 가능성**: 계열사 포함 시 100-150명
 
-```
-- 나이: 20-30대
-- 직업: 직장인
-- 기술 수준: 보통
-- 주요 니즈: 간단하면서 명료한 할일 관리
-- 사용 패턴: 하루에 10분-1시간 정도 사용
-- 페인 포인트:
-  - 복잡한 기능보다 단순한 체크리스트 선호
-  - 업무와 개인 일정을 함께 관리하고 싶음
-  - 실수로 삭제한 할일 복구 필요
-```
+### 2.3 기대 효과
 
-#### 페르소나 2: 카리나 (대학생)
-
-```
-- 나이: 20대 초반
-- 직업: 대학생
-- 기술 수준: 초급
-- 주요 니즈: 학과 수업과 과제를 위한 할일 관리
-- 사용 패턴: 하루 중 아침에 주로 이용
-- 페인 포인트:
-  - 시험 일정과 과제 마감일 관리
-  - 공휴일 확인을 위한 별도 앱 사용 불편
-  - 모바일에서 빠르게 확인하고 싶음
-```
+1. **업무 효율성 향상**: 전 직원이 하나의 통합된 플랫폼에서 할일을 관리
+2. **누락 방지**: 국경일/회사 행사 등 공통 일정이 자동으로 표시
+3. **안심 사용**: 실수로 삭제한 할일도 휴지통에서 복구 가능
+4. **생산성 개선**: 개인별 할일 완료율, 업무 패턴 파악
+5. **보안 강화**: 사내 전용 도구로 보안 걱정 없이 안전하게 관리
 
 ---
 
-## 4. 성공 지표 (KPI)
+## 3. 사용자 분석
 
-### 4.1 사용자 성장 지표
+### 3.1 사용자 페르소나
 
-| 지표 | 목표 | 측정 주기 |
-|------|------|-----------|
-| 1개월 내 가입자 수 | 100명 | 월간 |
-| 3개월 내 가입자 수 | 500명 | 분기 |
-| DAU (일일 활성 사용자) | 30명 | 일간 |
-| MAU (월간 활성 사용자) | 1,000명 | 월간 |
+#### 페르소나 1: 김개발 (소프트웨어 엔지니어, 30대)
 
-### 4.2 사용자 참여도 지표
+**할일 관리 패턴**:
 
-| 지표 | 목표 | 측정 방법 |
-|------|------|-----------|
-| 할일 완료율 | 50% | 완료된 할일 / 전체 할일 |
-| 일평균 할일 생성 | 3개/사용자 | 총 생성 수 / DAU |
-| 사용자 유지율 (30일) | 80% | 30일 후 재방문 사용자 비율 |
-| 평균 세션 시간 | 5-10분 | 로그인 ~ 로그아웃 시간 |
+- 하루 평균 10-15개의 작은 개발 태스크 관리
+- 주로 스프린트 단위(2주)로 업무 계획
+- 급하게 생긴 버그 수정, 코드 리뷰 등 예상 외 작업이 많음
 
-### 4.3 기능 사용 지표
+**주요 니즈**:
 
-- 휴지통 사용률: 삭제 후 복원하는 사용자 비율
-- 국경일 조회 빈도: 국경일 정보 클릭 수
-- 검색 기능 사용률: 전체 사용자 중 검색 사용 비율
+- 빠른 할일 추가/체크 (개발 중 방해 최소화)
+- 키보드 단축키 지원
+- 우선순위별 정렬
+- 마감일 표시
 
----
+**페인포인트**:
 
-## 5. 기능 요구사항
+- 복잡한 UI는 오히려 업무 방해됨
+- 로딩 시간이 길면 집중력 깨짐
+- 여러 도구(Jira, Notion, 메모장)를 왔다갔다 하는 게 번거로움
 
-### 5.1 MVP (1차 출시) 필수 기능
+#### 페르소나 2: 박기획 (프로덕트 매니저, 20대 후반)
 
-#### 5.1.1 사용자 인증 및 관리
+**할일 관리 패턴**:
 
-| ID | 기능 | 설명 | 우선순위 |
-|----|------|------|----------|
-| [UC-01] | 회원가입 | 이메일, 비밀번호, 사용자 이름으로 신규 계정 생성 | P0 |
-| [UC-02] | 로그인 | 이메일/비밀번호 인증 후 JWT 토큰 발급 | P0 |
-| - | 로그아웃 | 클라이언트 토큰 삭제 | P0 |
-| - | 토큰 갱신 | Refresh Token으로 Access Token 재발급 | P0 |
-| - | 프로필 조회/수정 | 사용자 자신의 정보 조회 및 수정 | P1 |
+- 하루 5-10개의 회의, 문서 작성, 이메일 응답 등 다양한 업무
+- 주간/월간 단위로 프로젝트 일정 관리
+- 회의 중 실시간으로 액션 아이템 기록
 
-#### 5.1.2 할일 관리
+**주요 니즈**:
 
-| ID | 기능 | 설명 | 우선순위 |
-|----|------|------|----------|
-| [UC-03] | 할일 조회 | 로그인한 사용자의 활성 할일 목록 조회 | P0 |
-| [UC-04] | 할일 추가 | 제목, 내용, 시작일, 만료일로 새 할일 생성 | P0 |
-| [UC-05] | 할일 수정 | 기존 할일의 모든 속성 변경 가능 | P0 |
-| [UC-06] | 할일 완료 | 할일 완료 처리 (isCompleted=true, status='completed') | P0 |
-| [UC-07] | 할일 삭제 | 할일을 휴지통으로 이동 (소프트 삭제) | P0 |
-| [UC-08] | 할일 복원 | 휴지통의 할일을 활성 상태로 복원 | P0 |
-| - | 할일 검색 | 제목/내용 기반 검색 | P1 |
-| - | 할일 필터링 | 날짜별, 상태별 필터 | P1 |
-| - | 할일 정렬 | 날짜, 상태 기준 정렬 | P1 |
+- 회의 중 빠른 메모 (모바일에서도 편리하게)
+- 일정(시작일, 마감일) 명확히 관리
+- 완료한 일 체크하면서 성취감 느끼기
+- 주간 리뷰로 지난주 업무 정리
 
-**비즈니스 규칙**:
-- [BR-02] 사용자는 자신의 할일만 조회/수정/삭제 가능
-- [BR-08] 할일 완료 시 isCompleted=true, status='completed'
-- [BR-12] 만료일은 시작일과 같거나 이후여야 함
-- [BR-13] 만료일 지난 할일은 UI에서 시각적 구분
+**페인포인트**:
 
-#### 5.1.3 휴지통 관리
+- 여러 프로젝트의 할일이 섞여서 혼란스러움
+- 급한 일과 중요한 일 구분이 어려움
+- Excel로 관리하면 이동 중 확인/수정이 불편함
 
-| ID | 기능 | 설명 | 우선순위 |
-|----|------|------|----------|
-| [UC-09] | 휴지통 조회 | 삭제된 할일 목록 조회 (status='deleted') | P0 |
-| [UC-10] | 영구 삭제 | 휴지통의 할일을 DB에서 완전히 제거 | P0 |
+#### 페르소나 3: 이관리 (인사/총무팀 팀장, 40대)
 
-**비즈니스 규칙**:
-- [BR-05] 할일 삭제 시 휴지통으로 이동 (status='deleted', deletedAt 기록)
-- [BR-06] 휴지통의 할일은 복원 가능
-- [BR-07] 영구 삭제 시 DB에서 완전히 제거
+**할일 관리 패턴**:
 
-#### 5.1.4 국경일 관리
+- 하루 3-5개의 주요 업무 (급여, 채용, 사내 행사 준비)
+- 월간 루틴 업무 (급여일, 법정 신고 기한 등)
+- 반복적인 업무가 많음
 
-| ID | 기능 | 설명 | 우선순위 |
-|----|------|------|----------|
-| [UC-11] | 국경일 조회 | 모든 사용자가 국경일 목록 조회 가능 | P0 |
-| - | 국경일 추가 | 관리자만 새로운 국경일 추가 가능 | P1 |
-| - | 국경일 수정 | 관리자만 기존 국경일 수정 가능 | P1 |
+**주요 니즈**:
 
-**비즈니스 규칙**:
-- [BR-03] 모든 인증된 사용자가 조회 가능
-- [BR-04] 관리자(role='admin')만 추가/수정 권한
-- [BR-09] 관리자만 추가/수정 가능
-- [BR-10] 국경일은 삭제 불가
-- [BR-11] 매년 반복되는 일정 지원
+- 심플하고 직관적인 인터페이스 (복잡한 건 싫음)
+- 중요한 마감일 놓치지 않게 알림
+- PC 위주 사용 (모바일은 보조)
+- 종이 수첩처럼 쉽고 편하게
 
-### 5.2 기능 우선순위 정의
+**페인포인트**:
 
-- **P0 (Must-have)**: MVP 출시에 필수적인 기능
-- **P1 (Should-have)**: MVP에 포함되면 좋지만 필수는 아님
-- **P2 (Nice-to-have)**: 2차 개발에서 고려
+- 새로운 도구 배우기 부담스러움
+- 매달 반복되는 업무를 매번 새로 입력하기 귀찮음
+- 국경일, 회사 휴무일을 매번 수동으로 추가해야 함
 
-### 5.3 MVP 제외 기능 (2차 개발)
+### 3.2 주요 사용 시나리오
 
-- 할일 카테고리/태그
-- 할일 공유 기능
-- 알림 기능 (이메일/푸시)
-- 통계 및 리포트
-- 협업 기능
-- 반복 일정
-- 캘린더 뷰
+#### 시나리오 1: 아침 출근 후 - 오늘 할일 확인
 
----
+**시간**: 오전 9시, 사무실 도착 직후
+**사용자**: 김개발(개발자)
+**목표**: 오늘 해야 할 일을 확인하고 우선순위 파악
 
-## 6. 비기능 요구사항
+1. IGK-TodoList 웹사이트 접속 (브라우저 즐겨찾기)
+2. 자동 로그인되어 메인 화면(할일 목록) 즉시 표시
+3. "오늘" 필터를 선택하여 오늘 마감인 할일만 보기
+4. 우선순위 높은 순으로 정렬
+5. 가장 급한 "버그 수정 #1234" 할일을 확인하고 작업 시작
 
-### 6.1 성능 요구사항
+**기대 결과**:
 
-| 항목 | 요구사항 | 측정 방법 |
-|------|----------|-----------|
-| API 응답 시간 | 1,000ms 이내 | 95 percentile |
-| 페이지 로딩 시간 | 3초 이내 | First Contentful Paint |
-| 동시 접속자 | 100명 지원 | 로드 테스트 |
-| 데이터베이스 성능 | 20,000개 할일 처리 가능 | 쿼리 성능 테스트 |
+- 출근 후 30초 이내에 오늘 할 일 파악
+- 우선순위에 따라 하루 업무 계획 수립
 
-**성능 최적화 전략**:
-- API 응답 최적화 (인덱싱, 쿼리 최적화)
-- 프론트엔드 번들 크기 최소화
-- 이미지 최적화
-- Lazy Loading 적용
+#### 시나리오 2: 회의 중 - 갑자기 생긴 할일 추가
 
-### 6.2 보안 요구사항
+**시간**: 오전 10시 30분, 팀 회의 중
+**사용자**: 박기획(PM)
+**목표**: 회의 중 새로운 액션 아이템을 할일로 바로 추가
 
-#### 필수 보안 조치
+1. 스마트폰으로 IGK-TodoList 앱 실행 (반응형 웹)
+2. 메인 화면 상단의 "+" 버튼 터치
+3. 할일 추가 화면에서 빠르게 입력:
+   - 제목: "고객 피드백 정리 보고서 작성"
+   - 마감일: 이번 주 금요일 선택 (날짜 피커)
+4. "저장" 버튼 터치
+5. 메인 화면으로 돌아가 할일이 추가된 것 확인
 
-| 항목 | 구현 방법 | 우선순위 |
-|------|-----------|----------|
-| HTTPS 통신 | SSL/TLS 인증서 적용 | P0 |
-| 비밀번호 암호화 | bcrypt 해싱 (salt rounds: 10) | P0 |
-| JWT 인증 | Access Token (15분) + Refresh Token (7일) | P0 |
-| CORS 정책 | 허용된 Origin만 접근 가능 | P0 |
-| SQL Injection 방어 | Prepared Statements, ORM 사용 | P0 |
-| XSS 방어 | 입력 값 sanitization, CSP 헤더 | P0 |
-| Rate Limiting | API 호출 제한 (100 req/min per user) | P1 |
+**기대 결과**:
 
-**보안 규칙** (도메인 정의서 참조):
-- [BR-01] 인증된 사용자만 접근 가능
-- [BR-02] 사용자는 타인의 할일 접근 불가
+- 회의 내용을 놓치지 않고 10초 이내에 할일 추가
+- 나중에 기억하려고 애쓰지 않아도 됨
 
-### 6.3 확장성 요구사항
+#### 시나리오 3: 퇴근 전 - 오늘 업무 정리 및 내일 준비
 
-| 항목 | 목표 | 구현 전략 |
-|------|------|-----------|
-| 사용자 규모 | 1,000명 지원 | PostgreSQL 최적화 |
-| 데이터 규모 | 20,000개 할일 | 인덱싱, 페이지네이션 |
-| 향후 확장 | 수평 확장 가능 구조 | Stateless 아키텍처 |
+**시간**: 오후 6시, 퇴근 준비
+**사용자**: 김개발(개발자)
+**목표**: 오늘 완료한 일을 체크하고 내일 할 일을 확인
 
-### 6.4 가용성 요구사항
+1. IGK-TodoList에서 오늘 완료한 할일들 체크박스 클릭 (5개)
+2. 체크하는 순간 할일이 흐릿해지며 하단으로 이동 (완료 표시)
+3. 미완료 할일 2개는 내일로 마감일 변경
+4. 실수로 삭제한 할일 1개를 휴지통에서 찾아 복원
+5. "내일" 필터로 전환하여 내일 할 일 미리 확인 (3개)
+6. 내일 출근하자마자 할 일을 미리 숙지하고 퇴근
 
-- **목표 Uptime**: 99% (MVP 기준)
-- **백업**: 일일 데이터베이스 백업 (Supabase 자동 백업)
-- **장애 복구**: 24시간 이내 복구
+**기대 결과**:
 
-### 6.5 접근성 요구사항
+- 오늘 성과 확인으로 성취감
+- 내일 업무 미리 파악으로 다음 날 효율적 시작
+- 실수로 삭제한 할일도 안전하게 복구
 
-- **WCAG 2.1 AA 준수**
-- 색상 대비율: 4.5:1 이상
-- 키보드 네비게이션 지원
-- 스크린 리더 호환성
+#### 시나리오 4: 월초 - 국경일 자동 확인
 
-### 6.6 브라우저 호환성
+**시간**: 매월 1일
+**사용자**: 이관리(인사팀장)
+**목표**: 이번 달 휴무일을 확인
 
-| 브라우저 | 최소 지원 버전 |
-|----------|----------------|
-| Chrome | 최신 2개 버전 |
-| Firefox | 최신 2개 버전 |
-| Safari | 최신 2개 버전 |
-| Edge | 최신 2개 버전 |
-| Mobile Safari (iOS) | iOS 14+ |
-| Chrome Mobile (Android) | Android 10+ |
+1. IGK-TodoList 접속
+2. 메인 화면에 이번 달 국경일이 자동으로 표시됨 (회색 배경)
+   - "3월 1일 삼일절" (공통 할일, 삭제 불가)
+3. 개인 할일과 함께 한눈에 확인
+4. 별도로 국경일을 입력할 필요 없음
+
+**기대 결과**:
+
+- 국경일/회사 휴무일을 수동으로 관리할 필요 없음
+- 업무 일정 계획 시 휴무일 자동 반영
 
 ---
 
-## 7. 기술 스택
+## 4. 제품 기능
 
-### 7.1 프론트엔드
+### 4.1 기능 우선순위 (MoSCoW)
 
-```
-Framework: React 18
-State Management: Zustand
-Styling: Tailwind CSS
-HTTP Client: Axios
-Routing: React Router v6
-Form Handling: React Hook Form
-Validation: Zod
-Build Tool: Vite
-```
+#### Must Have - MVP에 반드시 필요
 
-**주요 라이브러리**:
-- `react`: 18.x
-- `zustand`: 상태 관리
-- `tailwindcss`: 유틸리티 우선 CSS
-- `axios`: HTTP 통신
-- `react-router-dom`: 라우팅
-- `react-hook-form`: 폼 관리
-- `zod`: 스키마 검증
-- `date-fns`: 날짜 처리
-- `lucide-react`: 아이콘
+| 기능                   | 설명                                      | 우선순위 |
+| ---------------------- | ----------------------------------------- | -------- |
+| 회원가입/로그인        | 이메일/비밀번호 기반 회원가입 및 로그인   | P0       |
+| 할일 CRUD              | 할일 추가, 조회, 수정, 삭제 (휴지통 이동) | P0       |
+| 할일 완료 체크         | 할일 완료/미완료 상태 변경                | P0       |
+| 시작일시/만료일시 설정 | 할일의 시작 시간과 마감 기한 설정         | P0       |
+| 휴지통 기능            | 삭제된 할일 조회, 복원, 영구 삭제         | P0       |
+| 공통 할일 표시         | 국경일 등 공통 일정 자동 표시 (삭제 불가) | P0       |
+| 반응형 웹              | PC, 태블릿, 모바일 대응                   | P0       |
 
-### 7.2 백엔드
+#### Should Have - 1차 출시 목표 (v1.0)
 
-```
-Runtime: Node.js 18+
-Framework: Express.js
-API Style: REST API
-Authentication: JWT (jsonwebtoken)
-Password Hashing: bcrypt
-Validation: express-validator
-ORM: Prisma
-```
+| 기능                    | 설명                             | 우선순위 |
+| ----------------------- | -------------------------------- | -------- |
+| 할일 검색               | 제목, 내용 기반 검색             | P1       |
+| 할일 필터링             | 완료/미완료, 날짜별 필터링       | P1       |
+| 할일 정렬               | 날짜, 생성일, 제목 기준 정렬     | P1       |
+| 만료일 임박 시각적 표시 | 마감일이 가까운 할일 빨간색 강조 | P1       |
+| 기본 통계               | 오늘/이번주 완료율               | P1       |
 
-**주요 라이브러리**:
-- `express`: 4.x
-- `jsonwebtoken`: JWT 인증
-- `bcrypt`: 비밀번호 해싱
-- `prisma`: ORM
-- `express-validator`: 요청 검증
-- `cors`: CORS 설정
-- `helmet`: 보안 헤더
-- `express-rate-limit`: Rate limiting
+#### Could Have - 여유 있으면 추가
 
-### 7.3 데이터베이스
+| 기능          | 설명                              | 우선순위 |
+| ------------- | --------------------------------- | -------- |
+| 할일 카테고리 | 업무, 개인, 회의 등 카테고리 분류 | P2       |
+| 할일 우선순위 | 높음, 보통, 낮음 우선순위 설정    | P2       |
+| 통계/대시보드 | 월간 완료율, 생산성 그래프        | P2       |
 
-```
-Database: PostgreSQL 15+
-Hosting: Supabase
-ORM: Prisma
-```
+#### Won't Have - 이번 버전에서 제외
 
-**데이터베이스 기능**:
-- 트랜잭션 지원
-- 인덱싱 최적화
-- 자동 백업 (Supabase)
-- Connection Pooling
+- AI 추천 (할일 우선순위 자동 제안)
+- 팀 협업 기능 (팀 할일, 댓글, 멘션)
+- 캘린더 연동 (Google Calendar, Outlook)
+- 파일 첨부
+- 할일 템플릿
+- 소셜 로그인 (Google, 카카오)
 
-### 7.4 배포 및 인프라
+**제외 이유**: 개인 할일 관리에 집중, MVP 범위 초과, 개발 복잡도 높음
 
-```
-Frontend Hosting: Vercel
-Backend Hosting: Vercel (Serverless Functions)
-Database Hosting: Supabase PostgreSQL
-CI/CD: GitHub Actions (2차 개발)
-Version Control: Git + GitHub
-```
+### 4.2 MVP 기능 상세
 
-**배포 전략**:
-- 프론트엔드: Vercel 자동 배포
-- 백엔드: Vercel Serverless Functions
-- 환경 변수 관리: Vercel Environment Variables
-- 도메인: Vercel 제공 도메인 (커스텀 도메인은 선택)
+#### 4.2.1 사용자 인증
 
-### 7.5 개발 도구
+**회원가입**
 
-```
-Code Editor: VS Code
-Linting: ESLint
-Formatting: Prettier
-Type Checking: TypeScript (선택)
-API Testing: Postman / Thunder Client
-Version Control: Git
-```
+- 입력 항목: 이메일, 비밀번호, 이름
+- 검증:
+  - 이메일: 형식 검증, 중복 확인
+  - 비밀번호: 최소 8자, 영문+숫자 조합
+  - 이름: 1-50자
+- 비밀번호: bcrypt 해시 암호화 저장
 
----
+**로그인**
 
-## 8. 데이터 모델
+- 이메일/비밀번호 입력
+- JWT 토큰 발급
+- 7일 세션 유지 (자동 로그인 옵션)
+- 5회 로그인 실패 시 10분간 계정 잠금
 
-### 8.1 ERD (Entity Relationship Diagram)
+**로그아웃**
 
-```
-┌─────────────────┐
-│     User        │
-├─────────────────┤
-│ userId (PK)     │
-│ email (unique)  │
-│ password        │
-│ username        │
-│ role            │
-│ createdAt       │
-│ updatedAt       │
-└────────┬────────┘
-         │
-         │ 1:N
-         │
-         ▼
-┌─────────────────┐
-│      Todo       │
-├─────────────────┤
-│ todoId (PK)     │
-│ userId (FK)     │
-│ title           │
-│ content         │
-│ startDate       │
-│ dueDate         │
-│ status          │
-│ isCompleted     │
-│ createdAt       │
-│ updatedAt       │
-│ deletedAt       │
-└─────────────────┘
+- 토큰 무효화
+- 클라이언트 측 토큰 삭제
 
-┌─────────────────┐
-│    Holiday      │
-├─────────────────┤
-│ holidayId (PK)  │
-│ title           │
-│ date            │
-│ description     │
-│ isRecurring     │
-│ createdAt       │
-│ updatedAt       │
-└─────────────────┘
-```
+#### 4.2.2 할일 CRUD
 
-### 8.2 엔티티 상세
+**할일 생성**
+
+- 입력 항목:
+  - 제목 (필수): 1-200자
+  - 내용 (선택): 0-2000자
+  - 시작일시 (선택)
+  - 만료일시 (선택)
+- 검증:
+  - 시작일시 < 만료일시 (둘 다 입력된 경우)
+- 자동 설정:
+  - 완료여부: FALSE
+  - 상태: ACTIVE
+  - 유형: PERSONAL
+  - 소유자: 현재 로그인 사용자
+
+**할일 조회**
+
+- 본인의 할일 목록 조회 (개인 할일 + 공통 할일)
+- 완료/미완료 필터링 가능
+- 공통 할일은 수정/삭제/완료 처리 불가 표시
+
+**할일 수정**
+
+- 개인 할일만 수정 가능
+- 수정 가능 항목: 제목, 내용, 시작일시, 만료일시
+- 공통 할일, 타인의 할일, 삭제된 할일은 수정 불가
+
+**할일 삭제 (휴지통 이동)**
+
+- 개인 할일만 삭제 가능
+- 즉시 삭제되지 않고 휴지통으로 이동
+- 프로세스:
+  1. TodoItem.상태 → DELETED
+  2. Trash 레코드 생성
+
+#### 4.2.3 할일 완료 처리
+
+**완료 처리**
+
+- 활성 상태의 개인 할일만 가능
+- 프로세스:
+  1. 완료여부 → TRUE
+  2. 완료일시 → 현재 시간
+  3. 수정일시 업데이트
+
+**완료 취소**
+
+- 완료된 할일을 미완료로 되돌리기
+- 프로세스:
+  1. 완료여부 → FALSE
+  2. 완료일시 → NULL
+  3. 수정일시 업데이트
+
+**제약사항**:
+
+- 공통 할일은 완료 처리 불가
+- 만료일시가 지나도 자동 완료되지 않음 (수동 처리 필요)
+- 삭제된 할일도 완료 상태 유지 (복원 시 그대로 복원)
+
+#### 4.2.4 휴지통 관리
+
+**휴지통 조회**
+
+- 본인이 삭제한 할일 목록 표시
+- 삭제일시 함께 표시
+
+**할일 복원**
+
+- 휴지통의 할일을 활성 상태로 복원
+- 프로세스:
+  1. TodoItem.상태 → ACTIVE
+  2. Trash 레코드 삭제
+- 완료 상태는 그대로 유지
+
+**할일 영구 삭제**
+
+- 복구 불가능하게 완전히 삭제
+- 재확인 메시지 표시: "정말 삭제하시겠습니까?"
+- 프로세스:
+  1. Trash 레코드 삭제
+  2. TodoItem 레코드 물리적 삭제
+
+#### 4.2.5 공통 할일
+
+**공통 할일 등록** (시스템 관리자만)
+
+- 국경일 등 공통 일정 등록
+- 소유자 = NULL, 유형 = COMMON
+- 모든 사용자에게 자동 표시
+
+**공통 할일 조회**
+
+- 모든 로그인 사용자 조회 가능
+- 개인 할일 목록과 함께 표시
+- 수정/삭제/완료 처리 불가 표시
+
+**제약사항**:
+
+- 일반 사용자는 공통 할일 등록 불가
+- 공통 할일은 수정, 삭제, 완료 처리 불가
+- 공통 할일은 휴지통으로 이동 불가
+
+### 4.3 데이터 모델
 
 #### User (사용자)
 
-| 필드 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| userId | UUID | PK | 사용자 고유 ID |
-| email | VARCHAR(255) | UNIQUE, NOT NULL | 로그인 이메일 |
-| password | VARCHAR(255) | NOT NULL | bcrypt 해시된 비밀번호 |
-| username | VARCHAR(100) | NOT NULL | 사용자 이름 |
-| role | ENUM('user', 'admin') | NOT NULL, DEFAULT 'user' | 사용자 역할 |
-| createdAt | TIMESTAMP | NOT NULL | 가입일시 |
-| updatedAt | TIMESTAMP | NOT NULL | 최종 수정일시 |
+| 속성명   | 타입     | 필수 | 제약조건              | 설명                    |
+| -------- | -------- | ---- | --------------------- | ----------------------- |
+| 사용자ID | UUID     | O    | PK, Unique            | 사용자 고유 식별자      |
+| 이메일   | String   | O    | Unique, Email 형식    | 로그인 아이디           |
+| 비밀번호 | String   | O    | 최소 8자, 암호화 저장 | 사용자 비밀번호         |
+| 이름     | String   | O    | 1-50자                | 사용자 실명 또는 닉네임 |
+| 가입일시 | DateTime | O    | -                     | 회원가입 완료 시간      |
 
-**인덱스**:
-- PRIMARY KEY: userId
-- UNIQUE INDEX: email
-- INDEX: role (관리자 조회용)
+#### TodoItem (할일)
 
-#### Todo (할일)
+| 속성명   | 타입     | 필수 | 제약조건            | 기본값   | 설명                            |
+| -------- | -------- | ---- | ------------------- | -------- | ------------------------------- |
+| 할일ID   | UUID     | O    | PK, Unique          | Auto     | 할일 고유 식별자                |
+| 제목     | String   | O    | 1-200자             | -        | 할일 제목                       |
+| 내용     | Text     | X    | 0-2000자            | NULL     | 할일 상세 설명                  |
+| 시작일시 | DateTime | X    | 만료일시보다 이전   | NULL     | 할일 시작 시간                  |
+| 만료일시 | DateTime | X    | 시작일시보다 이후   | NULL     | 할일 마감 기한                  |
+| 완료여부 | Boolean  | O    | TRUE, FALSE         | FALSE    | 할일 완료 상태                  |
+| 완료일시 | DateTime | X    | -                   | NULL     | 할일 완료 시간                  |
+| 상태     | Enum     | O    | ACTIVE, DELETED     | ACTIVE   | 할일 생명주기 상태              |
+| 소유자   | UUID     | X    | FK(User), NULL 가능 | NULL     | 소유 사용자 ID (NULL=공통 할일) |
+| 유형     | Enum     | O    | PERSONAL, COMMON    | PERSONAL | 할일 유형                       |
+| 생성일시 | DateTime | O    | -                   | Now()    | 레코드 생성 시간                |
+| 수정일시 | DateTime | O    | -                   | Now()    | 레코드 최종 수정 시간           |
 
-| 필드 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| todoId | UUID | PK | 할일 고유 ID |
-| userId | UUID | FK, NOT NULL | 소유자 ID |
-| title | VARCHAR(200) | NOT NULL | 할일 제목 |
-| content | TEXT | NULL | 할일 상세 내용 |
-| startDate | DATE | NULL | 시작일 |
-| dueDate | DATE | NULL | 만료일 |
-| status | ENUM('active', 'completed', 'deleted') | NOT NULL, DEFAULT 'active' | 할일 상태 |
-| isCompleted | BOOLEAN | NOT NULL, DEFAULT false | 완료 여부 |
-| createdAt | TIMESTAMP | NOT NULL | 생성일시 |
-| updatedAt | TIMESTAMP | NOT NULL | 최종 수정일시 |
-| deletedAt | TIMESTAMP | NULL | 삭제일시 (소프트 삭제) |
+#### Trash (휴지통)
 
-**제약 조건**:
-- CHECK: dueDate >= startDate (만료일은 시작일 이후)
-- FOREIGN KEY: userId REFERENCES User(userId) ON DELETE CASCADE
-
-**인덱스**:
-- PRIMARY KEY: todoId
-- INDEX: userId, status (사용자별 상태 조회)
-- INDEX: dueDate (만료일 기준 정렬)
-- INDEX: deletedAt (휴지통 조회)
-
-#### Holiday (국경일)
-
-| 필드 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| holidayId | UUID | PK | 국경일 고유 ID |
-| title | VARCHAR(100) | NOT NULL | 국경일 이름 |
-| date | DATE | NOT NULL | 국경일 날짜 |
-| description | TEXT | NULL | 설명 |
-| isRecurring | BOOLEAN | NOT NULL, DEFAULT true | 매년 반복 여부 |
-| createdAt | TIMESTAMP | NOT NULL | 생성일시 |
-| updatedAt | TIMESTAMP | NOT NULL | 최종 수정일시 |
-
-**인덱스**:
-- PRIMARY KEY: holidayId
-- INDEX: date (날짜 기준 조회)
-
-### 8.3 Prisma 스키마 예시
-
-```prisma
-model User {
-  userId    String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  username  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  todos     Todo[]
-
-  @@index([role])
-}
-
-model Todo {
-  todoId      String    @id @default(uuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  title       String
-  content     String?
-  startDate   DateTime?
-  dueDate     DateTime?
-  status      TodoStatus @default(ACTIVE)
-  isCompleted Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  deletedAt   DateTime?
-
-  @@index([userId, status])
-  @@index([dueDate])
-  @@index([deletedAt])
-}
-
-model Holiday {
-  holidayId   String   @id @default(uuid())
-  title       String
-  date        DateTime
-  description String?
-  isRecurring Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([date])
-}
-
-enum Role {
-  USER
-  ADMIN
-}
-
-enum TodoStatus {
-  ACTIVE
-  COMPLETED
-  DELETED
-}
-```
+| 속성명   | 타입     | 필수 | 제약조건             | 설명                    |
+| -------- | -------- | ---- | -------------------- | ----------------------- |
+| 휴지통ID | UUID     | O    | PK, Unique           | 휴지통 항목 고유 식별자 |
+| 할일ID   | UUID     | O    | FK(TodoItem), Unique | 삭제된 할일 참조        |
+| 삭제일시 | DateTime | O    | -                    | 휴지통 이동 시간        |
 
 ---
 
-## 9. API 설계
+## 5. 기술 요구사항
 
-### 9.1 API 기본 정보
+### 5.1 기술 스택
 
-**베이스 URL**: `http://localhost:3000/api` (개발), `https://your-domain.vercel.app/api` (프로덕션)
+#### 프론트엔드
 
-**인증 방식**: JWT Bearer Token
+| 항목                | 기술            | 버전 | 사유                               |
+| ------------------- | --------------- | ---- | ---------------------------------- |
+| **프레임워크**      | React           | 18.x | 컴포넌트 기반 개발, 풍부한 생태계  |
+| **스타일링**        | Tailwind CSS    | 3.x  | 빠른 UI 개발, 일관된 디자인 시스템 |
+| **상태 관리**       | Zustand         | 4.x  | 가벼운 상태 관리, 간단한 API       |
+| **빌드 도구**       | Vite            | 5.x  | 빠른 개발 서버, 최적화된 빌드      |
+| **HTTP 클라이언트** | Axios           | 1.x  | 간편한 API 호출, 인터셉터 지원     |
+| **라우팅**          | React Router    | 6.x  | SPA 라우팅                         |
+| **폼 관리**         | React Hook Form | 7.x  | 성능 최적화된 폼 처리              |
+| **날짜 처리**       | date-fns        | 3.x  | 가벼운 날짜 라이브러리             |
 
-**응답 형식**: JSON
+#### 백엔드
 
-**에러 형식**:
+| 항목                | 기술               | 버전     | 사유                          |
+| ------------------- | ------------------ | -------- | ----------------------------- |
+| **런타임**          | Node.js            | 20.x LTS | JavaScript 풀스택, 비동기 I/O |
+| **프레임워크**      | Express            | 4.x      | 가볍고 유연한 웹 프레임워크   |
+| **API 스타일**      | REST API           | -        | 표준화된 HTTP 메서드 활용     |
+| **인증**            | JWT (jsonwebtoken) | 9.x      | 무상태 토큰 기반 인증         |
+| **비밀번호 암호화** | bcrypt             | 5.x      | 안전한 비밀번호 해싱          |
+| **입력 검증**       | express-validator  | 7.x      | 요청 데이터 유효성 검증       |
+| **CORS**            | cors               | 2.x      | 크로스 오리진 요청 처리       |
+| **환경 변수**       | dotenv             | 16.x     | 설정 관리                     |
+
+#### 데이터베이스
+
+| 항목             | 기술                  | 사유                                         |
+| ---------------- | --------------------- | -------------------------------------------- |
+| **데이터베이스** | PostgreSQL (Supabase) | 관계형 데이터 모델, 안정성, 무료 플랜 제공   |
+| **ORM**          | Prisma                | 타입 안전성, 직관적인 API, 마이그레이션 관리 |
+| **캐싱**         | 미사용                | MVP에서는 불필요, 추후 필요 시 추가          |
+
+#### 배포 및 인프라
+
+| 항목                    | 기술                          | 사유                                           |
+| ----------------------- | ----------------------------- | ---------------------------------------------- |
+| **프론트엔드 배포**     | Vercel                        | 자동 배포, CDN, 서버리스                       |
+| **백엔드 배포**         | Vercel (Serverless Functions) | 간편한 배포, 자동 스케일링                     |
+| **데이터베이스 호스팅** | Supabase                      | 관리형 PostgreSQL, 자동 백업                   |
+| **버전 관리**           | GitHub                        | Git 기반 협업                                  |
+| **CI/CD**               | 수동 배포 (초기)              | MVP에서는 간단히, v1.0에서 GitHub Actions 고려 |
+
+#### 인증 방식
+
+- 토큰(JWT) 기반 인증 방식 적용
+- 토큰은 access_token, refresh_token을 함께 사용하도록 할것
+
+### 5.2 API 설계
+
+#### 5.2.1 API 엔드포인트
+
+**인증 (Authentication)**
+
+```
+POST   /api/auth/register     회원가입
+POST   /api/auth/login        로그인
+POST   /api/auth/logout       로그아웃
+GET    /api/auth/me           현재 사용자 정보 조회
+```
+
+**할일 (Todos)**
+
+```
+GET    /api/todos             할일 목록 조회 (개인 + 공통)
+GET    /api/todos/:id         할일 상세 조회
+POST   /api/todos             할일 생성
+PUT    /api/todos/:id         할일 수정
+DELETE /api/todos/:id         할일 삭제 (휴지통 이동)
+PATCH  /api/todos/:id/complete  할일 완료 처리
+PATCH  /api/todos/:id/uncomplete  할일 완료 취소
+```
+
+**휴지통 (Trash)**
+
+```
+GET    /api/trash             휴지통 목록 조회
+POST   /api/trash/:id/restore 할일 복원
+DELETE /api/trash/:id         할일 영구 삭제
+```
+
+**공통 할일 (Common Todos) - 관리자 전용**
+
+```
+POST   /api/admin/common-todos       공통 할일 생성
+DELETE /api/admin/common-todos/:id   공통 할일 삭제
+```
+
+#### 5.2.2 API 응답 형식
+
+**성공 응답**
+
+```json
+{
+  "success": true,
+  "data": {
+    // 응답 데이터
+  }
+}
+```
+
+**에러 응답**
+
 ```json
 {
   "success": false,
   "error": {
-    "code": "ERROR_CODE",
-    "message": "에러 메시지"
+    "code": "400",
+    "message": "제목은 1-200자 이내로 입력해주세요",
+    "field": "제목"
   }
 }
 ```
 
-### 9.2 인증 API
+#### 5.2.3 인증 방식
 
-#### POST /api/auth/register
-회원가입
+- **JWT Bearer Token**: HTTP 헤더에 포함
+- **토큰 위치**: `Authorization: Bearer <token>`
+- **토큰 만료**: 7일
+- **리프레시 토큰**: MVP에서는 미사용, v1.0에서 고려
 
-**요청**:
-```json
-{
-  "email": "user@example.com",
-  "password": "password123",
-  "username": "홍길동"
+### 5.3 데이터베이스 설계
+
+#### 5.3.1 Prisma 스키마 예시
+
+```prisma
+// User 모델
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+
+  todos     TodoItem[]
+}
+
+// TodoItem 모델
+model TodoItem {
+  id          String    @id @default(uuid())
+  title       String
+  content     String?
+  startAt     DateTime?
+  endAt       DateTime?
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  status      Status    @default(ACTIVE)
+  ownerId     String?
+  type        TodoType  @default(PERSONAL)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  owner       User?     @relation(fields: [ownerId], references: [id])
+  trash       Trash?
+}
+
+enum Status {
+  ACTIVE
+  DELETED
+}
+
+enum TodoType {
+  PERSONAL
+  COMMON
+}
+
+// Trash 모델
+model Trash {
+  id        String   @id @default(uuid())
+  todoId    String   @unique
+  deletedAt DateTime @default(now())
+
+  todo      TodoItem @relation(fields: [todoId], references: [id], onDelete: Cascade)
 }
 ```
 
-**응답** (201 Created):
-```json
-{
-  "success": true,
-  "data": {
-    "userId": "uuid",
-    "email": "user@example.com",
-    "username": "홍길동",
-    "role": "user"
-  }
-}
+### 5.4 프로젝트 구조
+
+#### 프론트엔드 구조
+
+```
+igk-todolist-frontend/
+├── public/
+├── src/
+│   ├── components/       # 재사용 가능한 컴포넌트
+│   │   ├── common/       # 공통 컴포넌트 (Button, Input, Modal 등)
+│   │   ├── todos/        # 할일 관련 컴포넌트
+│   │   └── layout/       # 레이아웃 컴포넌트
+│   ├── pages/            # 페이지 컴포넌트
+│   │   ├── LoginPage.tsx
+│   │   ├── TodoListPage.tsx
+│   │   └── TrashPage.tsx
+│   ├── stores/           # Zustand 상태 관리
+│   │   ├── authStore.ts
+│   │   └── todoStore.ts
+│   ├── services/         # API 호출 서비스
+│   │   ├── authService.ts
+│   │   └── todoService.ts
+│   ├── hooks/            # 커스텀 훅
+│   ├── utils/            # 유틸리티 함수
+│   ├── types/            # TypeScript 타입 정의
+│   ├── App.tsx
+│   └── main.tsx
+├── package.json
+└── tailwind.config.js
 ```
 
-**에러**:
-- 400: 이메일 형식 오류, 비밀번호 길이 부족
-- 409: 이메일 중복
+#### 백엔드 구조
 
-#### POST /api/auth/login
-로그인
-
-**요청**:
-```json
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
 ```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "accessToken": "jwt-access-token",
-    "refreshToken": "jwt-refresh-token",
-    "user": {
-      "userId": "uuid",
-      "email": "user@example.com",
-      "username": "홍길동",
-      "role": "user"
-    }
-  }
-}
+igk-todolist-backend/
+├── src/
+│   ├── controllers/      # 요청 처리 로직
+│   │   ├── authController.js
+│   │   ├── todoController.js
+│   │   └── trashController.js
+│   ├── middlewares/      # 미들웨어
+│   │   ├── auth.js       # 인증 미들웨어
+│   │   └── errorHandler.js
+│   ├── routes/           # API 라우트
+│   │   ├── auth.js
+│   │   ├── todos.js
+│   │   └── trash.js
+│   ├── services/         # 비즈니스 로직
+│   │   ├── authService.js
+│   │   └── todoService.js
+│   ├── utils/            # 유틸리티 함수
+│   │   ├── jwt.js
+│   │   └── validator.js
+│   ├── prisma/           # Prisma 설정
+│   │   └── schema.prisma
+│   ├── app.js            # Express 앱 설정
+│   └── server.js         # 서버 시작
+├── .env
+└── package.json
 ```
-
-**에러**:
-- 401: 이메일 또는 비밀번호 오류
-
-#### POST /api/auth/refresh
-토큰 갱신
-
-**요청**:
-```json
-{
-  "refreshToken": "jwt-refresh-token"
-}
-```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "accessToken": "new-jwt-access-token"
-  }
-}
-```
-
-**에러**:
-- 401: 유효하지 않은 Refresh Token
-
-#### POST /api/auth/logout
-로그아웃
-
-**요청 헤더**:
-```
-Authorization: Bearer {accessToken}
-```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "message": "로그아웃 되었습니다"
-}
-```
-
-### 9.3 할일 API
-
-#### GET /api/todos
-할일 목록 조회
-
-**요청 헤더**:
-```
-Authorization: Bearer {accessToken}
-```
-
-**쿼리 파라미터**:
-- `status`: active | completed | deleted (선택)
-- `search`: 검색어 (선택)
-- `sortBy`: dueDate | createdAt (선택, 기본: createdAt)
-- `order`: asc | desc (선택, 기본: desc)
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "todoId": "uuid",
-      "title": "프로젝트 마감",
-      "content": "PRD 작성 완료하기",
-      "startDate": "2025-11-25",
-      "dueDate": "2025-11-28",
-      "status": "active",
-      "isCompleted": false,
-      "createdAt": "2025-11-25T10:00:00Z",
-      "updatedAt": "2025-11-25T10:00:00Z"
-    }
-  ]
-}
-```
-
-#### POST /api/todos
-할일 생성
-
-**요청**:
-```json
-{
-  "title": "프로젝트 마감",
-  "content": "PRD 작성 완료하기",
-  "startDate": "2025-11-25",
-  "dueDate": "2025-11-28"
-}
-```
-
-**응답** (201 Created):
-```json
-{
-  "success": true,
-  "data": {
-    "todoId": "uuid",
-    "title": "프로젝트 마감",
-    "content": "PRD 작성 완료하기",
-    "startDate": "2025-11-25",
-    "dueDate": "2025-11-28",
-    "status": "active",
-    "isCompleted": false
-  }
-}
-```
-
-**에러**:
-- 400: title 누락, dueDate < startDate
-
-#### GET /api/todos/:id
-할일 상세 조회
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "todoId": "uuid",
-    "title": "프로젝트 마감",
-    "content": "PRD 작성 완료하기",
-    "startDate": "2025-11-25",
-    "dueDate": "2025-11-28",
-    "status": "active",
-    "isCompleted": false
-  }
-}
-```
-
-**에러**:
-- 404: 할일을 찾을 수 없음
-- 403: 권한 없음 (타인의 할일)
-
-#### PUT /api/todos/:id
-할일 수정
-
-**요청**:
-```json
-{
-  "title": "프로젝트 마감 (수정)",
-  "content": "PRD 작성 및 검토 완료",
-  "startDate": "2025-11-25",
-  "dueDate": "2025-11-29"
-}
-```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "todoId": "uuid",
-    "title": "프로젝트 마감 (수정)",
-    "content": "PRD 작성 및 검토 완료",
-    "dueDate": "2025-11-29"
-  }
-}
-```
-
-#### PATCH /api/todos/:id/complete
-할일 완료
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "todoId": "uuid",
-    "status": "completed",
-    "isCompleted": true
-  }
-}
-```
-
-#### DELETE /api/todos/:id
-할일 삭제 (휴지통 이동)
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "message": "할일이 휴지통으로 이동되었습니다",
-  "data": {
-    "todoId": "uuid",
-    "status": "deleted",
-    "deletedAt": "2025-11-25T15:00:00Z"
-  }
-}
-```
-
-#### PATCH /api/todos/:id/restore
-할일 복원
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "message": "할일이 복원되었습니다",
-  "data": {
-    "todoId": "uuid",
-    "status": "active",
-    "deletedAt": null
-  }
-}
-```
-
-### 9.4 휴지통 API
-
-#### GET /api/trash
-휴지통 조회
-
-**요청 헤더**:
-```
-Authorization: Bearer {accessToken}
-```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "todoId": "uuid",
-      "title": "삭제된 할일",
-      "status": "deleted",
-      "deletedAt": "2025-11-25T15:00:00Z"
-    }
-  ]
-}
-```
-
-#### DELETE /api/trash/:id
-영구 삭제
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "message": "할일이 영구적으로 삭제되었습니다"
-}
-```
-
-**에러**:
-- 400: 활성 상태의 할일은 영구 삭제 불가
-- 404: 할일을 찾을 수 없음
-
-### 9.5 국경일 API
-
-#### GET /api/holidays
-국경일 조회
-
-**쿼리 파라미터**:
-- `year`: 연도 (선택, 기본: 현재 연도)
-- `month`: 월 (선택)
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "holidayId": "uuid",
-      "title": "신정",
-      "date": "2025-01-01",
-      "description": "새해 첫날",
-      "isRecurring": true
-    },
-    {
-      "holidayId": "uuid",
-      "title": "설날",
-      "date": "2025-01-29",
-      "description": "음력 1월 1일",
-      "isRecurring": true
-    }
-  ]
-}
-```
-
-#### POST /api/holidays
-국경일 추가 (관리자 전용)
-
-**요청 헤더**:
-```
-Authorization: Bearer {accessToken}
-X-Admin-Role: required
-```
-
-**요청**:
-```json
-{
-  "title": "광복절",
-  "date": "2025-08-15",
-  "description": "대한민국 독립 기념일",
-  "isRecurring": true
-}
-```
-
-**응답** (201 Created):
-```json
-{
-  "success": true,
-  "data": {
-    "holidayId": "uuid",
-    "title": "광복절",
-    "date": "2025-08-15",
-    "isRecurring": true
-  }
-}
-```
-
-**에러**:
-- 403: 관리자 권한 필요
-
-#### PUT /api/holidays/:id
-국경일 수정 (관리자 전용)
-
-**요청**:
-```json
-{
-  "title": "광복절",
-  "date": "2025-08-15",
-  "description": "수정된 설명"
-}
-```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "holidayId": "uuid",
-    "title": "광복절",
-    "description": "수정된 설명"
-  }
-}
-```
-
-### 9.6 사용자 API
-
-#### GET /api/users/me
-현재 사용자 프로필 조회
-
-**요청 헤더**:
-```
-Authorization: Bearer {accessToken}
-```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "userId": "uuid",
-    "email": "user@example.com",
-    "username": "홍길동",
-    "role": "user",
-    "createdAt": "2025-11-01T00:00:00Z"
-  }
-}
-```
-
-#### PATCH /api/users/me
-현재 사용자 프로필 수정
-
-**요청**:
-```json
-{
-  "username": "새이름",
-  "password": "newpassword123"
-}
-```
-
-**응답** (200 OK):
-```json
-{
-  "success": true,
-  "data": {
-    "userId": "uuid",
-    "username": "새이름"
-  }
-}
-```
-
-### 9.7 에러 코드 정의
-
-| HTTP 상태 | 에러 코드 | 설명 |
-|-----------|-----------|------|
-| 400 | BAD_REQUEST | 잘못된 요청 |
-| 400 | INVALID_DATE_RANGE | 만료일이 시작일보다 이전 |
-| 400 | TITLE_REQUIRED | 제목 필수 입력 |
-| 401 | UNAUTHORIZED | 인증 실패 |
-| 401 | TOKEN_EXPIRED | 토큰 만료 |
-| 401 | INVALID_TOKEN | 유효하지 않은 토큰 |
-| 403 | FORBIDDEN | 권한 없음 |
-| 403 | ADMIN_REQUIRED | 관리자 권한 필요 |
-| 404 | NOT_FOUND | 리소스 없음 |
-| 404 | TODO_NOT_FOUND | 할일을 찾을 수 없음 |
-| 404 | USER_NOT_FOUND | 사용자를 찾을 수 없음 |
-| 409 | CONFLICT | 중복 데이터 |
-| 409 | EMAIL_EXISTS | 이메일 중복 |
-| 409 | ALREADY_DELETED | 이미 삭제된 할일 |
-| 429 | TOO_MANY_REQUESTS | 요청 횟수 초과 |
-| 500 | INTERNAL_ERROR | 서버 내부 오류 |
 
 ---
 
-## 10. UI/UX 요구사항
+## 6. UI/UX 요구사항
 
-### 10.1 화면 구성
+### 6.1 화면 구성
 
-#### 필수 화면
+#### 6.1.1 주요 화면
 
-| 화면 | 라우트 | 설명 | 우선순위 |
-|------|--------|------|----------|
-| 로그인 | `/login` | 이메일/비밀번호 로그인 | P0 |
-| 회원가입 | `/register` | 신규 사용자 등록 | P0 |
-| 할일 목록 (메인) | `/` | 할일 목록 조회 및 관리 | P0 |
-| 할일 상세/수정 | `/todos/:id` | 모달 또는 별도 페이지 | P0 |
-| 휴지통 | `/trash` | 삭제된 할일 관리 | P0 |
-| 국경일 조회 | `/holidays` | 국경일 목록 (할일 목록과 통합 가능) | P0 |
-| 관리자 화면 | `/admin/holidays` | 국경일 관리 (관리자 전용) | P1 |
-| 프로필 | `/profile` | 사용자 정보 조회/수정 | P1 |
+| 화면명                    | 설명                                            | 우선순위 |
+| ------------------------- | ----------------------------------------------- | -------- |
+| **로그인 화면**           | 이메일/비밀번호 입력 로그인                     | P0       |
+| **회원가입 화면**         | 이메일, 비밀번호, 이름 입력 회원가입            | P0       |
+| **할일 목록 화면 (메인)** | 개인 할일 + 공통 할일 표시, 추가/수정/삭제/완료 | P0       |
+| **할일 추가/편집 모달**   | 할일 생성/수정 폼 (모달 팝업)                   | P0       |
+| **휴지통 화면**           | 삭제된 할일 목록, 복원/영구삭제                 | P0       |
+| **설정 화면**             | 비밀번호 변경, 계정 관리                        | P1       |
 
-#### 화면 플로우
+#### 6.1.2 할일 목록 화면 (메인)
 
-```
-[로그인] → [할일 목록 (메인)]
-            ├→ [할일 추가 모달]
-            ├→ [할일 상세/수정 모달]
-            ├→ [휴지통]
-            ├→ [국경일 조회]
-            └→ [프로필]
+**레이아웃**:
 
-[회원가입] → [로그인]
+- **좌측 사이드바**: 메뉴 (오늘, 이번주, 전체, 휴지통)
+- **중앙 영역**: 할일 리스트
+- **상단 바**: 검색, 필터, 정렬, 사용자 프로필
 
-[관리자] → [관리자 화면 (국경일 관리)]
-```
+**할일 카드 표시 정보**:
 
-### 10.2 디자인 방향
+1. **완료 체크박스** (가장 왼쪽, 클릭하기 쉽게)
+2. **할일 제목** (가장 크게, 굵게)
+3. **만료일** (제목 옆 또는 아래, 주목도 높게)
+   - D-3, 오늘, 내일 등 상대 날짜 표시
+   - 만료일 임박 시 빨간색 강조
+4. **완료 여부 시각적 구분** (완료된 할일은 흐리게, 취소선)
+5. **공통 할일 표시** (다른 색상 배경, 회색)
+6. **할일 개수** (상단에 "전체 N개, 완료 N개" 표시)
 
-**스타일**: 모던하고 세련된 디자인
-**참조**: 네이버 캘린더 UI ([스타일 가이드](./4-style-guide.md) 참조)
+**인터랙션**:
 
-**핵심 원칙**:
-1. **단순함**: 불필요한 장식 없이 깔끔한 인터페이스
-2. **명확성**: 직관적인 아이콘과 레이블
-3. **일관성**: 모든 화면에서 동일한 디자인 패턴
-4. **반응성**: 데스크톱과 모바일 모두 최적화
+- 할일 클릭 → 상세 내용 확장 (인라인 확장)
+- 체크박스 클릭 → 즉시 완료 처리 (로딩 없이)
+- 할일 우클릭 또는 옵션 메뉴 → 수정, 삭제 옵션
+- - 버튼 클릭 → 할일 추가 모달 표시
 
-**색상 체계**:
-- Primary: 네이버 그린 (#00C73C)
-- 할일 상태:
-  - 진행 중: 주황색 (#FF7043)
-  - 완료: 초록색 (#66BB6A)
-  - 삭제: 회색 (#BDBDBD)
-- 국경일: 빨간색 (#E53935)
+### 6.2 UI/UX 원칙
 
-### 10.3 컴포넌트 구성
+#### 6.2.1 단순함
 
-#### 공통 컴포넌트
+- **최소한의 기능만 명확하게**: 불필요한 옵션이나 설정 배제
+- **3분 안에 사용 가능**: 처음 사용하는 사람도 설명 없이 사용
+- **익숙한 UI 패턴**: 체크박스, 휴지통 아이콘 등 직관적인 요소 사용
 
-1. **Header (헤더)**
-   - 로고
-   - 사용자 정보 (드롭다운)
-   - 로그아웃 버튼
+#### 6.2.2 빠름
 
-2. **Sidebar (사이드바)** - 선택
-   - 할일 목록
-   - 휴지통
-   - 국경일
-   - 설정
+- **즉각 반응**: 할일 추가/체크 시 로딩 스피너 없이 즉시 UI 업데이트
+- **SPA 구조**: 페이지 전환 없이 인라인으로 작업 완료
+- **낙관적 업데이트**: 서버 응답 전에 UI 먼저 업데이트, 실패 시 롤백
 
-3. **Button (버튼)**
-   - Primary, Secondary, Icon 버튼
-   - Hover/Active 상태
+#### 6.2.3 직관성
 
-4. **Input Field (입력 필드)**
-   - Text, Email, Password, Date
-   - 에러 상태 표시
+- **명확한 시각적 피드백**:
+  - 완료된 할일: 흐리게 + 취소선
+  - 공통 할일: 회색 배경
+  - 만료일 임박: 빨간색 강조
+- **키보드 단축키 지원** (개발자용):
+  - `N`: 새 할일 추가
+  - `Enter`: 선택한 할일 체크
+  - `Delete`: 선택한 할일 삭제
+- **모바일 최적화**:
+  - 터치 영역: 최소 44x44px
+  - 한 손으로 편리하게 사용
+  - Pull to Refresh
 
-5. **Modal (모달)**
-   - 할일 추가/수정 모달
-   - 확인 다이얼로그
+### 6.3 디자인 스타일
 
-6. **TodoCard (할일 카드)**
-   - 제목, 내용, 날짜
-   - 완료 체크박스
-   - 수정/삭제 버튼
-   - 상태별 색상 구분
+#### 6.3.1 디자인 컨셉
 
-7. **Calendar (캘린더)** - 2차 개발
-   - 월간 캘린더 그리드
-   - 할일 바 표시
-   - 국경일 표시
+- **미니멀**: 흰색/회색 위주, 심플한 디자인
+- **깔끔한 UI**: Todoist, Things 3 레퍼런스
+- **빠른 인터랙션**: Linear 스타일 레퍼런스
 
-### 10.4 반응형 디자인
+#### 6.3.2 색상 팔레트
 
-**지원 디바이스**:
-- 데스크톱 (1024px+)
-- 모바일 (< 768px)
+| 용도          | 색상                                 | 설명               |
+| ------------- | ------------------------------------ | ------------------ |
+| **주 색상**   | 파란색 계열 (#3B82F6)                | 신뢰감, 안정감     |
+| **보조 색상** | 회색 (#6B7280)                       | 중요하지 않은 정보 |
+| **강조 색상** | 빨간색 (#EF4444)                     | 긴급 마감일, 에러  |
+| **성공 색상** | 초록색 (#10B981)                     | 완료, 성공         |
+| **배경 색상** | 흰색 (#FFFFFF) / 밝은 회색 (#F9FAFB) |                    |
 
-**브레이크포인트**:
-```css
-mobile: 480px
-tablet: 768px
-desktop: 1024px
-wide: 1440px
-```
+#### 6.3.3 타이포그래피
 
-**모바일 최적화**:
-- 터치 친화적인 버튼 크기 (최소 44x44px)
-- 스와이프 제스처 지원 (할일 삭제 등)
-- 하단 고정 네비게이션 바
-- 풀스크린 모달
+- **폰트**: 고딕 계열 (Pretendard, Inter)
+- **크기**:
+  - 할일 제목: 16px (bold)
+  - 날짜/부가 정보: 14px
+  - 최소 14px (가독성)
+- **행간**: 1.5 (편안한 가독성)
 
-### 10.5 다크모드
+#### 6.3.4 여백 및 레이아웃
 
-**지원 여부**: 예 (P1 우선순위)
+- **충분한 여백**: 답답하지 않게, 각 요소 사이 16px 이상
+- **카드 스타일**: 그림자 최소화, 경계선 사용
+- **반응형 그리드**: 모바일(1열), 태블릿(1-2열), 데스크톱(2-3열)
 
-**구현 방법**:
-- Tailwind CSS `dark:` 유틸리티 사용
-- 사용자 설정 저장 (LocalStorage)
-- 시스템 설정 감지 (`prefers-color-scheme`)
+### 6.4 반응형 디자인
 
-**다크모드 색상**:
-- 배경: #1A1A1A
-- 텍스트: #E5E5E5
-- Primary: #00E047 (밝은 그린)
+#### 6.4.1 브레이크포인트
 
-### 10.6 접근성
+| 디바이스     | 화면 크기      | 레이아웃             |
+| ------------ | -------------- | -------------------- |
+| **모바일**   | 320px - 767px  | 1열, 사이드바 접기   |
+| **태블릿**   | 768px - 1023px | 1-2열, 사이드바 토글 |
+| **데스크톱** | 1024px 이상    | 2-3열, 사이드바 고정 |
 
-- **키보드 네비게이션**: Tab, Enter, ESC 지원
-- **포커스 인디케이터**: 명확한 포커스 스타일
-- **스크린 리더**: aria-label, role 속성 사용
-- **색상 대비**: WCAG AA 기준 (4.5:1)
+#### 6.4.2 모바일 최적화
+
+- **터치 영역**: 최소 44x44px
+- **스크롤**: 부드러운 스크롤, Pull to Refresh 지원
+- **네비게이션**: 하단 고정 바 (모바일)
+- **입력**: 키보드 팝업 시 레이아웃 조정
 
 ---
 
-## 11. 일정 및 마일스톤
+## 7. 비기능 요구사항
 
-### 11.1 전체 일정
+### 7.1 성능
 
-**프로젝트 기간**: 2025-11-25 ~ 2025-11-28 (4일)
-**목표 런칭일**: 2025-11-28 오후
+#### 7.1.1 예상 사용자 규모
 
-### 11.2 상세 일정
+- **사용자 수**: 초기 80명 (전체 직원), 확장 시 100-150명
+- **동시 접속자**: 평균 20-30명, 피크 시 50명
+- **할일 데이터**: 사용자당 평균 50개, 최대 500개
 
-#### Phase 1: 기획 및 설계 (완료)
+#### 7.1.2 응답 시간 목표
 
-| 항목 | 목표 완료일 | 상태 |
-|------|-------------|------|
-| 도메인 정의서 작성 | 2025-11-25 | ✅ 완료 |
-| PRD 작성 | 2025-11-25 | ✅ 완료 |
-| 스타일 가이드 작성 | 2025-11-25 | ✅ 완료 |
-| DB 스키마 설계 | 2025-11-25 | 진행 중 |
-| API 명세 완료 | 2025-11-26 | 예정 |
+| 작업           | 목표 응답 시간               |
+| -------------- | ---------------------------- |
+| 할일 목록 로딩 | 0.5초 이내                   |
+| 할일 추가/수정 | 0.3초 이내                   |
+| 할일 완료 체크 | 0.1초 이내 (낙관적 업데이트) |
+| 검색 결과      | 1초 이내                     |
 
-#### Phase 2: 백엔드 개발
+#### 7.1.3 성능 최적화 전략
 
-**기간**: 2025-11-26
+- **프론트엔드**:
+  - 코드 스플리팅 (React.lazy)
+  - 이미지 최적화 (WebP, lazy loading)
+  - 낙관적 업데이트
+  - 리스트 가상화 (100개 이상 할일 시)
+- **백엔드**:
+  - 데이터베이스 인덱싱 (userId, status, createdAt)
+  - 페이지네이션 (50개씩)
+  - 불필요한 JOIN 최소화
 
-| 항목 | 담당 | 예상 시간 |
-|------|------|-----------|
-| 프로젝트 초기 설정 | Backend | 1h |
-| Prisma 스키마 작성 및 마이그레이션 | Backend | 1h |
-| 인증 API 구현 (회원가입, 로그인, 토큰 갱신) | Backend | 3h |
-| 할일 CRUD API 구현 | Backend | 4h |
-| 휴지통 API 구현 | Backend | 2h |
-| 국경일 API 구현 | Backend | 2h |
-| 미들웨어 (인증, 에러 핸들링, Rate Limiting) | Backend | 2h |
-| API 테스트 (Postman) | Backend | 2h |
+### 7.2 보안
 
-**총 예상 시간**: 17시간
+#### 7.2.1 인증 및 권한
 
-#### Phase 3: 프론트엔드 개발
+- **인증 방식**: JWT Bearer Token
+- **비밀번호 암호화**: bcrypt (10 라운드)
+- **세션 유지**: 7일 (자동 로그인 옵션)
+- **계정 잠금**: 5회 로그인 실패 시 10분간 잠금
 
-**기간**: 2025-11-27 ~ 2025-11-28 오전
+#### 7.2.2 데이터 보안
 
-| 항목 | 담당 | 예상 시간 |
-|------|------|-----------|
-| 프로젝트 초기 설정 (React + Vite + Tailwind) | Frontend | 1h |
-| 라우팅 및 레이아웃 구조 | Frontend | 2h |
-| 공통 컴포넌트 구현 (Button, Input, Modal) | Frontend | 3h |
-| 인증 화면 (로그인, 회원가입) | Frontend | 3h |
-| 할일 목록 화면 | Frontend | 4h |
-| 할일 추가/수정 모달 | Frontend | 3h |
-| 휴지통 화면 | Frontend | 2h |
-| 국경일 화면 | Frontend | 2h |
-| 프로필 화면 | Frontend | 2h |
-| 상태 관리 (Zustand) | Frontend | 2h |
-| API 연동 (Axios) | Frontend | 4h |
-| 반응형 디자인 적용 | Frontend | 3h |
-| 다크모드 구현 | Frontend | 2h |
+- **HTTPS 필수**: Let's Encrypt SSL (Vercel 자동 제공)
+- **XSS 방어**: React의 기본 XSS 방어 + 입력 검증
+- **CSRF 방어**: SameSite Cookie 속성
+- **SQL Injection 방어**: Prisma ORM 사용 하지 말자 (파라미터화된 쿼리)
+- **환경 변수 보호**: .env 파일, Git 제외
 
-**총 예상 시간**: 33시간 → **2일 소요** (하루 16시간 작업 기준)
+#### 7.2.3 API 보안
 
-#### Phase 4: 통합 및 테스트
+- **CORS 설정**: 특정 도메인만 허용
+- **Rate Limiting**: 분당 60 요청 제한 (MVP에서는 미적용, v1.0 고려)
+- **입력 검증**: express-validator로 모든 입력 검증
+- **에러 메시지**: 내부 정보 노출 금지
 
-**기간**: 2025-11-28
+#### 7.2.4 개인정보 처리
 
-| 항목 | 담당 | 예상 시간 |
-|------|------|-----------|
-| 프론트엔드-백엔드 통합 테스트 | Full Stack | 2h |
-| 버그 수정 | Full Stack | 2h |
-| 크로스 브라우저 테스트 | Frontend | 1h |
-| 모바일 반응형 테스트 | Frontend | 1h |
-| 성능 최적화 | Full Stack | 2h |
+- **최소 수집**: 이메일, 이름, 비밀번호만 수집
+- **비밀번호 평문 저장 금지**: bcrypt 해싱 필수
+- **관리자도 비밀번호 조회 불가**: 해시만 저장
+- **탈퇴 시 데이터 삭제**: 30일 유예 기간 후 영구 삭제
 
-**총 예상 시간**: 8시간
+### 7.3 가용성
 
-#### Phase 5: 배포 및 런칭
+#### 7.3.1 목표 가동률 (Uptime)
 
-**기간**: 2025-11-28 오후
+- **목표**: 99% (월 1회 정도 짧은 다운타임 허용)
+- **허용 다운타임**:
+  - 월간 계획 점검: 1회, 최대 1시간 (새벽 시간대)
+  - 긴급 패치: 필요 시 공지 후 30분 이내
+- **업무 시간(9-18시) 가동 유지**: 필수
 
-| 항목 | 담당 | 예상 시간 |
-|------|------|-----------|
-| Vercel 프론트엔드 배포 | Frontend | 1h |
-| Vercel 백엔드 배포 | Backend | 1h |
-| Supabase DB 설정 | Backend | 1h |
-| 환경 변수 설정 | Full Stack | 0.5h |
-| 프로덕션 테스트 | Full Stack | 1h |
-| 런칭 | - | - |
+#### 7.3.2 백업 정책
 
-**총 예상 시간**: 4.5시간
+- **데이터베이스 백업** (Supabase 자동):
+  - 매일 자동 백업
+  - 30일 보관
+- **복구 시간 목표 (RTO)**: 1시간 이내
+- **복구 시점 목표 (RPO)**: 24시간 (일일 백업)
 
-### 11.3 마일스톤
+#### 7.3.3 모니터링
 
-| 마일스톤 | 날짜 | 목표 |
-|----------|------|------|
-| M1: 기획 완료 | 2025-11-25 | 도메인 정의서, PRD, API 명세 완료 |
-| M2: 백엔드 완료 | 2025-11-26 | 모든 API 구현 및 테스트 완료 |
-| M3: 프론트엔드 완료 | 2025-11-28 오전 | 모든 화면 구현 및 API 연동 완료 |
-| M4: 통합 테스트 완료 | 2025-11-28 오전 | E2E 테스트 및 버그 수정 완료 |
-| M5: 런칭 | 2025-11-28 오후 | 프로덕션 배포 완료 |
+- **프론트엔드**:
+  - Vercel Analytics (자동)
+  - 에러 추적: 브라우저 콘솔 로그
+- **백엔드**:
+  - Winston Logger (파일 저장)
+  - 에러 추적: Sentry (무료 플랜, v1.0에서 추가)
+- **데이터베이스**:
+  - Supabase 대시보드 모니터링
 
-### 11.4 리스크 및 일정 버퍼
+### 7.4 확장성
 
-**주요 리스크**:
-1. 기술 학습 곡선 (React 18, Zustand, Prisma)
-2. API 통합 이슈
-3. 배포 설정 문제
+#### 7.4.1 단기 확장 (현재 → 100명)
 
-**대응 방안**:
-- 각 Phase마다 2-4시간 버퍼 포함
-- 우선순위 낮은 기능 (P1)은 시간 부족 시 제외
-- 다크모드, 검색/필터는 선택적 구현
+- **수직 확장**: Vercel Pro 플랜 업그레이드
+- **데이터베이스**: Supabase Pro 플랜 고려
 
----
+#### 7.4.2 중기 확장 (100명 → 500명)
 
-## 12. 리스크 및 제약사항
+- **API 최적화**: 캐싱 레이어 추가 (Redis)
+- **데이터베이스 인덱싱**: 쿼리 최적화
+- **CDN**: 정적 파일 캐싱 강화
 
-### 12.1 기술적 리스크
+### 7.5 호환성
 
-| 리스크 | 영향도 | 확률 | 대응 방안 |
-|--------|--------|------|-----------|
-| **새로운 기술 스택 학습** | High | High | - 공식 문서 우선 참고<br>- 간단한 예제부터 시작<br>- 커뮤니티 활용 |
-| **Prisma + Supabase 통합** | Medium | Medium | - Prisma 공식 Supabase 가이드 참조<br>- Connection String 설정 주의 |
-| **JWT 토큰 관리** | Medium | Medium | - 토큰 갱신 로직 명확화<br>- Refresh Token 저장 방식 결정 (Cookie vs LocalStorage) |
-| **CORS 이슈** | Low | Medium | - Express CORS 미들웨어 설정<br>- Vercel 환경 변수 확인 |
-| **성능 최적화** | Medium | Low | - 인덱싱 적용<br>- Lazy Loading<br>- 번들 크기 최소화 |
+#### 7.5.1 지원 브라우저
 
-### 12.2 일정 리스크
+| 브라우저            | 최소 버전                  | 우선순위        |
+| ------------------- | -------------------------- | --------------- |
+| **Chrome**          | 최신 -2 버전               | P0 (80% 사용)   |
+| **Firefox**         | 최신 -2 버전               | P1              |
+| **Safari**          | 최신 -1 버전               | P1 (Mac 사용자) |
+| **Edge**            | Chromium 기반 최신         | P1              |
+| **모바일 브라우저** | iOS Safari, Android Chrome | P0              |
 
-| 리스크 | 영향도 | 대응 방안 |
-|--------|--------|-----------|
-| **프론트엔드 개발 지연** | High | - 우선순위 낮은 기능 제외 (다크모드, 검색)<br>- UI 단순화 |
-| **API 통합 이슈** | Medium | - API 명세 사전 합의<br>- Mock 데이터로 프론트 먼저 개발 |
-| **배포 설정 시간 초과** | Medium | - Vercel 템플릿 활용<br>- 배포 가이드 사전 숙지 |
+#### 7.5.2 모바일 대응
 
-### 12.3 외부 의존성
-
-| 의존성 | 리스크 | 대응 방안 |
-|--------|--------|-----------|
-| **Supabase 서비스** | 서비스 다운타임 | - 로컬 PostgreSQL 백업 환경 구축<br>- Supabase 상태 페이지 모니터링 |
-| **Vercel 배포** | 배포 실패 | - 로컬 테스트 철저히<br>- Vercel 로그 확인 |
-| **국경일 데이터** | 데이터 정확성 | - 공공데이터포털 또는 수동 입력<br>- 관리자 화면으로 수정 가능 |
-
-### 12.4 기술적 제약사항
-
-**도메인 정의서 참조**:
-
-1. **인증**:
-   - JWT 기반 인증 (Access Token 15분, Refresh Token 7일)
-   - 비밀번호 bcrypt 해싱
-
-2. **데이터**:
-   - 소프트 삭제 방식 (복원 가능성 보장)
-   - 할일 제목 필수 입력
-   - 이메일 고유성
-   - 만료일 >= 시작일
-
-3. **보안**:
-   - HTTPS 필수
-   - CORS 정책 설정
-   - SQL Injection / XSS 방어
-   - Rate Limiting
-
-### 12.5 비즈니스 제약사항
-
-1. **개발 기간**: 4일 이내 완료 필수
-2. **인력**: 1인 개발 (풀스택)
-3. **예산**: 무료 티어 활용 (Vercel, Supabase)
-4. **범위**: MVP 기능만 우선 구현, 추가 기능은 2차 개발
-
-### 12.6 데이터 제약사항
-
-**도메인 정의서 5.3 참조**:
-- 할일 제목: 필수 입력, VARCHAR(200)
-- 이메일: 고유, VARCHAR(255)
-- 비밀번호: bcrypt 해싱, VARCHAR(255)
-- 날짜: dueDate >= startDate
-
-### 12.7 리스크 완화 전략
-
-1. **MVP 범위 엄격히 준수**
-   - P0 기능만 우선 구현
-   - P1 기능은 시간 여유 시 추가
-
-2. **단계별 테스트**
-   - 각 Phase 완료 후 테스트
-   - 문제 조기 발견 및 해결
-
-3. **문서화**
-   - API 명세 명확히
-   - 코드 주석 작성
-   - README 작성
-
-4. **버퍼 시간 확보**
-   - 각 Phase에 여유 시간 포함
-   - 예상치 못한 이슈 대응
+- **반응형 웹**: MVP 필수
+- **PWA 지원**: v1.0 목표 (홈 화면에 추가)
+- **네이티브 앱**: v2.0 고려
 
 ---
 
-## 13. 부록
+## 8. 출시 계획
 
-### 13.1 참조 문서
+### 8.1 개발 일정
 
-- [도메인 정의서 v1.1](./1-domain-definition.md)
-- [PRD 입력 템플릿](./2-prd-input-template.md)
-- [스타일 가이드](./4-style-guide.md)
+| 단계                         | 기간        | 주요 작업                                  | 인력                     |
+| ---------------------------- | ----------- | ------------------------------------------ | ------------------------ |
+| **요구사항 정의 및 설계**    | 2025년 12월 | 도메인 정의, PRD 작성, API 설계, DB 스키마 | PM 1명, 개발자 2명 (50%) |
+| **MVP 개발**                 | 2026년 1월  | 핵심 기능 개발 (인증, CRUD, 휴지통)        | 개발자 2명 (50%)         |
+| **내부 베타 테스트**         | 2026년 2월  | 개발팀 10명 베타 테스트, 버그 수정         | 개발자 2명 (50%)         |
+| **피드백 반영 및 추가 기능** | 2026년 3월  | 검색, 필터링, 정렬 기능 추가               | 개발자 2명 (50%)         |
+| **전사 출시**                | 2026년 4월  | 전체 직원 대상 출시, 모니터링              | 개발자 2명 (유지보수)    |
 
-### 13.2 관련 링크
+### 8.2 마일스톤
 
-**기술 문서**:
-- [React 18 공식 문서](https://react.dev/)
-- [Zustand](https://zustand-demo.pmnd.rs/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Prisma](https://www.prisma.io/)
-- [Express.js](https://expressjs.com/)
-- [Vercel](https://vercel.com/docs)
-- [Supabase](https://supabase.com/docs)
+| 마일스톤              | 날짜       | 내용                                           |
+| --------------------- | ---------- | ---------------------------------------------- |
+| **M1: 설계 완료**     | 2025-12-31 | 도메인 정의서, PRD, API 명세서, DB 스키마 완료 |
+| **M2: MVP 개발 완료** | 2026-01-31 | 인증, CRUD, 휴지통, 공통 할일 기능 완료        |
+| **M3: 베타 출시**     | 2026-02-15 | 개발팀 10명 대상 베타 테스트 시작              |
+| **M4: v1.0 출시**     | 2026-04-01 | 전사 직원 대상 정식 출시                       |
 
-**디자인 참조**:
-- [네이버 캘린더](https://calendar.naver.com/)
-- [Material Design](https://material.io/)
+### 8.3 MVP 범위
 
-### 13.3 용어 정의
+**MVP에 포함**:
 
-| 용어 | 정의 |
-|------|------|
-| **MVP** | Minimum Viable Product - 최소 기능 제품 |
-| **JWT** | JSON Web Token - 토큰 기반 인증 방식 |
-| **소프트 삭제** | 데이터를 실제로 삭제하지 않고 상태만 변경 |
-| **REST API** | Representational State Transfer - RESTful 아키텍처 기반 API |
-| **ORM** | Object-Relational Mapping - 객체-관계 매핑 |
-| **DAU** | Daily Active Users - 일일 활성 사용자 |
-| **MAU** | Monthly Active Users - 월간 활성 사용자 |
-| **KPI** | Key Performance Indicator - 핵심 성과 지표 |
+1. 사용자 인증 (회원가입, 로그인)
+2. 할일 CRUD (생성, 조회, 수정, 삭제)
+3. 할일 완료 처리
+4. 휴지통 (삭제, 복원, 영구 삭제)
+5. 공통 할일 자동 표시
+6. 반응형 웹 (PC, 모바일)
 
-### 13.4 변경 이력
+**MVP에서 제외** (v1.0에서 추가):
 
-| 버전 | 날짜 | 변경 내용 | 작성자 |
-|------|------|----------|--------|
-| 1.0 | 2025-11-25 | 초안 작성 | Claude |
+- 검색, 필터링, 정렬
+- 통계/대시보드
+- 카테고리, 우선순위
+- 알림 기능 (이메일, 웹 푸시)
+- 반복 할일
+
+### 8.4 베타 테스트 계획
+
+#### 8.4.1 베타 테스터
+
+- **규모**: 개발팀 10명
+- **기간**: 2주 (2026년 2월 1일 ~ 2월 14일)
+- **목표**: 핵심 기능 검증, 버그 발견, 사용성 피드백
+
+#### 8.4.2 테스트 시나리오
+
+1. **회원가입/로그인**: 계정 생성 및 로그인 테스트
+2. **할일 관리**: 추가, 수정, 삭제, 완료 처리
+3. **휴지통**: 삭제된 할일 복원, 영구 삭제
+4. **공통 할일**: 국경일 표시 확인
+5. **모바일 사용**: 스마트폰에서 할일 추가/체크
+
+#### 8.4.3 피드백 수집
+
+- **채널**: 사내 메신저 (Slack #igk-todolist-beta)
+- **설문조사**: 만족도 5점 척도, 개선 의견 자유 기술
+- **버그 리포트**: GitHub Issues 또는 이메일
+
+### 8.5 전사 출시 계획
+
+#### 8.5.1 출시 준비
+
+- **공지 메일 발송**: 출시 1주일 전
+  - 로그인 방법, 주요 기능 3가지 소개
+  - 1페이지 Quick Start 가이드 첨부
+- **온보딩 튜토리얼**: 첫 로그인 시 3단계 안내
+  - 할일 추가 → 완료 체크 → 삭제/복원
+- **FAQ 페이지**: 자주 묻는 질문 5개
+
+#### 8.5.2 사용자 교육
+
+- **교육 방식**: 자가 학습 (온보딩 튜토리얼, FAQ)
+- **지원 채널**:
+  - 사내 메신저: #igk-todolist-help
+  - 이메일: 개발팀 이메일
+  - 응답 시간: 업무일 기준 24시간 이내
 
 ---
 
-## 승인
+## 9. 성공 지표
 
-| 역할 | 이름 | 서명 | 날짜 |
-|------|------|------|------|
-| Product Owner | - | - | - |
-| Tech Lead | - | - | - |
-| Designer | - | - | - |
+### 9.1 정량 지표 (KPI)
+
+| 지표                       | 목표                    | 측정 방법               |
+| -------------------------- | ----------------------- | ----------------------- |
+| **사용자 수**              | 80명 중 60명 이상 (75%) | 회원가입 수             |
+| **일일 활성 사용자 (DAU)** | 평균 50명 이상 (60%)    | 일일 로그인 수          |
+| **할일 완료율**            | 평균 70% 이상           | 완료된 할일 / 전체 할일 |
+| **사용자 만족도**          | 4.0점/5점 이상          | 분기별 설문조사         |
+| **업무 시간 절감**         | 30% 감소                | 사용자 인터뷰, 설문조사 |
+
+### 9.2 목표 달성 일정
+
+| 기간              | 목표                                      |
+| ----------------- | ----------------------------------------- |
+| **출시 후 1개월** | 사용자 50명 달성                          |
+| **출시 후 3개월** | DAU 40명 이상 유지                        |
+| **출시 후 6개월** | 생산성 개선 효과 측정 (완료율, 시간 절감) |
+| **분기별**        | 사용자 만족도 설문조사 실시               |
+
+### 9.3 모니터링 항목
+
+#### 9.3.1 사용 통계
+
+- **사용자 지표**:
+  - 일일/주간/월간 활성 사용자 (DAU/WAU/MAU)
+  - 신규 가입자 수
+  - 이탈 사용자 수
+- **할일 지표**:
+  - 할일 생성/완료/삭제 횟수
+  - 평균 완료율
+  - 사용자당 평균 할일 개수
+- **기능 사용률**:
+  - 휴지통 사용 빈도
+  - 할일 복원율
+  - 검색 사용 빈도 (v1.0)
+
+#### 9.3.2 성능 모니터링
+
+- **페이지 로딩 시간**: 평균, P95, P99
+- **API 응답 시간**: 평균, P95, P99
+- **에러 발생률**: 전체 요청 대비 에러 비율
+
+#### 9.3.3 사용자 피드백
+
+- **앱 내 피드백**: "피드백 보내기" 버튼 (별점 + 한줄평)
+- **분기별 설문조사**: 만족도, 개선 의견
+- **사내 메신저**: 실시간 피드백 수집
 
 ---
 
-**문서 종료**
+## 10. 리스크 및 제약사항
+
+### 10.1 리스크
+
+#### 10.1.1 기술적 리스크
+
+| 리스크               | 영향도 | 발생 가능성 | 대응 방안                     |
+| -------------------- | ------ | ----------- | ----------------------------- |
+| **개발 인력 부족**   | 높음   | 중간        | 외부 프리랜서 투입, 일정 조정 |
+| **신기술 학습 곡선** | 중간   | 중간        | 사전 학습, 페어 프로그래밍    |
+| **Supabase 장애**    | 높음   | 낮음        | 자동 백업, 대체 DB 준비       |
+| **보안 취약점**      | 높음   | 낮음        | 코드 리뷰, 보안 체크리스트    |
+
+#### 10.1.2 일정 리스크
+
+| 리스크               | 영향도 | 발생 가능성 | 대응 방안                          |
+| -------------------- | ------ | ----------- | ---------------------------------- |
+| **타 프로젝트 병행** | 중간   | 높음        | 우선순위 조정, 50% 투입 보장       |
+| **요구사항 변경**    | 중간   | 중간        | MVP 범위 엄격히 관리, 변경 최소화  |
+| **베타 테스트 지연** | 낮음   | 중간        | 테스트 기간 단축, 중요 기능만 검증 |
+
+#### 10.1.3 운영 리스크
+
+| 리스크                     | 영향도 | 발생 가능성 | 대응 방안                            |
+| -------------------------- | ------ | ----------- | ------------------------------------ |
+| **사용자 교육 부족**       | 중간   | 중간        | 온보딩 튜토리얼 강화, 지원 채널 운영 |
+| **전사 확대 시 지원 부담** | 중간   | 높음        | FAQ 페이지, 자동화된 응답            |
+| **사용자 저조**            | 높음   | 낮음        | 사전 홍보, 인센티브 제공 고려        |
+
+### 10.2 제약사항
+
+#### 10.2.1 예산 제약
+
+- **최소화**: 사내 서버 활용, 오픈소스 활용
+- **클라우드 비용**: Vercel, Supabase 무료 플랜 활용
+- **유료 서비스**: 월 10만원 이내 (클라우드 확장 시)
+
+#### 10.2.2 인력 제약
+
+- **개발자 2명**: 50% 투입 (다른 업무 병행)
+- **디자이너 없음**: UI 라이브러리 (Tailwind CSS) 활용
+- **전담 PM 없음**: 개발팀 내 자체 PM
+
+#### 10.2.3 기간 제약
+
+- **MVP**: 2개월 (순수 개발 시간 1인월 x 2명)
+- **v1.0**: 3-4개월 (피드백 반영 + 추가 기능)
+- **빠른 출시 우선**: 완벽함보다는 실용성
+
+#### 10.2.4 기타 제약
+
+- **기존 시스템 영향 최소화**: 독립 실행형 앱
+- **보안 검토 필요**: 정보보안팀 승인
+- **사내 네트워크 의존**: 안정적인 인터넷 연결 필요
+
+### 10.3 가정 (Assumptions)
+
+- 사용자가 안정적인 인터넷 연결 가능 (사내 네트워크)
+- 사용자가 PC/노트북 사용 가능 (전 직원 업무용 PC 보유)
+- 개발 리소스 확보됨 (2명, 50% 투입)
+- 베타 테스터 10명 이상 확보 가능
+- 경영진의 프로젝트 지원 (공지, 독려)
+- 국경일 데이터는 수동 등록 (관리자)
+
+### 10.4 피해야 할 것
+
+1. **복잡한 UI**: Notion처럼 기능이 많고 복잡하면 안 됨
+2. **느린 로딩**: 페이지 전환마다 로딩 스피너는 답답함
+3. **강제 온보딩**: 긴 튜토리얼은 사용자를 짜증나게 함
+4. **과도한 알림**: 알림이 너무 많으면 무시하게 됨
+5. **필수 입력 항목 많음**: 제목만 입력해도 저장 가능하게
+6. **데스크톱 전용**: 모바일 지원 필수
+7. **외부 의존성**: 외부 API 의존 시 장애 위험
+8. **너무 많은 기능**: 80%가 사용하는 기능만 제공
+
+---
+
+## 11. 관련 문서
+
+| 문서명              | 위치                                     | 상태      |
+| ------------------- | ---------------------------------------- | --------- |
+| 도메인 정의 요청서  | `docs/0-domain-definition-request.md`    | 완료      |
+| 도메인 정의서       | `docs/1-domain-definition.md`            | 완료      |
+| 도메인 정의 평가서  | `docs/2-domain-definition-evaluation.md` | 완료      |
+| PRD 입력 정보       | `docs/prd-input.md`                      | 완료      |
+| API 명세서          | `docs/4-api-specification.md`            | 작성 예정 |
+| 데이터베이스 스키마 | `docs/5-database-schema.md`              | 작성 예정 |
+| 테스트 계획서       | `docs/6-test-plan.md`                    | 작성 예정 |
+| 배포 가이드         | `docs/7-deployment-guide.md`             | 작성 예정 |
+
+---
+
+## 12. 부록
+
+### 12.1 참고 레퍼런스
+
+#### UI/UX 레퍼런스
+
+1. **Todoist** (https://todoist.com)
+
+   - 간결한 UI, 빠른 할일 추가, 자연어 입력
+   - 참고 포인트: 메인 화면 레이아웃, 우선순위 색상, 체크 애니메이션
+
+2. **Things 3** (Mac 앱)
+
+   - 심플하고 아름다운 디자인, 직관적인 흐름
+   - 참고 포인트: 할일 상세 화면, 계층 구조, 애니메이션
+
+3. **Linear** (https://linear.app)
+
+   - 빠른 속도, 키보드 중심 UX
+   - 참고 포인트: Command K 검색, 키보드 단축키, 빠른 로딩
+
+4. **Google Keep** (https://keep.google.com)
+   - 간단한 메모, 색상 구분, 모바일 최적화
+   - 참고 포인트: 카드 레이아웃, 색상 태그, 검색
+
+### 12.2 용어집
+
+| 용어     | 설명                                              |
+| -------- | ------------------------------------------------- |
+| **MVP**  | Minimum Viable Product, 최소 기능 제품            |
+| **SPA**  | Single Page Application, 단일 페이지 애플리케이션 |
+| **JWT**  | JSON Web Token, 토큰 기반 인증 방식               |
+| **CRUD** | Create, Read, Update, Delete, 기본 데이터 조작    |
+| **ORM**  | Object-Relational Mapping, 객체-관계 매핑         |
+| **DAU**  | Daily Active Users, 일일 활성 사용자              |
+| **KPI**  | Key Performance Indicator, 핵심 성과 지표         |
+
+### 12.3 버전 관리
+
+| 버전           | 출시 목표  | 주요 기능                      |
+| -------------- | ---------- | ------------------------------ |
+| **MVP (v0.1)** | 2026년 2월 | 인증, CRUD, 휴지통, 공통 할일  |
+| **v1.0**       | 2026년 4월 | 검색, 필터링, 정렬, 기본 통계  |
+| **v1.1**       | 2026년 6월 | 카테고리, 우선순위             |
+| **v2.0**       | 2026년 9월 | 알림, 반복 할일, 통계 대시보드 |
+
+---
+
+**문서 작성 완료**
+
+이 PRD는 IGK-TodoList 프로젝트의 요구사항을 정의하고, 개발 팀과 이해관계자 간의 합의를 도출하기 위한 문서입니다. 프로젝트 진행 중 변경사항이 발생하면 이 문서를 업데이트하고 버전을 관리합니다.
