@@ -1,605 +1,607 @@
-# IGK-TodoList Technical Architecture Diagram
+# igk-TodoList 기술 아키텍처
 
-## Document Information
-
-- **Version**: 1.0
-- **Last Updated**: 2025-11-26
-- **Status**: Draft
-- **Author**: Architect Reviewer
-- **Related Documents**: [PRD](3-prd.md), [Domain Definition](1-domain-definition.md)
+**버전**: 1.0
+**작성일**: 2025-11-26
+**상태**: 최종
+**작성자**: Claude
+**참조 문서**: [PRD](./3-prd.md)
 
 ---
 
-## Table of Contents
+## 목차
 
-1. [Overview](#1-overview)
-2. [System Architecture](#2-system-architecture)
-3. [Backend Layer Architecture](#3-backend-layer-architecture)
-4. [Frontend Architecture](#4-frontend-architecture)
-5. [Data Flow](#5-data-flow)
-6. [Authentication Flow](#6-authentication-flow)
-7. [Database Schema](#7-database-schema)
-8. [Deployment Architecture](#8-deployment-architecture)
+1. [아키텍처 개요](#1-아키텍처-개요)
+2. [전체 시스템 아키텍처](#2-전체-시스템-아키텍처)
+3. [레이어별 상세 설명](#3-레이어별-상세-설명)
+4. [데이터 플로우](#4-데이터-플로우)
+5. [배포 아키텍처](#5-배포-아키텍처)
 
 ---
 
-## 1. Overview
+## 1. 아키텍처 개요
 
-This document provides technical architecture diagrams for the IGK-TodoList application. The architecture follows a simple layered pattern with clear separation between frontend, backend, and data layers.
+### 1.1 아키텍처 원칙
 
-### Key Architectural Principles
+igk-TodoList는 **단순하고 효율적인 3-Layer 아키텍처**를 채택합니다.
 
-- **Simplicity First**: Keep architecture straightforward and maintainable
-- **Layered Separation**: Clear boundaries between presentation, business logic, and data access
-- **Stateless API**: RESTful API with JWT-based authentication
-- **Scalability**: Serverless architecture for automatic scaling
-- **Security**: Token-based authentication with encrypted passwords
+**핵심 원칙**:
+
+- **단순성**: 오버엔지니어링 지양, 필요한 기능만 구현
+- **확장성**: 향후 기능 추가를 위한 모듈화된 구조
+- **보안성**: JWT 기반 인증 및 데이터 보호
+- **성능**: Stateless 아키텍처로 수평 확장 가능
+
+### 1.2 기술 스택 요약
+
+| 레이어           | 기술                                         |
+| ---------------- | -------------------------------------------- |
+| **프론트엔드**   | React 18, Vite, Tailwind CSS, Zustand, Axios |
+| **백엔드**       | Node.js, Express.js, JWT, bcrypt             |
+| **데이터베이스** | PostgreSQL (Supabase)                        |
+| **배포**         | Vercel (Frontend + Serverless Functions)     |
 
 ---
 
-## 2. System Architecture
+## 2. 전체 시스템 아키텍처
 
-### High-Level System Overview
-
-This diagram shows the overall system architecture with user interaction, frontend, backend API, and database layers.
+### 2.1 고수준 아키텍처 다이어그램
 
 ```mermaid
 graph TB
-    subgraph "Client Layer"
-        User[User Browser/Mobile]
+    subgraph Client["클라이언트 레이어"]
+        Browser["웹 브라우저<br/>(Chrome, Safari, Firefox)"]
+        Mobile["모바일 브라우저<br/>(iOS Safari, Chrome Mobile)"]
     end
 
-    subgraph "Frontend - Vercel"
-        FE[React SPA<br/>Vite + Tailwind CSS<br/>Zustand State Management]
+    subgraph Frontend["프론트엔드 레이어<br/>(Vercel)"]
+        React["React 18 Application"]
+        Zustand["Zustand<br/>(상태 관리)"]
+        TailwindCSS["Tailwind CSS<br/>(스타일링)"]
+        Axios["Axios<br/>(HTTP 클라이언트)"]
+
+        React --> Zustand
+        React --> TailwindCSS
+        React --> Axios
     end
 
-    subgraph "Backend - Vercel Serverless"
-        API[Express REST API<br/>JWT Authentication<br/>Prisma ORM]
+    subgraph Backend["백엔드 레이어<br/>(Vercel Serverless)"]
+        Express["Express.js API"]
+        Auth["JWT 인증 미들웨어"]
+        Controllers["컨트롤러"]
+        Services["비즈니스 로직"]
+
+        Express --> Auth
+        Express --> Controllers
+        Controllers --> Services
     end
 
-    subgraph "Database Layer"
-        DB[(PostgreSQL<br/>Supabase)]
+    subgraph Database["데이터베이스 레이어<br/>(Supabase)"]
+        PostgreSQL[(PostgreSQL 15+)]
+        Tables["테이블<br/>• User<br/>• Todo<br/>• Holiday"]
+
+        PostgreSQL --> Tables
     end
 
-    User -->|HTTPS| FE
-    FE -->|REST API Calls<br/>Authorization: Bearer Token| API
-    API -->|SQL Queries<br/>via Prisma| DB
+    Browser --> React
+    Mobile --> React
+    Axios -->|REST API<br/>HTTPS| Express
+    Services -->|SQL 쿼리<br/>Connection Pool| PostgreSQL
 
-    style User fill:#e1f5ff
-    style FE fill:#bbdefb
-    style API fill:#90caf9
-    style DB fill:#64b5f6
+    style Client fill:#E3F2FD
+    style Frontend fill:#FFF3E0
+    style Backend fill:#E8F5E9
+    style Database fill:#F3E5F5
 ```
 
-### Architecture Components
-
-| Component | Technology | Purpose |
-|-----------|-----------|---------|
-| **Client** | Modern Browser | User interface access |
-| **Frontend** | React 18, Zustand, Tailwind CSS | Single Page Application |
-| **Backend API** | Node.js 20, Express 4 | RESTful API services |
-| **Database** | PostgreSQL (Supabase) | Data persistence |
-| **Deployment** | Vercel (Frontend + Backend Serverless) | Hosting and CDN |
-
----
-
-## 3. Backend Layer Architecture
-
-### Layered Architecture Pattern
-
-The backend follows a clean layered architecture with separation of concerns.
+### 2.2 컴포넌트 구조 (C4 모델 - Level 2)
 
 ```mermaid
-graph TB
-    subgraph "Presentation Layer"
-        Routes[Routes<br/>API Endpoints]
-        Middleware[Middleware<br/>Auth, Validation, Error Handler]
-        Controllers[Controllers<br/>Request/Response Handling]
+graph LR
+    subgraph "Frontend Application"
+        UI["UI Components<br/>(TodoCard, Modal, Button)"]
+        Pages["Pages<br/>(Login, TodoList, Trash)"]
+        Store["Zustand Store<br/>(authStore, todoStore)"]
+        API["API Service<br/>(axios instances)"]
+
+        Pages --> UI
+        Pages --> Store
+        Store --> API
     end
 
-    subgraph "Business Logic Layer"
-        Services[Services<br/>Business Rules & Logic]
-        Validators[Validators<br/>Input Validation]
+    subgraph "Backend API"
+        Routes["Routes<br/>(auth, todos, holidays)"]
+        MW["Middlewares<br/>(auth, validation, error)"]
+        Ctrl["Controllers<br/>(authCtrl, todoCtrl)"]
+        Svc["Services<br/>(authService, todoService)"]
+
+        Routes --> MW
+        MW --> Ctrl
+        Ctrl --> Svc
     end
 
-    subgraph "Data Access Layer"
-        Prisma[Prisma ORM<br/>Database Abstraction]
-        Models[Data Models<br/>User, TodoItem, Trash]
+    subgraph "Database"
+        DB[(PostgreSQL)]
     end
 
-    subgraph "External"
-        DB[(PostgreSQL<br/>Database)]
-    end
+    API -->|HTTP/JSON| Routes
+    Svc -->|pg client| DB
 
-    Routes --> Middleware
-    Middleware --> Controllers
-    Controllers --> Services
-    Services --> Validators
-    Services --> Prisma
-    Prisma --> Models
-    Models --> DB
-
-    style Routes fill:#fff3e0
-    style Middleware fill:#ffe0b2
-    style Controllers fill:#ffcc80
-    style Services fill:#ffb74d
-    style Validators fill:#ffa726
-    style Prisma fill:#ff9800
-    style Models fill:#fb8c00
-    style DB fill:#f57c00
+    style Frontend fill:#FFE0B2
+    style Backend fill:#C8E6C9
+    style Database fill:#E1BEE7
 ```
-
-### Layer Responsibilities
-
-#### Presentation Layer
-- **Routes**: Define API endpoints (auth, todos, trash)
-- **Middleware**: Handle authentication, CORS, validation, error handling
-- **Controllers**: Process HTTP requests/responses, delegate to services
-
-#### Business Logic Layer
-- **Services**: Implement core business logic (todo CRUD, authentication)
-- **Validators**: Validate input data (express-validator)
-
-#### Data Access Layer
-- **Prisma ORM**: Database queries and transactions
-- **Models**: Entity definitions (User, TodoItem, Trash)
 
 ---
 
-## 4. Frontend Architecture
+## 3. 레이어별 상세 설명
 
-### Component-Based Architecture
+### 3.1 프론트엔드 레이어
 
-The frontend uses React with a clear separation between UI components, state management, and API services.
+**역할**: 사용자 인터페이스 제공 및 사용자 경험 관리
 
-```mermaid
-graph TB
-    subgraph "Pages"
-        LoginPage[LoginPage<br/>User Authentication]
-        TodoListPage[TodoListPage<br/>Main Todo Interface]
-        TrashPage[TrashPage<br/>Deleted Todos]
-    end
+**핵심 기술**:
 
-    subgraph "Components"
-        Common[Common Components<br/>Button, Input, Modal]
-        TodoComponents[Todo Components<br/>TodoItem, TodoForm, TodoList]
-        Layout[Layout Components<br/>Header, Sidebar, Nav]
-    end
+- **React 18**: UI 컴포넌트 기반 개발
+- **Vite**: 빠른 빌드 및 개발 서버
+- **Tailwind CSS**: 유틸리티 우선 스타일링
+- **Zustand**: 간단하고 효율적인 상태 관리
+- **React Router v6**: 클라이언트 사이드 라우팅
+- **Axios**: HTTP 통신 (JWT 토큰 자동 포함)
 
-    subgraph "State Management - Zustand"
-        AuthStore[authStore<br/>User, Token, Login State]
-        TodoStore[todoStore<br/>Todos, Filters, CRUD Actions]
-    end
+**주요 디렉토리 구조**:
 
-    subgraph "Services"
-        AuthService[authService<br/>Login, Register, Logout]
-        TodoService[todoService<br/>CRUD API Calls]
-        API[Axios HTTP Client]
-    end
-
-    Pages --> Components
-    Pages --> AuthStore
-    Pages --> TodoStore
-
-    Components --> AuthStore
-    Components --> TodoStore
-
-    TodoStore --> TodoService
-    AuthStore --> AuthService
-
-    TodoService --> API
-    AuthService --> API
-
-    API -->|REST API| Backend[Backend API]
-
-    style LoginPage fill:#e8f5e9
-    style TodoListPage fill:#c8e6c9
-    style TrashPage fill:#a5d6a7
-    style AuthStore fill:#81c784
-    style TodoStore fill:#66bb6a
-    style API fill:#4caf50
+```
+frontend/
+├── src/
+│   ├── components/      # 재사용 가능한 UI 컴포넌트
+│   ├── pages/           # 페이지 컴포넌트
+│   ├── stores/          # Zustand 상태 관리
+│   ├── services/        # API 호출 로직
+│   ├── hooks/           # Custom React Hooks
+│   ├── utils/           # 유틸리티 함수
+│   └── App.jsx          # 메인 앱 컴포넌트
 ```
 
-### Frontend Structure
+**책임**:
 
-#### Pages Layer
-- Route-level components (LoginPage, TodoListPage, TrashPage)
-- Compose smaller components and manage page-level logic
+- 사용자 인증 상태 관리
+- 할일 목록 렌더링 및 CRUD 조작
+- 폼 입력 검증 (React Hook Form + Zod)
+- 반응형 디자인 구현
+- 다크모드 지원
 
-#### Components Layer
-- Reusable UI components (Button, Input, Modal)
-- Feature-specific components (TodoItem, TodoForm)
-- Layout components (Header, Sidebar)
+### 3.2 백엔드 레이어
 
-#### State Management
-- **authStore**: User authentication state, token, login/logout
-- **todoStore**: Todo items, filters, CRUD operations
+**역할**: 비즈니스 로직 처리 및 데이터베이스 연동
 
-#### Services Layer
-- API communication using Axios
-- Centralized HTTP client configuration
-- JWT token injection via interceptors
+**핵심 기술**:
+
+- **Node.js 18+**: JavaScript 런타임
+- **Express.js**: 웹 프레임워크
+- **jsonwebtoken**: JWT 토큰 생성/검증
+- **bcrypt**: 비밀번호 해싱
+- **pg (node-postgres)**: PostgreSQL 클라이언트
+- **express-validator**: 요청 데이터 검증
+- **helmet**: 보안 헤더 설정
+- **express-rate-limit**: API 호출 제한
+
+**주요 디렉토리 구조**:
+
+```
+backend/
+├── src/
+│   ├── routes/          # API 라우트 정의
+│   ├── controllers/     # 요청 처리 로직
+│   ├── services/        # 비즈니스 로직
+│   ├── middlewares/     # 인증, 검증, 에러 핸들링
+│   ├── models/          # 데이터 모델 (선택)
+│   ├── config/          # 설정 파일 (DB, JWT)
+│   ├── utils/           # 유틸리티 함수
+│   └── app.js           # Express 앱 설정
+```
+
+**책임**:
+
+- JWT 기반 사용자 인증/인가
+- RESTful API 엔드포인트 제공
+- 비즈니스 규칙 적용 (날짜 검증, 권한 체크)
+- 데이터베이스 트랜잭션 관리
+- 에러 핸들링 및 로깅
+- CORS, Rate Limiting, 보안 헤더 설정
+
+### 3.3 데이터베이스 레이어
+
+**역할**: 영구 데이터 저장 및 관리
+
+**핵심 기술**:
+
+- **PostgreSQL 15+**: 관계형 데이터베이스
+- **Supabase**: PostgreSQL 호스팅 (무료 티어)
+- **Connection Pooling**: 효율적인 연결 관리
+
+**주요 테이블**:
+
+| 테이블    | 설명                           | 관계        |
+| --------- | ------------------------------ | ----------- |
+| `User`    | 사용자 정보 (이메일, 비밀번호) | 1:N → Todo  |
+| `Todo`    | 할일 정보 (제목, 날짜, 상태)   | N:1 ← User  |
+| `Holiday` | 국경일 정보 (제목, 날짜)       | 독립 테이블 |
+
+**인덱스 전략**:
+
+- `User.email`: UNIQUE INDEX (로그인 조회)
+- `Todo.userId, Todo.status`: INDEX (사용자별 할일 조회)
+- `Todo.dueDate`: INDEX (날짜 정렬)
+- `Holiday.date`: INDEX (날짜 조회)
+
+**책임**:
+
+- 데이터 영속성 보장
+- 트랜잭션 지원 (ACID 보장)
+- 소프트 삭제 구현 (deletedAt 필드)
+- 자동 백업 (Supabase)
 
 ---
 
-## 5. Data Flow
+## 4. 데이터 플로우
 
-### Complete Todo CRUD Data Flow
-
-This diagram shows how data flows through the system for typical todo operations.
+### 4.1 사용자 인증 플로우
 
 ```mermaid
 sequenceDiagram
-    participant U as User
-    participant UI as React UI
-    participant Store as Zustand Store
-    participant Service as API Service
-    participant API as Express API
-    participant BL as Business Logic
+    participant User as 사용자
+    participant Frontend as React App
+    participant Backend as Express API
     participant DB as PostgreSQL
 
-    Note over U,DB: Create Todo Flow
-
-    U->>UI: Fill Todo Form & Submit
-    UI->>Store: dispatch(createTodo)
-    Store->>Service: todoService.create(data)
-    Service->>API: POST /api/todos
-    Note over Service,API: Authorization: Bearer {token}
-    API->>API: Verify JWT Token
-    API->>BL: todoService.create()
-    BL->>BL: Validate Input
-    BL->>DB: INSERT TodoItem
-    DB-->>BL: New Todo Record
-    BL-->>API: Success Response
-    API-->>Service: 200 OK {data}
-    Service-->>Store: Update State
-    Store-->>UI: Re-render
-    UI-->>U: Show New Todo
-
-    Note over U,DB: Complete Todo Flow
-
-    U->>UI: Click Checkbox
-    UI->>Store: dispatch(completeTodo)
-    Store->>UI: Optimistic Update (immediate)
-    Store->>Service: todoService.complete(id)
-    Service->>API: PATCH /api/todos/:id/complete
-    API->>BL: todoService.complete()
-    BL->>DB: UPDATE isCompleted=TRUE
-    DB-->>BL: Updated Record
-    BL-->>API: Success
-    API-->>Service: 200 OK
-    Service-->>Store: Confirm Update
-
-    Note over U,DB: Delete Todo Flow
-
-    U->>UI: Click Delete
-    UI->>UI: Confirm Dialog
-    U->>UI: Confirm
-    UI->>Store: dispatch(deleteTodo)
-    Store->>Service: todoService.delete(id)
-    Service->>API: DELETE /api/todos/:id
-    API->>BL: todoService.delete()
-    BL->>DB: UPDATE status=DELETED
-    BL->>DB: INSERT Trash record
-    DB-->>BL: Success
-    BL-->>API: Success
-    API-->>Service: 200 OK
-    Service-->>Store: Remove from State
-    Store-->>UI: Re-render
-    UI-->>U: Todo Moved to Trash
+    User->>Frontend: 1. 로그인 요청<br/>(email, password)
+    Frontend->>Backend: 2. POST /api/auth/login
+    Backend->>DB: 3. 사용자 조회<br/>SELECT * FROM User WHERE email=?
+    DB-->>Backend: 4. 사용자 데이터
+    Backend->>Backend: 5. bcrypt 비밀번호 검증
+    Backend->>Backend: 6. JWT 토큰 생성<br/>(Access + Refresh)
+    Backend-->>Frontend: 7. 토큰 반환<br/>{accessToken, refreshToken}
+    Frontend->>Frontend: 8. 토큰 저장<br/>(localStorage)
+    Frontend-->>User: 9. 로그인 완료<br/>(메인 페이지 이동)
 ```
 
----
-
-## 6. Authentication Flow
-
-### JWT-Based Authentication
+### 4.2 할일 생성 플로우
 
 ```mermaid
 sequenceDiagram
-    participant U as User
-    participant FE as Frontend
-    participant API as Backend API
-    participant DB as Database
+    participant User as 사용자
+    participant Frontend as React App
+    participant Backend as Express API
+    participant DB as PostgreSQL
 
-    Note over U,DB: Registration Flow
-
-    U->>FE: Fill Registration Form
-    FE->>API: POST /api/auth/register
-    Note over FE,API: {email, password, name}
-    API->>API: Validate Input
-    API->>API: Hash Password (bcrypt)
-    API->>DB: INSERT User
-    DB-->>API: User Created
-    API-->>FE: 201 Created
-    FE-->>U: Show Success, Redirect to Login
-
-    Note over U,DB: Login Flow
-
-    U->>FE: Enter Email & Password
-    FE->>API: POST /api/auth/login
-    API->>DB: SELECT User WHERE email
-    DB-->>API: User Record
-    API->>API: Compare Password Hash
-    API->>API: Generate JWT (access + refresh)
-    Note over API: Payload: {userId, email}<br/>Expires: 7 days
-    API-->>FE: 200 OK {access_token, refresh_token}
-    FE->>FE: Store Tokens (localStorage)
-    FE-->>U: Redirect to Todo List
-
-    Note over U,DB: Authenticated Request Flow
-
-    U->>FE: Access Todo List
-    FE->>API: GET /api/todos
-    Note over FE,API: Authorization: Bearer {token}
-    API->>API: Verify JWT Signature
-    API->>API: Extract userId from Token
-    API->>DB: SELECT Todos WHERE ownerId
-    DB-->>API: Todo Records
-    API-->>FE: 200 OK {data}
-    FE-->>U: Display Todos
-
-    Note over U,DB: Logout Flow
-
-    U->>FE: Click Logout
-    FE->>FE: Clear Tokens from Storage
-    FE->>API: POST /api/auth/logout (optional)
-    API-->>FE: 200 OK
-    FE-->>U: Redirect to Login
+    User->>Frontend: 1. 할일 추가<br/>(제목, 날짜 입력)
+    Frontend->>Frontend: 2. 클라이언트 검증<br/>(Zod 스키마)
+    Frontend->>Backend: 3. POST /api/todos<br/>Authorization: Bearer {token}
+    Backend->>Backend: 4. JWT 토큰 검증<br/>(auth middleware)
+    Backend->>Backend: 5. 요청 데이터 검증<br/>(express-validator)
+    Backend->>Backend: 6. 비즈니스 규칙 체크<br/>(dueDate >= startDate)
+    Backend->>DB: 7. INSERT INTO Todo<br/>(userId, title, content, dates)
+    DB-->>Backend: 8. 생성된 할일 데이터
+    Backend-->>Frontend: 9. 201 Created<br/>{success: true, data: {...}}
+    Frontend->>Frontend: 10. Zustand 상태 업데이트
+    Frontend-->>User: 11. UI 갱신<br/>(새 할일 표시)
 ```
 
-### Security Measures
-
-1. **Password Security**: bcrypt hashing with 10 rounds
-2. **Token-Based Auth**: JWT with 7-day expiration
-3. **HTTPS Only**: All communications encrypted
-4. **Token Storage**: localStorage (with XSS protection via React)
-5. **Account Lockout**: 5 failed attempts = 10-minute lock
-
----
-
-## 7. Database Schema
-
-### Entity Relationship Diagram
+### 4.3 할일 조회 플로우
 
 ```mermaid
-erDiagram
-    User ||--o{ TodoItem : owns
-    TodoItem ||--o| Trash : "moves to"
+sequenceDiagram
+    participant User as 사용자
+    participant Frontend as React App
+    participant Backend as Express API
+    participant DB as PostgreSQL
 
-    User {
-        UUID id PK
-        String email UK
-        String password
-        String name
-        DateTime createdAt
-    }
-
-    TodoItem {
-        UUID id PK
-        String title
-        Text content
-        DateTime startAt
-        DateTime endAt
-        Boolean isCompleted
-        DateTime completedAt
-        Enum status
-        UUID ownerId FK
-        Enum type
-        DateTime createdAt
-        DateTime updatedAt
-    }
-
-    Trash {
-        UUID id PK
-        UUID todoId FK,UK
-        DateTime deletedAt
-    }
+    User->>Frontend: 1. 페이지 접속
+    Frontend->>Backend: 2. GET /api/todos<br/>?status=active&sortBy=dueDate
+    Backend->>Backend: 3. JWT 인증
+    Backend->>DB: 4. SELECT * FROM Todo<br/>WHERE userId=? AND status='active'<br/>ORDER BY dueDate
+    DB-->>Backend: 5. 할일 목록 데이터
+    Backend-->>Frontend: 6. 200 OK<br/>{success: true, data: [todos]}
+    Frontend->>Frontend: 7. Zustand 상태 저장
+    Frontend-->>User: 8. 할일 목록 렌더링
 ```
 
-### Schema Details
+### 4.4 휴지통 복원 플로우
 
-#### User Table
-- Primary authentication entity
-- Stores hashed passwords (bcrypt)
-- One-to-many relationship with TodoItems
+```mermaid
+sequenceDiagram
+    participant User as 사용자
+    participant Frontend as React App
+    participant Backend as Express API
+    participant DB as PostgreSQL
 
-#### TodoItem Table
-- Main todo entity
-- **status**: ACTIVE | DELETED
-- **type**: PERSONAL | COMMON
-- **ownerId**: NULL for common todos (national holidays)
-- Soft delete pattern (status=DELETED)
-
-#### Trash Table
-- Tracks deleted todos for recovery
-- One-to-one relationship with TodoItem
-- Stores deletion timestamp
+    User->>Frontend: 1. 휴지통에서 복원 클릭
+    Frontend->>Backend: 2. PATCH /api/todos/:id/restore
+    Backend->>Backend: 3. JWT 인증 + 권한 확인
+    Backend->>DB: 4. UPDATE Todo<br/>SET status='active', deletedAt=NULL<br/>WHERE todoId=? AND userId=?
+    DB-->>Backend: 5. 업데이트 완료
+    Backend-->>Frontend: 6. 200 OK<br/>{success: true, data: {...}}
+    Frontend->>Frontend: 7. 상태 업데이트
+    Frontend-->>User: 8. 할일 목록으로 이동
+```
 
 ---
 
-## 8. Deployment Architecture
+## 5. 배포 아키텍처
 
-### Serverless Deployment on Vercel
+### 5.1 배포 환경 구성도
 
 ```mermaid
 graph TB
-    subgraph "User Devices"
-        Browser[Web Browser]
-        Mobile[Mobile Browser]
+    subgraph Internet["인터넷"]
+        Users["사용자<br/>(웹/모바일 브라우저)"]
     end
 
-    subgraph "Vercel CDN"
-        CDN[Global CDN<br/>Static Assets<br/>React Build]
+    subgraph Vercel["Vercel Platform"]
+        CDN["Vercel CDN<br/>(정적 파일 배포)"]
+        FrontendApp["React SPA<br/>(정적 호스팅)"]
+        ServerlessAPI["Express API<br/>(Serverless Functions)"]
+
+        CDN --> FrontendApp
     end
 
-    subgraph "Vercel Serverless Functions"
-        F1[/api/auth/*<br/>Auth Functions]
-        F2[/api/todos/*<br/>Todo Functions]
-        F3[/api/trash/*<br/>Trash Functions]
+    subgraph Supabase["Supabase Cloud"]
+        PostgresDB[(PostgreSQL 15+<br/>Database)]
+        Backup["자동 백업"]
+
+        PostgresDB -.-> Backup
     end
 
-    subgraph "Supabase"
-        PG[(PostgreSQL<br/>Primary Database)]
-        Backup[(Auto Backup<br/>Daily)]
+    subgraph GitHub["GitHub Repository"]
+        Code["소스 코드"]
     end
 
-    subgraph "External Services"
-        GitHub[GitHub<br/>Source Control]
-    end
+    Users -->|HTTPS| CDN
+    FrontendApp -->|REST API<br/>HTTPS| ServerlessAPI
+    ServerlessAPI -->|Connection Pool<br/>SSL| PostgresDB
 
-    Browser --> CDN
-    Mobile --> CDN
+    Code -->|Git Push| Vercel
+    Vercel -->|자동 배포<br/>(CI/CD)| FrontendApp
+    Vercel -->|자동 배포<br/>(CI/CD)| ServerlessAPI
 
-    Browser --> F1
-    Browser --> F2
-    Browser --> F3
-    Mobile --> F1
-    Mobile --> F2
-    Mobile --> F3
-
-    F1 --> PG
-    F2 --> PG
-    F3 --> PG
-
-    PG --> Backup
-
-    GitHub -->|Auto Deploy| CDN
-    GitHub -->|Auto Deploy| F1
-    GitHub -->|Auto Deploy| F2
-    GitHub -->|Auto Deploy| F3
-
-    style Browser fill:#fff3e0
-    style Mobile fill:#fff3e0
-    style CDN fill:#bbdefb
-    style F1 fill:#90caf9
-    style F2 fill:#90caf9
-    style F3 fill:#90caf9
-    style PG fill:#64b5f6
-    style Backup fill:#42a5f5
-    style GitHub fill:#e1f5ff
+    style Internet fill:#E3F2FD
+    style Vercel fill:#FFF3E0
+    style Supabase fill:#E8F5E9
+    style GitHub fill:#F3E5F5
 ```
 
-### Deployment Components
+### 5.2 배포 프로세스
 
-#### Frontend Deployment (Vercel)
-- Static React build deployed to global CDN
-- Automatic HTTPS/SSL certificates
-- Environment-based configuration (production, staging)
+**단계별 배포 흐름**:
 
-#### Backend Deployment (Vercel Serverless Functions)
-- Express API runs as serverless functions
-- Automatic scaling based on traffic
-- Cold start optimization (~500ms)
+1. **개발 → Git Push**
 
-#### Database (Supabase)
-- Managed PostgreSQL instance
-- Automatic daily backups (30-day retention)
-- Connection pooling for serverless compatibility
+   - 로컬 개발 완료 후 GitHub에 코드 푸시
 
-#### CI/CD Pipeline
-- GitHub integration for automatic deployments
-- Push to main branch triggers production deployment
-- Preview deployments for pull requests
+2. **GitHub → Vercel 자동 배포**
+
+   - Vercel이 GitHub Webhook 감지
+   - 자동으로 빌드 및 배포 시작
+
+3. **프론트엔드 배포**
+
+   - Vite로 React 앱 빌드
+   - 정적 파일을 Vercel CDN에 배포
+   - 도메인: `https://igk-todolist.vercel.app`
+
+4. **백엔드 배포**
+
+   - Express API를 Serverless Functions로 변환
+   - `/api/*` 경로로 라우팅 설정
+   - 환경 변수 주입 (JWT_SECRET, DB 연결 정보)
+
+5. **데이터베이스 연결**
+   - Supabase PostgreSQL 연결 문자열 설정
+   - Connection Pool 구성 (최대 연결 수: 10)
+
+### 5.3 환경 변수 관리
+
+**프론트엔드 (.env)**:
+
+```bash
+VITE_API_BASE_URL=https://igk-todolist.vercel.app/api
+```
+
+**백엔드 (Vercel 환경 변수)**:
+
+```bash
+DATABASE_URL=postgresql://user:password@host:5432/database
+JWT_SECRET=your-secret-key
+JWT_ACCESS_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=7d
+NODE_ENV=production
+```
+
+### 5.4 성능 최적화
+
+**CDN 활용**:
+
+- Vercel CDN을 통한 전 세계 빠른 정적 파일 제공
+- 자동 이미지 최적화
+
+**Serverless 장점**:
+
+- 자동 스케일링 (트래픽에 따라 자동 증감)
+- Cold Start 최소화 (Vercel 최적화)
+- Pay-per-use 요금제 (무료 티어: 100GB 대역폭)
+
+**데이터베이스 최적화**:
+
+- Connection Pooling으로 연결 재사용
+- 인덱스를 통한 쿼리 성능 향상
+- Prepared Statements로 SQL Injection 방어
+
+### 5.5 보안 구성
+
+**HTTPS 강제**:
+
+- Vercel 자동 SSL/TLS 인증서 발급
+- HTTP → HTTPS 자동 리다이렉트
+
+**CORS 설정**:
+
+```javascript
+// backend/src/app.js
+app.use(
+  cors({
+    origin: "https://igk-todolist.vercel.app",
+    credentials: true,
+  })
+);
+```
+
+**보안 헤더** (Helmet):
+
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- X-XSS-Protection: 1; mode=block
+
+**Rate Limiting**:
+
+- API 호출 제한: 100 requests/min per IP
+- 로그인 시도 제한: 5 attempts/15min
 
 ---
 
-## Architecture Evaluation
+## 6. 아키텍처 의사결정 기록 (ADR)
 
-### Strengths
+### ADR-001: Zustand 선택 (Redux 대신)
 
-1. **Simple & Clear**: Easy to understand layered architecture
-2. **Scalable**: Serverless functions scale automatically
-3. **Cost-Effective**: Free tier usage for MVP (Vercel + Supabase)
-4. **Fast Development**: Modern stack with good DX (Vite, Prisma)
-5. **Secure**: JWT authentication, password hashing, HTTPS
+**결정**: 상태 관리 라이브러리로 Zustand 선택
 
-### Potential Concerns
+**근거**:
 
-1. **Cold Starts**: Serverless functions may have 500ms+ cold start
-   - **Mitigation**: Acceptable for internal tool with 80 users
+- 간단한 API (boilerplate 코드 최소화)
+- 번들 크기 작음 (~1KB)
+- TypeScript 지원
+- MVP 규모에 충분한 기능
 
-2. **Database Connection Pooling**: Serverless needs connection management
-   - **Mitigation**: Supabase provides built-in pooling
+**대안**:
 
-3. **No Caching Layer**: Direct database queries for all requests
-   - **Mitigation**: Not needed for MVP scale (80 users, ~50 todos each)
-   - **Future**: Add Redis if DAU exceeds 200
-
-4. **Single Region**: No multi-region deployment
-   - **Mitigation**: Internal company tool, single location acceptable
-
-### Recommendations
-
-#### For MVP (Current)
-- Architecture is appropriate for stated requirements
-- Focus on feature completion over premature optimization
-- Monitor performance metrics post-launch
-
-#### For v1.0 (3-6 months)
-- Add application-level caching for common todos (national holidays)
-- Implement request rate limiting (60 req/min per user)
-- Add monitoring with Sentry for error tracking
-
-#### For v2.0 (6-12 months)
-- Consider Redis caching layer if user base grows beyond 200
-- Implement websocket support for real-time updates (if team features added)
-- Add database read replicas if query latency increases
+- Redux: 너무 복잡 (오버엔지니어링)
+- Context API: 성능 이슈 가능성
 
 ---
 
-## Technology Stack Summary
+### ADR-002: Serverless Functions 배포
 
-### Frontend Stack
-```
-React 18.x          - UI framework
-Zustand 4.x         - State management
-Tailwind CSS 3.x    - Styling
-Vite 5.x            - Build tool
-Axios 1.x           - HTTP client
-React Router 6.x    - Routing
-React Hook Form 7.x - Form handling
-date-fns 3.x        - Date utilities
-```
+**결정**: Vercel Serverless Functions로 백엔드 배포
 
-### Backend Stack
-```
-Node.js 20.x LTS    - Runtime
-Express 4.x         - Web framework
-Prisma 5.x          - ORM
-JWT (jsonwebtoken)  - Authentication
-bcrypt 5.x          - Password hashing
-express-validator   - Input validation
-cors 2.x            - CORS handling
-dotenv 16.x         - Environment config
-```
+**근거**:
 
-### Infrastructure
-```
-Vercel              - Frontend & Backend hosting
-Supabase            - PostgreSQL database
-GitHub              - Version control
-```
+- 무료 티어 활용 가능
+- 자동 스케일링
+- 프론트엔드와 동일 플랫폼 (관리 편의성)
+- CI/CD 자동화
+
+**대안**:
+
+- AWS EC2: 비용 및 관리 부담
+- Heroku: 무료 티어 종료
 
 ---
 
-## Conclusion
+### ADR-003: PostgreSQL (Supabase)
 
-The IGK-TodoList architecture follows proven patterns with appropriate technology choices for the stated requirements. The layered backend architecture provides clear separation of concerns, while the component-based frontend enables reusable and maintainable UI code.
+**결정**: Supabase 호스팅 PostgreSQL 사용
 
-The serverless deployment strategy minimizes operational overhead while providing automatic scaling. For the target scale (80 users, expanding to 150), this architecture is well-suited and cost-effective.
+**근거**:
 
-Key architectural decisions align with the product goals of simplicity, speed, and security. The use of modern frameworks (React, Express, Prisma) ensures good developer experience and maintainability.
+- 관계형 DB 필요 (User-Todo 관계)
+- 무료 티어 (500MB 스토리지)
+- 자동 백업 기능
+- Connection Pooling 지원
 
-**Status**: Ready for implementation
+**대안**:
 
-**Next Steps**:
-1. Set up project repositories (frontend, backend)
-2. Configure development environment
-3. Initialize database schema with Prisma migrations
-4. Implement authentication layer (highest priority)
-5. Begin iterative feature development following PRD priorities
+- MongoDB: NoSQL은 관계 관리 복잡
+- Firebase: 비용 예측 어려움
 
 ---
 
-**Document End**
+### ADR-004: JWT 인증 (Session 대신)
+
+**결정**: JWT 기반 Stateless 인증
+
+**근거**:
+
+- Serverless 환경에 적합 (서버 상태 불필요)
+- 수평 확장 용이
+- 모바일 앱 확장 고려
+
+**대안**:
+
+- Session: Serverless에 부적합
+- OAuth: MVP에 과도
+
+---
+
+## 7. 향후 아키텍처 발전 방향
+
+### 7.1 Phase 2 (2차 개발)
+
+**예상 추가 기능**:
+
+- 캘린더 뷰 (월간/주간)
+- 할일 카테고리/태그
+- 알림 기능 (이메일/푸시)
+- 통계 대시보드
+
+**아키텍처 변경 검토**:
+
+- Redis 캐싱 레이어 추가 (자주 조회되는 데이터)
+- WebSocket 실시간 동기화 (협업 기능)
+- CDN 이미지 스토리지 (프로필 사진)
+
+### 7.2 확장성 고려사항
+
+**수평 확장**:
+
+- Stateless 아키텍처로 인스턴스 추가 용이
+- Database Read Replica 추가 (읽기 성능 향상)
+
+**모니터링**:
+
+- Vercel Analytics
+- Sentry (에러 추적)
+- DataDog (성능 모니터링) - 선택
+
+---
+
+## 8. 부록
+
+### 8.1 기술 스택 버전
+
+| 기술         | 버전 |
+| ------------ | ---- |
+| React        | 18.x |
+| Vite         | 5.x  |
+| Tailwind CSS | 3.x  |
+| Zustand      | 4.x  |
+| Node.js      | 18+  |
+| Express      | 4.x  |
+| PostgreSQL   | 15+  |
+| jsonwebtoken | 9.x  |
+| bcrypt       | 5.x  |
+
+### 8.2 참조 문서
+
+- [PRD (Product Requirements Document)](./3-prd.md)
+- [도메인 정의서](./1-domain-definition.md)
+- [스타일 가이드](./4-style-guide.md)
+
+### 8.3 외부 링크
+
+- [Vercel Documentation](https://vercel.com/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+- [React 18 Docs](https://react.dev/)
+- [Zustand GitHub](https://github.com/pmndrs/zustand)
+
+---
+
+**문서 종료**

@@ -54,11 +54,6 @@
 
 **원칙**: 가능한 한 단순하게 작성합니다. 복잡한 추상화나 과도한 엔지니어링을 지양합니다.
 
-**적용 방법**:
-- MVP에서는 불필요한 Factory 패턴이나 복잡한 클래스 계층 구조 지양
-- 간단한 함수로 해결 가능하다면 단순한 방법 선택
-- 과도한 추상화보다는 명확하고 직관적인 코드 작성
-
 **체크리스트**:
 
 - [ ] 코드가 읽고 이해하기 쉬운가?
@@ -193,13 +188,8 @@ Business Logic → Presentation (❌ 금지)
 
 **원칙**: 구체적인 구현이 아닌 인터페이스(또는 추상화)에 의존합니다. (TypeScript 사용 시)
 
-**적용 방법 (TypeScript 사용 시)**:
-- Repository 인터페이스 정의 후 구현체 작성
-- Service는 인터페이스에만 의존하도록 설계
-- 생성자를 통한 의존성 주입 패턴 사용
-- 테스트 시 Mock 객체로 쉽게 대체 가능하도록 구성
-
 **JavaScript 프로젝트의 경우**:
+
 - TypeScript를 사용하지 않는 경우, 명확한 모듈 분리와 JSDoc으로 대체 가능
 - 의존성 주입보다는 명확한 레이어 분리에 집중
 
@@ -239,33 +229,6 @@ Business Logic → Presentation (❌ 금지)
 | 미들웨어   | camelCase, `Middleware` 접미사 | `authMiddleware.js`, `errorMiddleware.js` |
 | 유틸리티   | camelCase                      | `jwtHelper.js`, `passwordHelper.js`       |
 | 설정       | camelCase                      | `database.js`, `jwt.js`                   |
-
-**예시 구조**:
-
-```
-frontend/src/
-├── components/
-│   ├── TodoCard.jsx           ✅ PascalCase
-│   └── Button.jsx             ✅ PascalCase
-├── pages/
-│   └── LoginPage.jsx          ✅ PascalCase
-├── hooks/
-│   └── useTodos.js            ✅ camelCase + use prefix
-├── stores/
-│   └── todoStore.js           ✅ camelCase + Store suffix
-├── services/
-│   └── todoService.js         ✅ camelCase + Service suffix
-└── utils/
-    └── dateFormatter.js       ✅ camelCase
-
-backend/src/
-├── controllers/
-│   └── todoController.js      ✅ camelCase + Controller suffix
-├── services/
-│   └── todoService.js         ✅ camelCase + Service suffix
-└── repositories/
-    └── todoRepository.js      ✅ camelCase + Repository suffix
-```
 
 **체크리스트**:
 
@@ -334,12 +297,6 @@ backend/src/
 
 **원칙**: 변경되지 않는 값은 UPPER_SNAKE_CASE를 사용하고, 파일 상단 또는 별도 상수 파일에 정의합니다.
 
-**적용 방법**:
-- API 엔드포인트는 `constants/apiEndpoints.js`에 정의
-- 검증 규칙 관련 상수는 `constants/validationRules.js`에 정의
-- 상태값은 객체로 그룹화 (예: TODO_STATUS 객체)
-- 매직 넘버나 하드코딩된 문자열 대신 상수 사용
-
 **체크리스트**:
 
 - [ ] 매직 넘버를 상수로 추출했는가?
@@ -352,61 +309,6 @@ backend/src/
 ### 3.5 코드 포맷팅 (ESLint, Prettier)
 
 **원칙**: 일관된 코드 스타일을 위해 ESLint와 Prettier를 설정하고 자동 포맷팅을 적용합니다.
-
-#### ESLint 설정 (`.eslintrc.json`)
-
-```json
-{
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true
-  },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended"
-  ],
-  "parserOptions": {
-    "ecmaVersion": "latest",
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
-  "rules": {
-    "no-console": "warn",
-    "no-unused-vars": "warn",
-    "react/prop-types": "off",
-    "react/react-in-jsx-scope": "off"
-  }
-}
-```
-
-#### Prettier 설정 (`.prettierrc`)
-
-```json
-{
-  "semi": true,
-  "singleQuote": true,
-  "tabWidth": 2,
-  "trailingComma": "es5",
-  "printWidth": 100,
-  "arrowParens": "always"
-}
-```
-
-#### VS Code 설정 (`.vscode/settings.json`)
-
-```json
-{
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  }
-}
-```
 
 **체크리스트**:
 
@@ -446,23 +348,7 @@ backend/src/
 
 **원칙**: 각 함수/모듈을 독립적으로 테스트합니다. 외부 의존성은 Mock으로 대체합니다.
 
-**적용 방법**:
-
-**백엔드 테스트 (Jest)**:
-- Repository를 Mock으로 대체하여 Service 계층 테스트
-- Arrange-Act-Assert 패턴 사용
-- `beforeEach`에서 Mock 초기화
-- 성공 케이스와 엣지 케이스 모두 테스트
-
-**프론트엔드 테스트 (React Testing Library)**:
-- 컴포넌트를 실제 DOM에 렌더링하여 테스트
-- 사용자 상호작용(클릭, 입력 등) 시뮬레이션
-- Mock 함수로 콜백 검증
-- 화면에 표시되는 내용 검증
-
-**테스트 네이밍 패턴**:
-- `describe("ComponentName or FunctionName", () => { ... })`
-- `it("should [expected behavior] when [condition]", () => { ... })`
+**테스트 네이밍 패턴**: `describe('ComponentName or FunctionName')` 내부에 `it('should [expected behavior] when [condition]')` 형식으로 작성
 
 **체크리스트**:
 
@@ -476,13 +362,6 @@ backend/src/
 ### 4.3 통합 테스트 전략
 
 **원칙**: 여러 모듈이 함께 동작하는지 테스트합니다. 주로 API 엔드포인트를 테스트합니다.
-
-**적용 방법 (Backend API 통합 테스트)**:
-- supertest 라이브러리로 HTTP 요청 시뮬레이션
-- 테스트용 사용자 생성 및 인증 토큰 획득
-- 실제 데이터베이스 연동하여 CRUD 작업 테스트
-- `beforeAll`에서 테스트 환경 설정, `afterAll`에서 데이터 정리
-- 성공 케이스와 실패 케이스(401 Unauthorized 등) 모두 테스트
 
 **체크리스트**:
 
@@ -563,58 +442,6 @@ backend/src/
 - `.env` 파일은 절대 Git에 커밋하지 않습니다.
 - `.env.example` 파일로 필요한 환경 변수 목록을 공유합니다.
 
-#### 프론트엔드 `.env` 예시
-
-```bash
-# .env (Git에 커밋하지 않음)
-REACT_APP_API_BASE_URL=http://localhost:3000
-REACT_APP_ENV=development
-```
-
-```bash
-# .env.example (Git에 커밋)
-REACT_APP_API_BASE_URL=
-REACT_APP_ENV=
-```
-
-#### 백엔드 `.env` 예시
-
-```bash
-# .env (Git에 커밋하지 않음)
-DATABASE_URL=postgresql://user:password@localhost:5432/whs_todolist
-JWT_SECRET=your-super-secret-jwt-key-here-change-in-production
-JWT_ACCESS_TOKEN_EXPIRY=15m
-JWT_REFRESH_TOKEN_EXPIRY=7d
-PORT=3000
-NODE_ENV=development
-CORS_ORIGIN=http://localhost:5173
-```
-
-```bash
-# .env.example (Git에 커밋)
-DATABASE_URL=
-JWT_SECRET=
-JWT_ACCESS_TOKEN_EXPIRY=15m
-JWT_REFRESH_TOKEN_EXPIRY=7d
-PORT=3000
-NODE_ENV=development
-CORS_ORIGIN=
-```
-
-#### `.gitignore` 설정
-
-```
-# 환경 변수
-.env
-.env.local
-.env.production
-
-# 민감한 정보
-*.key
-*.pem
-credentials.json
-```
-
 **체크리스트**:
 
 - [ ] `.env` 파일이 `.gitignore`에 포함되어 있는가?
@@ -638,21 +465,6 @@ credentials.json
 | 외부 서비스 토큰      | `STRIPE_API_KEY` | 환경 변수 |
 | 암호화 키             | `ENCRYPTION_KEY` | 환경 변수 |
 
-#### 시크릿 생성 방법
-
-```bash
-# JWT Secret 생성 (Node.js)
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-#### Vercel 환경 변수 설정
-
-```bash
-# Vercel CLI로 환경 변수 추가
-vercel env add JWT_SECRET production
-vercel env add DATABASE_URL production
-```
-
 **체크리스트**:
 
 - [ ] JWT Secret이 안전하게 생성되었는가? (최소 32자 이상)
@@ -665,13 +477,9 @@ vercel env add DATABASE_URL production
 ### 5.3 API 키 보호
 
 **원칙**:
+
 - 프론트엔드에서는 외부 API 키를 직접 사용하지 않습니다.
 - 백엔드를 통해 프록시하여 API 키를 보호합니다.
-
-**적용 방법**:
-- 프론트엔드: 백엔드 API 엔드포인트를 통해 간접 호출
-- 백엔드: 환경 변수에서 API 키 로드 후 외부 API 호출
-- API 키는 절대 프론트엔드 코드나 브라우저에 노출하지 않음
 
 **체크리스트**:
 
@@ -685,13 +493,6 @@ vercel env add DATABASE_URL production
 
 **원칙**: 허용된 Origin에서만 API 접근을 허용합니다.
 
-**적용 방법**:
-- 허용된 Origin 목록을 배열로 정의 (개발/프로덕션 환경)
-- `cors` 라이브러리 사용하여 미들웨어 설정
-- `credentials: true` 설정으로 쿠키 허용
-- 허용할 HTTP 메서드와 헤더 명시
-- `app.js`에서 CORS 미들웨어 등록
-
 **체크리스트**:
 
 - [ ] CORS가 설정되어 있는가?
@@ -704,13 +505,6 @@ vercel env add DATABASE_URL production
 ### 5.5 Rate Limiting
 
 **원칙**: API 남용을 방지하기 위해 요청 횟수를 제한합니다.
-
-**적용 방법**:
-- `express-rate-limit` 라이브러리 사용
-- 일반 API: 15분당 100 요청 제한
-- 인증 API: 15분당 5 요청 제한 (무차별 대입 공격 방지)
-- `skipSuccessfulRequests` 옵션으로 성공한 인증 요청은 카운트 제외
-- 라우트별로 적절한 제한 적용
 
 **체크리스트**:
 
@@ -727,13 +521,6 @@ vercel env add DATABASE_URL production
 - 적절한 로그 레벨을 사용합니다 (error, warn, info, debug).
 - 민감한 정보는 로그에 출력하지 않습니다.
 - 프로덕션 환경에서는 error와 warn만 로그합니다.
-
-**적용 방법**:
-- `winston` 라이브러리 사용하여 로거 설정
-- 프로덕션: warn 레벨, 개발: debug 레벨
-- 에러 로그는 별도 파일(`error.log`)로 저장
-- 민감한 정보(password, token) 필터링 함수 작성
-- `console.log` 대신 `logger.info`, `logger.error` 등 사용
 
 **로그 레벨 사용 가이드**:
 
@@ -950,68 +737,45 @@ backend/
 
 ### 7.1 React 컴포넌트 작성 가이드
 
-**함수형 컴포넌트 사용**:
-- React 18에서는 클래스 컴포넌트 대신 함수형 컴포넌트 사용
-- Hooks를 활용한 상태 관리 및 사이드 이펙트 처리
+**원칙**:
 
-**Props Destructuring**:
-- Props를 파라미터에서 구조 분해하여 사용
-- `props.todo.title` 대신 `todo.title`로 간결하게 작성
-
-**조건부 렌더링**:
-- Early return 패턴 사용 (null 체크)
-- 논리 AND 연산자(`&&`)로 조건부 렌더링
-- 삼항 연산자로 조건에 따른 다른 컴포넌트 렌더링
+- 함수형 컴포넌트를 사용합니다 (React 18 권장)
+- Props는 구조 분해하여 사용합니다
+- 조건부 렌더링을 명확하게 작성합니다
 
 ---
 
 ### 7.2 Zustand 스토어 작성 가이드
 
-**구조**:
-- State: `todos`, `loading`, `error` 등 상태 정의
-- Actions: `fetchTodos`, `addTodo`, `deleteTodo` 등 액션 함수
-- Selectors: `getActiveTodos` 등 파생 상태 계산 함수 (선택 사항)
+**원칙**:
 
-**작성 패턴**:
-- `create` 함수로 스토어 생성
-- `set` 함수로 상태 업데이트
-- `get` 함수로 현재 상태 조회
-- 비동기 작업 시 loading/error 상태 관리
-- Service 레이어 호출 후 결과를 상태에 반영
+- State와 Actions를 명확히 분리합니다
+- 비동기 작업 시 loading, error 상태를 관리합니다
+- Service 레이어를 통해 API를 호출합니다
+- Selectors를 활용하여 파생 상태를 관리합니다
 
 ---
 
 ### 7.3 Prisma 사용 가이드
 
-**스키마 작성**:
-- `schema.prisma`에서 데이터 모델 정의
-- `@id`, `@unique`, `@default` 데코레이터 활용
-- 관계 설정: `@relation` (User ↔ Todo)
-- Enum 타입 정의: `Role`, `TodoStatus`
-- 인덱스 설정: `@@index` (성능 최적화)
-- `onDelete: Cascade`로 연관 데이터 자동 삭제
+**원칙**:
 
-**Repository 패턴 사용**:
-- PrismaClient 인스턴스 생성
-- CRUD 함수 작성: `findByUserId`, `create`, `update`, `delete`
-- 소프트 삭제: `status='deleted'`, `deletedAt` 업데이트
-- 하드 삭제: `prisma.todo.delete()` 사용
-- `orderBy`, `where` 절로 쿼리 조건 지정
+- 스키마에서 관계를 명확히 정의합니다
+- 인덱스를 적절히 사용하여 쿼리 성능을 최적화합니다
+- Repository 패턴을 사용하여 데이터 액세스 로직을 분리합니다
+- Soft Delete를 고려하여 deletedAt 필드를 활용합니다
 
 ---
 
 ### 7.4 API 서비스 작성 가이드 (프론트엔드)
 
-**Axios 인스턴스 설정** (`services/api.js`):
-- `axios.create()`로 base URL 및 기본 헤더 설정
-- 요청 인터셉터: Access Token을 Authorization 헤더에 자동 추가
-- 응답 인터셉터: 401 에러 시 토큰 갱신 후 재시도, 실패 시 로그인 페이지로 리다이렉트
+**원칙**:
 
-**Service 레이어 작성** (`services/todoService.js`):
-- Axios 인스턴스를 import하여 API 호출
-- CRUD 함수 작성: `getTodos`, `createTodo`, `updateTodo`, `deleteTodo`
-- API_ENDPOINTS 상수 사용
-- `response.data.data`에서 실제 데이터 추출하여 반환
+- Axios 인스턴스를 생성하여 공통 설정을 관리합니다
+- 요청 인터셉터를 사용하여 자동으로 Access Token을 추가합니다
+- 응답 인터셉터를 사용하여 토큰 만료 시 자동 갱신을 처리합니다
+- API 엔드포인트를 상수로 관리합니다
+- 각 엔티티별로 서비스 파일을 분리합니다
 
 ---
 
