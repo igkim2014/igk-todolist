@@ -1,45 +1,61 @@
-const db = require('../config/database');
+const { prisma } = require('../config/database');
 const { hashPassword } = require('../utils/passwordHelper');
 
 const getProfile = async (userId) => {
-  const result = await db.query('SELECT userId, email, username, role, createdAt FROM "User" WHERE userId = $1', [userId]);
-  if (result.rows.length === 0) {
+  const user = await prisma.user.findUnique({
+    where: {
+      userId: userId
+    },
+    select: {
+      userId: true,
+      email: true,
+      username: true,
+      role: true,
+      createdAt: true
+    }
+  });
+
+  if (!user) {
     const error = new Error('사용자를 찾을 수 없습니다');
     error.statusCode = 404;
     error.code = 'USER_NOT_FOUND';
     throw error;
   }
-  return result.rows[0];
+  return user;
 };
 
 const updateProfile = async (userId, updateData) => {
   const { username, password } = updateData;
-  
-  let hashedPassword = null;
-  if (password) {
-    hashedPassword = await hashPassword(password);
-  }
 
-  let query = 'UPDATE "User" SET updatedAt = NOW()';
-  const params = [userId];
-  let paramIndex = 2;
+  let updateFields = {
+    updatedAt: new Date()
+  };
 
   if (username) {
-    query += `, username = $${paramIndex}`;
-    params.push(username);
-    paramIndex++;
+    updateFields.username = username;
   }
 
-  if (hashedPassword) {
-    query += `, password = $${paramIndex}`;
-    params.push(hashedPassword);
-    paramIndex++;
+  if (password) {
+    const hashedPassword = await hashPassword(password);
+    updateFields.password = hashedPassword;
   }
 
-  query += ` WHERE userId = $1 RETURNING userId, email, username, role, createdAt, updatedAt`;
+  const updatedUser = await prisma.user.update({
+    where: {
+      userId: userId
+    },
+    data: updateFields,
+    select: {
+      userId: true,
+      email: true,
+      username: true,
+      role: true,
+      createdAt: true,
+      updatedAt: true
+    }
+  });
 
-  const result = await db.query(query, params);
-  return result.rows[0];
+  return updatedUser;
 };
 
 module.exports = {

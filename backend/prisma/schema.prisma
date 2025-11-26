@@ -1,0 +1,46 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId    String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  username  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  todos     Todo[]
+}
+
+model Todo {
+  todoId      String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  content     String?
+  startDate   DateTime?
+  dueDate     DateTime?
+  status      String    @default("active")
+  isCompleted Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+}
+
+model Holiday {
+  holidayId   String   @id @default(uuid())
+  title       String
+  date        DateTime
+  description String?
+  isRecurring Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

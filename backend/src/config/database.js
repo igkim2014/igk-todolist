@@ -1,31 +1,22 @@
-const { Pool } = require('pg');
+const { PrismaClient } = require('@prisma/client');
 require('dotenv').config();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
 });
-
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
-  process.exit(-1);
-});
-
-const query = (text, params) => pool.query(text, params);
 
 const testConnection = async () => {
   try {
-    const res = await pool.query('SELECT NOW()');
-    console.log('Database connected successfully:', res.rows[0].now);
+    await prisma.$connect();
+    console.log('Database connected successfully with Prisma');
   } catch (err) {
     console.error('Database connection failed:', err.message);
+  } finally {
+    await prisma.$disconnect();
   }
 };
 
 module.exports = {
-  query,
-  pool,
+  prisma,
   testConnection,
 };

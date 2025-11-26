@@ -162,7 +162,7 @@ capacitor.config.json
 
 # Prisma
 prisma/migrations/
-schema.prisma
+# schema.prisma is needed in the repo
 
 # Supabase
 supabase/

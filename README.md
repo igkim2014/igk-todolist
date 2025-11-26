@@ -28,7 +28,7 @@ IGK-TodoList는 사용자 인증 기반의 개인 할일 관리 애플리케이�
 - **API Style**: REST API
 - **Authentication**: JWT (jsonwebtoken)
 - **ORM**: Prisma
-- **Hashing**: bcrypt
+- **Hashing**: bcryptjs
 
 ### 🗄️ 데이터베이스
 - **Database**: PostgreSQL 15+
