@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
   TRASH: {
     BASE: '/trash',
     BY_ID: (id) => `/trash/${id}`,
+    PERMANENTLY_DELETE: (id) => `/trash/${id}`,
   },
 
   // 국경일

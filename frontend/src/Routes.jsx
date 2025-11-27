@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import useAuthStore from './stores/authStore';
-import App from './App';
+import Layout from './components/layout/Layout';
 
 // 페이지 컴포넌트 - 나중에 생성될 예정
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
@@ -62,14 +62,59 @@ const AdminRoute = ({ children }) => {
 // 라우터 설정
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: (
-      <ProtectedRoute>
-        <React.Suspense fallback={<LoadingFallback />}>
-          <TodoListPage />
-        </React.Suspense>
-      </ProtectedRoute>
-    ),
+    element: <Layout />, // 공통 레이아웃
+    children: [
+      {
+        path: '/',
+        element: (
+          <ProtectedRoute>
+            <React.Suspense fallback={<LoadingFallback />}>
+              <TodoListPage />
+            </React.Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/trash',
+        element: (
+          <ProtectedRoute>
+            <React.Suspense fallback={<LoadingFallback />}>
+              <TrashPage />
+            </React.Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/holidays',
+        element: (
+          <ProtectedRoute>
+            <React.Suspense fallback={<LoadingFallback />}>
+              <HolidayPage />
+            </React.Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/profile',
+        element: (
+          <ProtectedRoute>
+            <React.Suspense fallback={<LoadingFallback />}>
+              <ProfilePage />
+            </React.Suspense>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/admin/holidays',
+        element: (
+          <AdminRoute>
+            <React.Suspense fallback={<LoadingFallback />}>
+              <AdminHolidayPage />
+            </React.Suspense>
+          </AdminRoute>
+        ),
+      },
+    ],
   },
   {
     path: '/login',
@@ -85,46 +130,6 @@ const router = createBrowserRouter([
       <React.Suspense fallback={<LoadingFallback />}>
         <RegisterPage />
       </React.Suspense>
-    ),
-  },
-  {
-    path: '/trash',
-    element: (
-      <ProtectedRoute>
-        <React.Suspense fallback={<LoadingFallback />}>
-          <TrashPage />
-        </React.Suspense>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/holidays',
-    element: (
-      <ProtectedRoute>
-        <React.Suspense fallback={<LoadingFallback />}>
-          <HolidayPage />
-        </React.Suspense>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/profile',
-    element: (
-      <ProtectedRoute>
-        <React.Suspense fallback={<LoadingFallback />}>
-          <ProfilePage />
-        </React.Suspense>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/admin/holidays',
-    element: (
-      <AdminRoute>
-        <React.Suspense fallback={<LoadingFallback />}>
-          <AdminHolidayPage />
-        </React.Suspense>
-      </AdminRoute>
     ),
   },
 ]);

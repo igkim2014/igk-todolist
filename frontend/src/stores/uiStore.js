@@ -22,7 +22,12 @@ const useUiStore = create(
      * 모달 열기
      */
     openModal: (type, props = {}) => {
-      set({ isModalOpen: true, modalType: type, modalProps: props });
+      set({
+        isModalOpen: true,
+        modalType: type,
+        modalProps: props,
+        selectedTodo: props.todo || null
+      });
     },
 
     /**

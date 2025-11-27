@@ -38,6 +38,20 @@ const useTodoStore = create(
     },
 
     /**
+     * 할일 검색
+     */
+    searchTodos: async (searchTerm) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await todoService.getTodos({ search: searchTerm });
+        set({ todos: response.data, isLoading: false });
+      } catch (error) {
+        set({ error: error.response?.data?.error?.message || '할일 검색에 실패했습니다', isLoading: false });
+        throw error;
+      }
+    },
+
+    /**
      * 할일 상세 조회
      */
     fetchTodoById: async (id) => {
@@ -123,12 +137,12 @@ const useTodoStore = create(
       try {
         const response = await todoService.deleteTodo(id);
         const { todos } = get();
-        const updatedTodos = todos.map(todo => 
+        const updatedTodos = todos.map(todo =>
           todo.todoId === id ? response.data : todo
         );
-        set({ 
+        set({
           todos: updatedTodos,
-          isLoading: false 
+          isLoading: false
         });
         return response.data;
       } catch (error) {
@@ -145,16 +159,36 @@ const useTodoStore = create(
       try {
         const response = await todoService.restoreTodo(id);
         const { todos } = get();
-        const updatedTodos = todos.map(todo => 
+        const updatedTodos = todos.map(todo =>
           todo.todoId === id ? response.data : todo
         );
-        set({ 
+        set({
           todos: updatedTodos,
-          isLoading: false 
+          isLoading: false
         });
         return response.data;
       } catch (error) {
         set({ error: error.response?.data?.error?.message || '할일 복원에 실패했습니다', isLoading: false });
+        throw error;
+      }
+    },
+
+    /**
+     * 할일 영구 삭제
+     */
+    permanentlyDeleteTodo: async (id) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await todoService.permanentlyDeleteTodo(id);
+        const { todos } = get();
+        const updatedTodos = todos.filter(todo => todo.todoId !== id);
+        set({
+          todos: updatedTodos,
+          isLoading: false
+        });
+        return response.data;
+      } catch (error) {
+        set({ error: error.response?.data?.error?.message || '할일 영구 삭제에 실패했습니다', isLoading: false });
         throw error;
       }
     },

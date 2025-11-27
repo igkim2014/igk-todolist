@@ -87,6 +87,16 @@ const todoService = {
     const response = await api.patch(API_ENDPOINTS.TODOS.RESTORE(id));
     return response.data;
   },
+
+  /**
+   * 할일 영구 삭제
+   * @param {string} id - 할일 ID
+   * @returns {Promise<Object>} 삭제 결과
+   */
+  permanentlyDeleteTodo: async (id) => {
+    const response = await api.delete(API_ENDPOINTS.TRASH.PERMANENTLY_DELETE(id));
+    return response.data;
+  },
 };
 
 export default todoService;
