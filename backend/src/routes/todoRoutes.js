@@ -77,7 +77,9 @@ router.post(
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
+ *         description: Todo ID (UUID)
  *     responses:
  *       200:
  *         description: Todo 상세 정보
@@ -97,7 +99,9 @@ router.get('/:id', todoController.getTodoById);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
+ *         description: Todo ID (UUID)
  *     requestBody:
  *       content:
  *         application/json:
@@ -130,7 +134,9 @@ router.put('/:id', todoController.updateTodo);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
+ *         description: Todo ID (UUID)
  *     responses:
  *       200:
  *         description: Todo 완료 처리 성공
@@ -150,7 +156,9 @@ router.patch('/:id/complete', todoController.completeTodo);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
+ *         description: Todo ID (UUID)
  *     responses:
  *       200:
  *         description: Todo 삭제 성공
@@ -170,7 +178,9 @@ router.delete('/:id', todoController.deleteTodo);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
+ *         description: Todo ID (UUID)
  *     responses:
  *       200:
  *         description: Todo 복원 성공
