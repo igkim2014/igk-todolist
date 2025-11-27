@@ -117,4 +117,5 @@ const useUiStore = create(
   }))
 );
 
+export { useUiStore };
 export default useUiStore;

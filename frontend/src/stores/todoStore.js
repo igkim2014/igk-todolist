@@ -215,4 +215,5 @@ const useTodoStore = create(
   }))
 );
 
+export { useTodoStore };
 export default useTodoStore;

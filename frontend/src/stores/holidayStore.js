@@ -89,4 +89,5 @@ const useHolidayStore = create(
   }))
 );
 
+export { useHolidayStore };
 export default useHolidayStore;
