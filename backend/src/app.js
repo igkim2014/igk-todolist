@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 const { apiLimiter } = require('./middlewares/rateLimitMiddleware');
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const routes = require('./routes');
@@ -14,6 +16,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Rate Limiting
 app.use('/api', apiLimiter);
