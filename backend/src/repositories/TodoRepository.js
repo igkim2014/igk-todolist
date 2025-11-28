@@ -4,26 +4,30 @@
  * SOLID Principles: Single Responsibility, Dependency Inversion
  */
 
-const BaseRepository = require('./base/BaseRepository');
-const { v4: uuidv4 } = require('uuid');
+const BaseRepository = require("./base/BaseRepository");
+// uuid 대신 Node 내장 crypto 사용 (ESM 문제 없음)
+const { randomUUID } = require("crypto");
 
 class TodoRepository extends BaseRepository {
   constructor() {
-    super('Todo');
+    super("Todo");
   }
 
   /**
    * todoId로 할일 조회
    */
   async findByTodoId(todoId) {
-    return await this.findById(todoId, 'todoId');
+    return await this.findById(todoId, "todoId");
   }
 
   /**
    * todoId와 userId로 할일 조회 (소유권 확인)
    */
   async findByTodoIdAndUserId(todoId, userId) {
-    return await this.findOne('"todoId" = $1 AND "userId" = $2', [todoId, userId]);
+    return await this.findOne('"todoId" = $1 AND "userId" = $2', [
+      todoId,
+      userId,
+    ]);
   }
 
   /**
@@ -36,7 +40,7 @@ class TodoRepository extends BaseRepository {
 
     // 기본적으로 active와 completed만 조회 (삭제된 항목 제외)
     if (!filters.includeDeleted) {
-      conditions.push('"status" IN (\'active\', \'completed\')');
+      conditions.push("\"status\" IN ('active', 'completed')");
     }
 
     // status 필터
@@ -48,21 +52,25 @@ class TodoRepository extends BaseRepository {
 
     // 검색 필터 (title 또는 content)
     if (filters.search) {
-      conditions.push(`("title" ILIKE $${paramIndex} OR "content" ILIKE $${paramIndex})`);
+      conditions.push(
+        `("title" ILIKE $${paramIndex} OR "content" ILIKE $${paramIndex})`
+      );
       params.push(`%${filters.search}%`);
       paramIndex++;
     }
 
-    const whereClause = conditions.join(' AND ');
+    const whereClause = conditions.join(" AND ");
 
     // 정렬
-    const sortBy = filters.sortBy || 'createdAt';
-    const order = filters.order || 'desc';
-    const safeSortFields = ['dueDate', 'createdAt', 'updatedAt'];
-    const safeOrder = ['asc', 'desc'];
+    const sortBy = filters.sortBy || "createdAt";
+    const order = filters.order || "desc";
+    const safeSortFields = ["dueDate", "createdAt", "updatedAt"];
+    const safeOrder = ["asc", "desc"];
 
-    const finalSort = safeSortFields.includes(sortBy) ? sortBy : 'createdAt';
-    const finalOrder = safeOrder.includes(order.toLowerCase()) ? order.toUpperCase() : 'DESC';
+    const finalSort = safeSortFields.includes(sortBy) ? sortBy : "createdAt";
+    const finalOrder = safeOrder.includes(order.toLowerCase())
+      ? order.toUpperCase()
+      : "DESC";
     const orderBy = `"${finalSort}" ${finalOrder}`;
 
     return await this.findAll(whereClause, params, orderBy);
@@ -75,13 +83,13 @@ class TodoRepository extends BaseRepository {
     const { title, content, startDate, dueDate } = todoData;
 
     const newTodo = {
-      todoId: uuidv4(),
+      todoId: randomUUID(), // 여기서 UUID 생성
       userId,
       title,
       content: content || null,
       startDate: startDate ? new Date(startDate) : null,
       dueDate: dueDate ? new Date(dueDate) : null,
-      status: 'active',
+      status: "active",
       isCompleted: false,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -95,13 +103,15 @@ class TodoRepository extends BaseRepository {
    * 할일 업데이트
    */
   async updateTodo(todoId, userId, updateData) {
-    const allowedFields = ['title', 'content', 'startDate', 'dueDate'];
+    const allowedFields = ["title", "content", "startDate", "dueDate"];
     const filteredData = {};
 
     Object.keys(updateData).forEach((key) => {
       if (allowedFields.includes(key) && updateData[key] !== undefined) {
-        if (key === 'startDate' || key === 'dueDate') {
-          filteredData[key] = updateData[key] ? new Date(updateData[key]) : null;
+        if (key === "startDate" || key === "dueDate") {
+          filteredData[key] = updateData[key]
+            ? new Date(updateData[key])
+            : null;
         } else {
           filteredData[key] = updateData[key];
         }
@@ -116,12 +126,14 @@ class TodoRepository extends BaseRepository {
     const values = Object.values(filteredData);
     const setClause = columns
       .map((col, index) => `"${col}" = $${index + 1}`)
-      .join(', ');
+      .join(", ");
 
     const query = `
       UPDATE "${this.tableName}"
       SET ${setClause}, "updatedAt" = CURRENT_TIMESTAMP
-      WHERE "todoId" = $${values.length + 1} AND "userId" = $${values.length + 2}
+      WHERE "todoId" = $${values.length + 1} AND "userId" = $${
+      values.length + 2
+    }
       RETURNING *
     `;
 
