@@ -81,13 +81,14 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 할일 완료 처리
-        const todoItem = page.locator('div').filter({ hasText: todoTitle }).first();
-        // 완료 버튼은 첫 번째 버튼 (체크박스 형태)
-        const completeBtn = todoItem.locator('button').first();
-        await completeBtn.click();
+        // 할일 항목을 더 구체적으로 찾기 (border rounded-lg p-4 클래스를 가진 div)
+        const todoItem = page.locator('div.border.rounded-lg.p-4').filter({ hasText: todoTitle });
 
-        // 완료 확인 (취소선 표시)
-        await expect(todoItem.locator('h3')).toHaveClass(/line-through/);
+        // 체크 아이콘 버튼 클릭 (할일 항목 내 첫 번째 버튼)
+        await todoItem.locator('button').first().click();
+
+        // 완료 상태 확인 - "완료" 뱃지가 표시됨 (Badge 컴포넌트)
+        await expect(todoItem.locator('.bg-green-100.text-green-800').getByText('완료')).toBeVisible();
     });
 
     test('시나리오 2.1.3: 할일 삭제 및 복원', async ({ page }) => {
@@ -106,7 +107,7 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 할일 삭제
-        const todoItem = page.locator('div').filter({ hasText: todoTitle }).first();
+        const todoItem = page.locator('div.border.rounded-lg.p-4').filter({ hasText: todoTitle });
         page.on('dialog', dialog => dialog.accept());
         await todoItem.getByRole('button', { name: /삭제/i }).click();
 
@@ -121,7 +122,7 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 복원
-        const trashItem = page.locator('div').filter({ hasText: todoTitle }).first();
+        const trashItem = page.locator('div.border.rounded-lg.p-4').filter({ hasText: todoTitle });
         await trashItem.getByRole('button', { name: /복원/i }).click();
 
         // 휴지통에서 사라졌는지 확인
@@ -186,12 +187,14 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 할일 수정
-        const todoItem = page.locator('div').filter({ hasText: todoTitle }).first();
+        const todoItem = page.locator('div.border.rounded-lg.p-4').filter({ hasText: todoTitle });
         await todoItem.getByRole('button', { name: /수정/i }).click();
 
         // 내용 변경
         await page.fill('textarea[name="content"]', "수정된 내용 - 시험 범위: 1-10장");
-        await page.getByRole('button', { name: /수정/i }).click();
+
+        // 모달 내부의 "수정" 버튼 클릭 (dialog role 내부의 버튼)
+        await page.getByRole('dialog').getByRole('button', { name: /수정/i }).click();
 
         // 모달이 닫힐 때까지 대기
         await expect(page.getByRole('dialog')).not.toBeVisible();
@@ -240,9 +243,9 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 완료 처리
-        const todoItem = page.locator('div').filter({ hasText: todoTitle }).first();
-        const completeBtn = todoItem.locator('button').first();
-        await completeBtn.click();
+        const todoItem = page.locator('div.border.rounded-lg.p-4').filter({ hasText: todoTitle });
+        // 체크 아이콘 버튼 클릭 (할일 항목 내 첫 번째 버튼)
+        await todoItem.locator('button').first().click();
 
         // '완료' 필터 클릭
         await page.getByRole('button', { name: /완료/i }).first().click();

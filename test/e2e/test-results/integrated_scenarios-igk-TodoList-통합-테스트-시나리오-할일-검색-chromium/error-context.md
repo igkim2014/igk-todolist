@@ -7,7 +7,7 @@
     - paragraph [ref=e7]: 새 계정 만들기
   - generic [ref=e9]:
     - img [ref=e11]
-    - paragraph [ref=e16]: 요청 횟수가 너무 많습니다. 잠시 후 다시 시도해주세요.
+    - paragraph [ref=e16]: 이미 사용 중인 이메일입니다
   - generic [ref=e17]:
     - generic [ref=e18]:
       - generic [ref=e19]: 이메일 *
