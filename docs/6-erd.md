@@ -1,13 +1,14 @@
 # igk-TodoList 데이터베이스 ERD
 
-**버전**: 1.0
-**작성일**: 2025-11-26
-**상태**: 최종
+**버전**: 1.1
+**작성일**: 2025-11-28 (v1.1 업데이트)
+**상태**: 최종 (Prisma 스키마 반영)
 **작성자**: Claude
 **참조 문서**:
 
 - [도메인 정의서](./1-domain-definition.md)
 - [PRD](./3-prd.md)
+- [Prisma 스키마](../backend/prisma/schema.prisma)
 
 ---
 
@@ -34,6 +35,8 @@
 
 igk-TodoList 애플리케이션의 데이터 저장 및 관리를 위한 PostgreSQL 15+ 기반 데이터베이스 스키마입니다.
 
+**중요**: 이 프로젝트는 **Prisma ORM**을 사용하여 데이터베이스를 관리합니다. 실제 스키마는 `backend/prisma/schema.prisma` 파일에서 정의되며, Prisma 마이그레이션을 통해 데이터베이스에 반영됩니다.
+
 ### 1.2 설계 원칙
 
 1. **정규화**: 데이터 중복 최소화 및 무결성 보장
@@ -49,13 +52,14 @@ igk-TodoList 애플리케이션의 데이터 저장 및 관리를 위한 Postgre
 
 ### 1.4 데이터베이스 메타 정보
 
-| 항목              | 내용                        |
-| ----------------- | --------------------------- |
-| DBMS              | PostgreSQL 15+              |
-| 문자 인코딩       | UTF-8                       |
-| 타임존            | UTC                         |
-| 기본 ID 타입      | UUID                        |
-| 타임스탬프 정밀도 | TIMESTAMP WITHOUT TIME ZONE |
+| 항목              | 내용                                        |
+| ----------------- | ------------------------------------------- |
+| DBMS              | PostgreSQL 15+                              |
+| ORM               | Prisma 5.x                                  |
+| 문자 인코딩       | UTF-8                                       |
+| 타임존            | UTC                                         |
+| 기본 ID 타입      | TEXT (UUID를 String으로 저장)               |
+| 타임스탬프 정밀도 | TIMESTAMP(3) (밀리초 단위, WITHOUT TIMEZONE) |
 
 ---
 
@@ -66,37 +70,37 @@ erDiagram
     User ||--o{ Todo : "owns"
 
     User {
-        UUID userId PK "사용자 고유 ID"
-        VARCHAR(255) email UK "로그인 이메일"
-        VARCHAR(255) password "bcrypt 해시 비밀번호"
-        VARCHAR(100) username "사용자 이름"
-        ENUM role "user, admin"
-        TIMESTAMP createdAt "가입일시"
-        TIMESTAMP updatedAt "최종 수정일시"
+        TEXT userId PK "사용자 고유 ID (UUID)"
+        TEXT email UK "로그인 이메일"
+        TEXT password "bcrypt 해시 비밀번호"
+        TEXT username "사용자 이름"
+        TEXT role "user, admin"
+        TIMESTAMP_3 createdAt "가입일시"
+        TIMESTAMP_3 updatedAt "최종 수정일시"
     }
 
     Todo {
-        UUID todoId PK "할일 고유 ID"
-        UUID userId FK "소유자 ID"
-        VARCHAR(200) title "할일 제목"
+        TEXT todoId PK "할일 고유 ID (UUID)"
+        TEXT userId FK "소유자 ID"
+        TEXT title "할일 제목"
         TEXT content "할일 상세 내용"
-        DATE startDate "시작일"
-        DATE dueDate "만료일"
-        ENUM status "active, completed, deleted"
+        TIMESTAMP_3 startDate "시작일시"
+        TIMESTAMP_3 dueDate "만료일시"
+        TEXT status "active, completed, deleted"
         BOOLEAN isCompleted "완료 여부"
-        TIMESTAMP createdAt "생성일시"
-        TIMESTAMP updatedAt "최종 수정일시"
-        TIMESTAMP deletedAt "삭제일시 (소프트 삭제)"
+        TIMESTAMP_3 createdAt "생성일시"
+        TIMESTAMP_3 updatedAt "최종 수정일시"
+        TIMESTAMP_3 deletedAt "삭제일시 (소프트 삭제)"
     }
 
     Holiday {
-        UUID holidayId PK "국경일 고유 ID"
-        VARCHAR(100) title "국경일 이름"
-        DATE date "국경일 날짜"
+        TEXT holidayId PK "국경일 고유 ID (UUID)"
+        TEXT title "국경일 이름"
+        TIMESTAMP_3 date "국경일 날짜"
         TEXT description "설명"
         BOOLEAN isRecurring "매년 반복 여부"
-        TIMESTAMP createdAt "생성일시"
-        TIMESTAMP updatedAt "최종 수정일시"
+        TIMESTAMP_3 createdAt "생성일시"
+        TIMESTAMP_3 updatedAt "최종 수정일시"
     }
 ```
 
@@ -110,15 +114,15 @@ erDiagram
 
 #### 필드 정의
 
-| 필드명    | 데이터 타입           | NULL | 기본값            | 제약 조건                | 설명                                     |
-| --------- | --------------------- | ---- | ----------------- | ------------------------ | ---------------------------------------- |
-| userId    | UUID                  | NO   | gen_random_uuid() | PRIMARY KEY              | 사용자 고유 식별자                       |
-| email     | VARCHAR(255)          | NO   | -                 | UNIQUE, NOT NULL         | 로그인용 이메일 주소                     |
-| password  | VARCHAR(255)          | NO   | -                 | NOT NULL                 | bcrypt 해시된 비밀번호 (salt rounds: 10) |
-| username  | VARCHAR(100)          | NO   | -                 | NOT NULL                 | 사용자 표시 이름                         |
-| role      | ENUM('user', 'admin') | NO   | 'user'            | NOT NULL, DEFAULT 'user' | 사용자 권한 역할                         |
-| createdAt | TIMESTAMP             | NO   | NOW()             | NOT NULL                 | 계정 생성 일시 (UTC)                     |
-| updatedAt | TIMESTAMP             | NO   | NOW()             | NOT NULL                 | 최종 정보 수정 일시 (UTC)                |
+| 필드명    | 데이터 타입 (Prisma) | 데이터 타입 (PostgreSQL) | NULL | 기본값              | 제약 조건        | 설명                                     |
+| --------- | -------------------- | ------------------------ | ---- | ------------------- | ---------------- | ---------------------------------------- |
+| userId    | String               | TEXT                     | NO   | uuid()              | PRIMARY KEY      | 사용자 고유 식별자 (UUID)                |
+| email     | String               | TEXT                     | NO   | -                   | UNIQUE, NOT NULL | 로그인용 이메일 주소                     |
+| password  | String               | TEXT                     | NO   | -                   | NOT NULL         | bcrypt 해시된 비밀번호 (salt rounds: 10) |
+| username  | String               | TEXT                     | NO   | -                   | NOT NULL         | 사용자 표시 이름                         |
+| role      | String               | TEXT                     | NO   | 'user'              | NOT NULL         | 사용자 권한 역할 (user, admin)           |
+| createdAt | DateTime             | TIMESTAMP(3)             | NO   | now()               | NOT NULL         | 계정 생성 일시 (UTC, 밀리초 포함)        |
+| updatedAt | DateTime             | TIMESTAMP(3)             | NO   | @updatedAt (자동)   | NOT NULL         | 최종 정보 수정 일시 (UTC, 자동 갱신)     |
 
 #### 비즈니스 규칙
 
@@ -130,9 +134,11 @@ erDiagram
 
 #### 참고 사항
 
-- UUID v4 사용으로 예측 불가능성 보장
+- Prisma의 `@default(uuid())` 사용으로 UUID 자동 생성
+- PostgreSQL에서는 TEXT 타입으로 UUID 문자열 저장
 - 이메일은 대소문자 구분 없이 저장 (소문자 변환 권장)
-- updatedAt은 프로필 수정 시마다 자동 갱신
+- updatedAt은 Prisma의 `@updatedAt` 속성으로 자동 갱신
+- role은 TEXT 타입이지만 애플리케이션 레벨에서 'user' 또는 'admin'만 허용
 
 ---
 
@@ -142,19 +148,19 @@ erDiagram
 
 #### 필드 정의
 
-| 필드명      | 데이터 타입                            | NULL | 기본값            | 제약 조건                                             | 설명                             |
-| ----------- | -------------------------------------- | ---- | ----------------- | ----------------------------------------------------- | -------------------------------- |
-| todoId      | UUID                                   | NO   | gen_random_uuid() | PRIMARY KEY                                           | 할일 고유 식별자                 |
-| userId      | UUID                                   | NO   | -                 | FOREIGN KEY REFERENCES User(userId) ON DELETE CASCADE | 할일 소유자 ID                   |
-| title       | VARCHAR(200)                           | NO   | -                 | NOT NULL                                              | 할일 제목 (최대 200자)           |
-| content     | TEXT                                   | YES  | NULL              | -                                                     | 할일 상세 내용 (선택사항)        |
-| startDate   | DATE                                   | YES  | NULL              | -                                                     | 할일 시작일                      |
-| dueDate     | DATE                                   | YES  | NULL              | CHECK (dueDate >= startDate OR dueDate IS NULL)       | 할일 만료일 (시작일 이후여야 함) |
-| status      | ENUM('active', 'completed', 'deleted') | NO   | 'active'          | NOT NULL, DEFAULT 'active'                            | 할일 상태 (활성/완료/삭제)       |
-| isCompleted | BOOLEAN                                | NO   | false             | NOT NULL, DEFAULT false                               | 완료 여부 플래그                 |
-| createdAt   | TIMESTAMP                              | NO   | NOW()             | NOT NULL                                              | 할일 생성 일시 (UTC)             |
-| updatedAt   | TIMESTAMP                              | NO   | NOW()             | NOT NULL                                              | 할일 최종 수정 일시 (UTC)        |
-| deletedAt   | TIMESTAMP                              | YES  | NULL              | -                                                     | 할일 삭제 일시 (소프트 삭제용)   |
+| 필드명      | 데이터 타입 (Prisma) | 데이터 타입 (PostgreSQL) | NULL | 기본값            | 제약 조건                                                              | 설명                           |
+| ----------- | -------------------- | ------------------------ | ---- | ----------------- | ---------------------------------------------------------------------- | ------------------------------ |
+| todoId      | String               | TEXT                     | NO   | uuid()            | PRIMARY KEY                                                            | 할일 고유 식별자 (UUID)        |
+| userId      | String               | TEXT                     | NO   | -                 | FOREIGN KEY REFERENCES User(userId) ON DELETE CASCADE ON UPDATE CASCADE | 할일 소유자 ID                 |
+| title       | String               | TEXT                     | NO   | -                 | NOT NULL                                                               | 할일 제목                      |
+| content     | String?              | TEXT                     | YES  | NULL              | -                                                                      | 할일 상세 내용 (선택사항)      |
+| startDate   | DateTime?            | TIMESTAMP(3)             | YES  | NULL              | -                                                                      | 할일 시작일시                  |
+| dueDate     | DateTime?            | TIMESTAMP(3)             | YES  | NULL              | -                                                                      | 할일 만료일시                  |
+| status      | String               | TEXT                     | NO   | 'active'          | NOT NULL, DEFAULT 'active'                                             | 할일 상태 (active/completed/deleted) |
+| isCompleted | Boolean              | BOOLEAN                  | NO   | false             | NOT NULL, DEFAULT false                                                | 완료 여부 플래그               |
+| createdAt   | DateTime             | TIMESTAMP(3)             | NO   | now()             | NOT NULL                                                               | 할일 생성 일시 (UTC)           |
+| updatedAt   | DateTime             | TIMESTAMP(3)             | NO   | @updatedAt (자동) | NOT NULL                                                               | 할일 최종 수정 일시 (UTC)      |
+| deletedAt   | DateTime?            | TIMESTAMP(3)             | YES  | NULL              | -                                                                      | 할일 삭제 일시 (소프트 삭제용) |
 
 #### 비즈니스 규칙
 
@@ -181,11 +187,14 @@ erDiagram
 
 #### 참고 사항
 
-- title은 필수 입력 필드
-- content는 선택사항으로 NULL 허용
-- startDate와 dueDate는 선택사항
+- title은 필수 입력 필드 (TEXT 타입으로 길이 제한 없음)
+- content는 선택사항으로 NULL 허용 (Prisma의 `String?` 타입)
+- **중요**: startDate와 dueDate는 DATE가 아닌 **TIMESTAMP(3)** 타입 (Prisma DateTime 매핑)
+  - 시간 정보를 포함하지만 UI에서는 날짜만 표시 가능
 - deletedAt은 소프트 삭제 시에만 값이 설정됨
 - 사용자 삭제 시 해당 사용자의 모든 할일도 CASCADE로 삭제
+- status는 TEXT 타입이지만 애플리케이션 레벨에서 'active', 'completed', 'deleted'만 허용
+- **dueDate >= startDate 체크 제약조건은 Prisma 레벨에서는 구현되지 않음** (애플리케이션 레벨에서 검증 필요)
 
 ---
 
@@ -195,15 +204,15 @@ erDiagram
 
 #### 필드 정의
 
-| 필드명      | 데이터 타입  | NULL | 기본값            | 제약 조건              | 설명                               |
-| ----------- | ------------ | ---- | ----------------- | ---------------------- | ---------------------------------- |
-| holidayId   | UUID         | NO   | gen_random_uuid() | PRIMARY KEY            | 국경일 고유 식별자                 |
-| title       | VARCHAR(100) | NO   | -                 | NOT NULL               | 국경일 이름 (예: 신정, 설날)       |
-| date        | DATE         | NO   | -                 | NOT NULL               | 국경일 날짜                        |
-| description | TEXT         | YES  | NULL              | -                      | 국경일 설명                        |
-| isRecurring | BOOLEAN      | NO   | true              | NOT NULL, DEFAULT true | 매년 반복 여부                     |
-| createdAt   | TIMESTAMP    | NO   | NOW()             | NOT NULL               | 국경일 데이터 생성 일시 (UTC)      |
-| updatedAt   | TIMESTAMP    | NO   | NOW()             | NOT NULL               | 국경일 데이터 최종 수정 일시 (UTC) |
+| 필드명      | 데이터 타입 (Prisma) | 데이터 타입 (PostgreSQL) | NULL | 기본값            | 제약 조건   | 설명                               |
+| ----------- | -------------------- | ------------------------ | ---- | ----------------- | ----------- | ---------------------------------- |
+| holidayId   | String               | TEXT                     | NO   | uuid()            | PRIMARY KEY | 국경일 고유 식별자 (UUID)          |
+| title       | String               | TEXT                     | NO   | -                 | NOT NULL    | 국경일 이름 (예: 신정, 설날)       |
+| date        | DateTime             | TIMESTAMP(3)             | NO   | -                 | NOT NULL    | 국경일 날짜                        |
+| description | String?              | TEXT                     | YES  | NULL              | -           | 국경일 설명                        |
+| isRecurring | Boolean              | BOOLEAN                  | NO   | true              | NOT NULL    | 매년 반복 여부                     |
+| createdAt   | DateTime             | TIMESTAMP(3)             | NO   | now()             | NOT NULL    | 국경일 데이터 생성 일시 (UTC)      |
+| updatedAt   | DateTime             | TIMESTAMP(3)             | NO   | @updatedAt (자동) | NOT NULL    | 국경일 데이터 최종 수정 일시 (UTC) |
 
 #### 비즈니스 규칙
 
@@ -224,6 +233,8 @@ erDiagram
 
 #### 참고 사항
 
+- **중요**: date는 DATE가 아닌 **TIMESTAMP(3)** 타입 (Prisma DateTime 매핑)
+  - 시간 정보를 포함하지만 UI에서는 날짜만 표시
 - isRecurring=true인 경우 매년 같은 날짜에 표시
 - 음력 기반 국경일(설날, 추석)은 연도별로 별도 레코드 생성 필요
 - 국경일은 삭제 기능 없음 (관리자만 수정 가능)
@@ -278,13 +289,17 @@ ON DELETE CASCADE
 
 ## 5. 인덱스 전략
 
+**중요**: Prisma는 자동으로 다음 인덱스를 생성합니다:
+- PRIMARY KEY에 대한 고유 인덱스
+- `@unique` 속성이 있는 필드에 대한 고유 인덱스
+- 외래키 필드에 대해서는 **자동으로 인덱스를 생성하지 않음**
+
 ### 5.1 User 테이블 인덱스
 
-| 인덱스 이름    | 타입         | 컬럼   | 목적                      |
-| -------------- | ------------ | ------ | ------------------------- |
-| user_pkey      | PRIMARY KEY  | userId | 기본키 인덱스 (자동 생성) |
-| idx_user_email | UNIQUE INDEX | email  | 로그인 시 빠른 조회       |
-| idx_user_role  | INDEX        | role   | 관리자 조회 최적화        |
+| 인덱스 이름     | 타입         | 컬럼   | 생성 방법          | 목적                      |
+| --------------- | ------------ | ------ | ------------------ | ------------------------- |
+| User_pkey       | PRIMARY KEY  | userId | Prisma 자동 생성   | 기본키 인덱스             |
+| User_email_key  | UNIQUE INDEX | email  | Prisma @unique     | 로그인 시 빠른 조회       |
 
 **쿼리 최적화 예시**:
 
@@ -300,13 +315,20 @@ SELECT * FROM "User" WHERE role = 'admin';
 
 ### 5.2 Todo 테이블 인덱스
 
-| 인덱스 이름          | 타입        | 컬럼           | 목적                      |
-| -------------------- | ----------- | -------------- | ------------------------- |
-| todo_pkey            | PRIMARY KEY | todoId         | 기본키 인덱스 (자동 생성) |
-| idx_todo_user_status | INDEX       | userId, status | 사용자별 상태 조회 최적화 |
-| idx_todo_duedate     | INDEX       | dueDate        | 만료일 기준 정렬 최적화   |
-| idx_todo_deletedat   | INDEX       | deletedAt      | 휴지통 조회 최적화        |
-| idx_todo_createdat   | INDEX       | createdAt      | 생성일 기준 정렬 최적화   |
+| 인덱스 이름 | 타입        | 컬럼   | 생성 방법        | 목적              |
+| ----------- | ----------- | ------ | ---------------- | ----------------- |
+| Todo_pkey   | PRIMARY KEY | todoId | Prisma 자동 생성 | 기본키 인덱스     |
+
+**성능 최적화를 위한 추가 인덱스 권장** (Prisma 스키마에 `@@index` 추가 필요):
+```prisma
+model Todo {
+  // ... 필드 정의
+
+  @@index([userId, status])  // 사용자별 상태 조회 최적화
+  @@index([dueDate])         // 만료일 기준 정렬 최적화
+  @@index([deletedAt])       // 휴지통 조회 최적화
+}
+```
 
 **복합 인덱스 설명**:
 
@@ -338,10 +360,18 @@ ORDER BY dueDate ASC;
 
 ### 5.3 Holiday 테이블 인덱스
 
-| 인덱스 이름      | 타입        | 컬럼      | 목적                      |
-| ---------------- | ----------- | --------- | ------------------------- |
-| holiday_pkey     | PRIMARY KEY | holidayId | 기본키 인덱스 (자동 생성) |
-| idx_holiday_date | INDEX       | date      | 날짜 기준 조회 최적화     |
+| 인덱스 이름  | 타입        | 컬럼      | 생성 방법        | 목적          |
+| ------------ | ----------- | --------- | ---------------- | ------------- |
+| Holiday_pkey | PRIMARY KEY | holidayId | Prisma 자동 생성 | 기본키 인덱스 |
+
+**성능 최적화를 위한 추가 인덱스 권장**:
+```prisma
+model Holiday {
+  // ... 필드 정의
+
+  @@index([date])  // 날짜 기준 조회 최적화
+}
+```
 
 **쿼리 최적화 예시**:
 
@@ -388,53 +418,82 @@ REINDEX TABLE "Todo";
 
 ## 6. 제약 조건
 
+**중요**: Prisma는 선언적 스키마를 사용하며, 대부분의 제약 조건은 Prisma 스키마에서 정의됩니다.
+
 ### 6.1 기본키 제약 (Primary Key)
 
-모든 테이블은 UUID 타입의 기본키를 사용합니다.
+모든 테이블은 TEXT 타입으로 저장되는 UUID 기본키를 사용합니다.
 
-```sql
-ALTER TABLE "User" ADD CONSTRAINT user_pkey PRIMARY KEY (userId);
-ALTER TABLE "Todo" ADD CONSTRAINT todo_pkey PRIMARY KEY (todoId);
-ALTER TABLE "Holiday" ADD CONSTRAINT holiday_pkey PRIMARY KEY (holidayId);
+```prisma
+model User {
+  userId String @id @default(uuid())
+  // ...
+}
+
+model Todo {
+  todoId String @id @default(uuid())
+  // ...
+}
+
+model Holiday {
+  holidayId String @id @default(uuid())
+  // ...
+}
 ```
 
 **특징**:
 
-- UUID v4 사용으로 전역적 고유성 보장
+- Prisma의 `@default(uuid())` 함수로 UUID 자동 생성
+- PostgreSQL에서 TEXT 타입으로 저장 (Prisma String 매핑)
+- 전역적 고유성 보장
 - 자동 증가(AUTO_INCREMENT) 대비 보안성 향상
-- 분산 시스템 환경에서 ID 충돌 방지
 
 ---
 
 ### 6.2 외래키 제약 (Foreign Key)
 
-```sql
-ALTER TABLE "Todo"
-ADD CONSTRAINT fk_todo_user
-FOREIGN KEY (userId)
-REFERENCES "User"(userId)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+Prisma에서 외래키는 `@relation` 속성으로 정의됩니다:
+
+```prisma
+model Todo {
+  todoId String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  // ...
+}
+
+model User {
+  userId String @id @default(uuid())
+  todos  Todo[]
+  // ...
+}
 ```
 
 **CASCADE 동작**:
 
-- `ON DELETE CASCADE`: 사용자 삭제 시 해당 사용자의 모든 할일도 삭제
-- `ON UPDATE CASCADE`: userId 변경 시 Todo의 userId도 자동 갱신 (UUID 사용으로 거의 발생 안 함)
+- `onDelete: Cascade`: 사용자 삭제 시 해당 사용자의 모든 할일도 삭제
+- Prisma는 기본적으로 `ON UPDATE CASCADE`를 설정
+- PostgreSQL 외래키 제약조건명: `Todo_userId_fkey`
 
 ---
 
 ### 6.3 고유성 제약 (Unique)
 
-```sql
--- User 테이블
-ALTER TABLE "User" ADD CONSTRAINT unique_user_email UNIQUE (email);
+Prisma에서 고유성 제약은 `@unique` 속성으로 정의됩니다:
+
+```prisma
+model User {
+  userId String @id @default(uuid())
+  email  String @unique
+  // ...
+}
 ```
 
 **목적**:
 
 - 이메일 중복 가입 방지
 - 로그인 시 고유성 보장
+- PostgreSQL 제약조건명: `User_email_key`
 
 ---
 
@@ -450,66 +509,77 @@ ALTER TABLE "User" ADD CONSTRAINT unique_user_email UNIQUE (email);
 
 ### 6.5 체크 제약 (Check Constraint)
 
-#### 6.5.1 Todo.dueDate 제약
+**중요**: Prisma는 현재 데이터베이스 레벨의 CHECK 제약조건을 직접 지원하지 않습니다.
+대신 애플리케이션 레벨에서 검증을 수행해야 합니다.
 
-```sql
-ALTER TABLE "Todo"
-ADD CONSTRAINT check_todo_duedate
-CHECK (dueDate IS NULL OR startDate IS NULL OR dueDate >= startDate);
-```
+#### 6.5.1 Todo.dueDate 검증 (애플리케이션 레벨)
 
 **규칙**: 만료일은 시작일과 같거나 이후여야 함 (BR-12)
 
-**허용 사례**:
+```typescript
+// 애플리케이션 코드에서 검증
+if (dueDate && startDate && dueDate < startDate) {
+  throw new Error('만료일은 시작일 이후여야 합니다');
+}
+```
 
+**허용 사례**:
 - startDate='2025-11-25', dueDate='2025-11-28' ✅
-- startDate='2025-11-25', dueDate='2025-11-25' ✅ (같은 날 허용)
-- startDate=NULL, dueDate='2025-11-28' ✅ (시작일 없음)
-- startDate='2025-11-25', dueDate=NULL ✅ (만료일 없음)
+- startDate='2025-11-25', dueDate='2025-11-25' ✅
+- startDate=NULL, dueDate='2025-11-28' ✅
+- startDate='2025-11-25', dueDate=NULL ✅
 
 **거부 사례**:
+- startDate='2025-11-25', dueDate='2025-11-24' ❌
 
-- startDate='2025-11-25', dueDate='2025-11-24' ❌ (만료일이 시작일 이전)
-
-#### 6.5.2 User.role 제약
-
-```sql
-ALTER TABLE "User"
-ADD CONSTRAINT check_user_role
-CHECK (role IN ('user', 'admin'));
-```
+#### 6.5.2 User.role 검증 (애플리케이션 레벨)
 
 **규칙**: role은 'user' 또는 'admin'만 허용
 
-#### 6.5.3 Todo.status 제약
-
-```sql
-ALTER TABLE "Todo"
-ADD CONSTRAINT check_todo_status
-CHECK (status IN ('active', 'completed', 'deleted'));
+```typescript
+// TypeScript enum 또는 Zod 스키마로 검증
+enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin'
+}
 ```
 
+#### 6.5.3 Todo.status 검증 (애플리케이션 레벨)
+
 **규칙**: status는 'active', 'completed', 'deleted'만 허용
+
+```typescript
+enum TodoStatus {
+  ACTIVE = 'active',
+  COMPLETED = 'completed',
+  DELETED = 'deleted'
+}
+```
 
 ---
 
 ### 6.6 기본값 제약 (Default)
 
-| 테이블  | 필드        | 기본값            | 설명             |
-| ------- | ----------- | ----------------- | ---------------- |
-| User    | userId      | gen_random_uuid() | UUID 자동 생성   |
-| User    | role        | 'user'            | 일반 사용자 역할 |
-| User    | createdAt   | NOW()             | 현재 시각        |
-| User    | updatedAt   | NOW()             | 현재 시각        |
-| Todo    | todoId      | gen_random_uuid() | UUID 자동 생성   |
-| Todo    | status      | 'active'          | 활성 상태        |
-| Todo    | isCompleted | false             | 미완료 상태      |
-| Todo    | createdAt   | NOW()             | 현재 시각        |
-| Todo    | updatedAt   | NOW()             | 현재 시각        |
-| Holiday | holidayId   | gen_random_uuid() | UUID 자동 생성   |
-| Holiday | isRecurring | true              | 매년 반복        |
-| Holiday | createdAt   | NOW()             | 현재 시각        |
-| Holiday | updatedAt   | NOW()             | 현재 시각        |
+Prisma에서 기본값은 `@default()` 속성으로 정의됩니다:
+
+| 테이블  | 필드        | Prisma 기본값      | 설명                       |
+| ------- | ----------- | ------------------ | -------------------------- |
+| User    | userId      | @default(uuid())   | UUID 자동 생성             |
+| User    | role        | @default("user")   | 일반 사용자 역할           |
+| User    | createdAt   | @default(now())    | 현재 시각                  |
+| User    | updatedAt   | @updatedAt         | 자동 갱신 (수정 시마다)    |
+| Todo    | todoId      | @default(uuid())   | UUID 자동 생성             |
+| Todo    | status      | @default("active") | 활성 상태                  |
+| Todo    | isCompleted | @default(false)    | 미완료 상태                |
+| Todo    | createdAt   | @default(now())    | 현재 시각                  |
+| Todo    | updatedAt   | @updatedAt         | 자동 갱신                  |
+| Holiday | holidayId   | @default(uuid())   | UUID 자동 생성             |
+| Holiday | isRecurring | @default(true)     | 매년 반복                  |
+| Holiday | createdAt   | @default(now())    | 현재 시각                  |
+| Holiday | updatedAt   | @updatedAt         | 자동 갱신                  |
+
+**특징**:
+- `@updatedAt`: Prisma가 자동으로 수정 시각 갱신 (트리거 불필요)
 
 ---
 
@@ -647,187 +717,210 @@ ORDER BY createdAt DESC;
 
 ---
 
-## 9. SQL DDL 예시
+## 9. Prisma 스키마 정의
 
-### 9.1 테이블 생성 스크립트
+### 9.1 Prisma 스키마 파일 (`backend/prisma/schema.prisma`)
 
-#### 9.1.1 User 테이블
+**중요**: 이 프로젝트는 SQL DDL 대신 Prisma 스키마를 사용합니다.
+스키마 변경 시 `npx prisma migrate dev` 명령으로 마이그레이션을 생성하고 적용합니다.
 
-```sql
--- User 테이블 생성
-CREATE TABLE "User" (
-    userId      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email       VARCHAR(255) NOT NULL UNIQUE,
-    password    VARCHAR(255) NOT NULL,
-    username    VARCHAR(100) NOT NULL,
-    role        VARCHAR(10) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
-    createdAt   TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt   TIMESTAMP NOT NULL DEFAULT NOW()
-);
+#### 9.1.1 User 모델
 
--- 이메일 고유 인덱스 (자동 생성됨)
--- CREATE UNIQUE INDEX idx_user_email ON "User"(email);
-
--- 역할 조회 인덱스
-CREATE INDEX idx_user_role ON "User"(role);
-
--- 테이블 코멘트
-COMMENT ON TABLE "User" IS '사용자 계정 정보';
-COMMENT ON COLUMN "User".userId IS '사용자 고유 ID (UUID)';
-COMMENT ON COLUMN "User".email IS '로그인용 이메일 주소 (고유)';
-COMMENT ON COLUMN "User".password IS 'bcrypt 해시된 비밀번호';
-COMMENT ON COLUMN "User".username IS '사용자 표시 이름';
-COMMENT ON COLUMN "User".role IS '사용자 역할 (user, admin)';
-COMMENT ON COLUMN "User".createdAt IS '계정 생성 일시';
-COMMENT ON COLUMN "User".updatedAt IS '최종 정보 수정 일시';
+```prisma
+model User {
+  userId    String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  username  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  todos     Todo[]
+}
 ```
 
-#### 9.1.2 Todo 테이블
+**생성되는 PostgreSQL 테이블**:
+- userId: TEXT PRIMARY KEY
+- email: TEXT UNIQUE
+- password: TEXT
+- username: TEXT
+- role: TEXT DEFAULT 'user'
+- createdAt: TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP
+- updatedAt: TIMESTAMP(3) (자동 갱신)
 
-```sql
--- Todo 테이블 생성
-CREATE TABLE "Todo" (
-    todoId      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    userId      UUID NOT NULL REFERENCES "User"(userId) ON DELETE CASCADE ON UPDATE CASCADE,
-    title       VARCHAR(200) NOT NULL,
-    content     TEXT,
-    startDate   DATE,
-    dueDate     DATE,
-    status      VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed', 'deleted')),
-    isCompleted BOOLEAN NOT NULL DEFAULT false,
-    createdAt   TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt   TIMESTAMP NOT NULL DEFAULT NOW(),
-    deletedAt   TIMESTAMP,
+#### 9.1.2 Todo 모델
 
-    -- 제약 조건: 만료일은 시작일 이후
-    CONSTRAINT check_todo_duedate CHECK (
-        dueDate IS NULL OR
-        startDate IS NULL OR
-        dueDate >= startDate
-    )
-);
-
--- 사용자별 상태 조회 복합 인덱스
-CREATE INDEX idx_todo_user_status ON "Todo"(userId, status);
-
--- 만료일 정렬 인덱스
-CREATE INDEX idx_todo_duedate ON "Todo"(dueDate);
-
--- 휴지통 조회 인덱스
-CREATE INDEX idx_todo_deletedat ON "Todo"(deletedAt);
-
--- 생성일 정렬 인덱스
-CREATE INDEX idx_todo_createdat ON "Todo"(createdAt);
-
--- 테이블 코멘트
-COMMENT ON TABLE "Todo" IS '사용자별 할일 정보';
-COMMENT ON COLUMN "Todo".todoId IS '할일 고유 ID (UUID)';
-COMMENT ON COLUMN "Todo".userId IS '할일 소유자 ID (외래키)';
-COMMENT ON COLUMN "Todo".title IS '할일 제목 (필수, 최대 200자)';
-COMMENT ON COLUMN "Todo".content IS '할일 상세 내용 (선택)';
-COMMENT ON COLUMN "Todo".startDate IS '할일 시작일';
-COMMENT ON COLUMN "Todo".dueDate IS '할일 만료일 (시작일 이후)';
-COMMENT ON COLUMN "Todo".status IS '할일 상태 (active, completed, deleted)';
-COMMENT ON COLUMN "Todo".isCompleted IS '완료 여부 플래그';
-COMMENT ON COLUMN "Todo".createdAt IS '할일 생성 일시';
-COMMENT ON COLUMN "Todo".updatedAt IS '할일 최종 수정 일시';
-COMMENT ON COLUMN "Todo".deletedAt IS '할일 삭제 일시 (소프트 삭제)';
+```prisma
+model Todo {
+  todoId      String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  title       String
+  content     String?
+  startDate   DateTime?
+  dueDate     DateTime?
+  status      String    @default("active")
+  isCompleted Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+}
 ```
 
-#### 9.1.3 Holiday 테이블
+**생성되는 PostgreSQL 테이블**:
+- todoId: TEXT PRIMARY KEY
+- userId: TEXT (외래키)
+- title: TEXT
+- content: TEXT NULL
+- startDate: TIMESTAMP(3) NULL
+- dueDate: TIMESTAMP(3) NULL
+- status: TEXT DEFAULT 'active'
+- isCompleted: BOOLEAN DEFAULT false
+- createdAt: TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP
+- updatedAt: TIMESTAMP(3) (자동 갱신)
+- deletedAt: TIMESTAMP(3) NULL
 
-```sql
--- Holiday 테이블 생성
-CREATE TABLE "Holiday" (
-    holidayId   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title       VARCHAR(100) NOT NULL,
-    date        DATE NOT NULL,
-    description TEXT,
-    isRecurring BOOLEAN NOT NULL DEFAULT true,
-    createdAt   TIMESTAMP NOT NULL DEFAULT NOW(),
-    updatedAt   TIMESTAMP NOT NULL DEFAULT NOW()
-);
+**주의사항**:
+- dueDate >= startDate 검증은 애플리케이션 레벨에서 수행 필요
+- 성능 최적화를 위해 인덱스 추가 권장 (`@@index([userId, status])`)
 
--- 날짜 조회 인덱스
-CREATE INDEX idx_holiday_date ON "Holiday"(date);
+#### 9.1.3 Holiday 모델
 
--- 테이블 코멘트
-COMMENT ON TABLE "Holiday" IS '공통 국경일 정보';
-COMMENT ON COLUMN "Holiday".holidayId IS '국경일 고유 ID (UUID)';
-COMMENT ON COLUMN "Holiday".title IS '국경일 이름';
-COMMENT ON COLUMN "Holiday".date IS '국경일 날짜';
-COMMENT ON COLUMN "Holiday".description IS '국경일 설명';
-COMMENT ON COLUMN "Holiday".isRecurring IS '매년 반복 여부';
-COMMENT ON COLUMN "Holiday".createdAt IS '데이터 생성 일시';
-COMMENT ON COLUMN "Holiday".updatedAt IS '데이터 최종 수정 일시';
+```prisma
+model Holiday {
+  holidayId   String   @id @default(uuid())
+  title       String
+  date        DateTime
+  description String?
+  isRecurring Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**생성되는 PostgreSQL 테이블**:
+- holidayId: TEXT PRIMARY KEY
+- title: TEXT
+- date: TIMESTAMP(3)
+- description: TEXT NULL
+- isRecurring: BOOLEAN DEFAULT true
+- createdAt: TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP
+- updatedAt: TIMESTAMP(3) (자동 갱신)
+
+---
+
+### 9.2 Prisma 마이그레이션 워크플로우
+
+Prisma는 트리거 대신 `@updatedAt` 속성을 사용하여 자동으로 updatedAt을 갱신합니다.
+
+#### 마이그레이션 생성 및 적용
+
+```bash
+# 1. Prisma 스키마 수정 후 마이그레이션 생성
+npx prisma migrate dev --name add_user_table
+
+# 2. 프로덕션 환경에서 마이그레이션 적용
+npx prisma migrate deploy
+
+# 3. Prisma Client 재생성
+npx prisma generate
+
+# 4. 데이터베이스 스키마와 Prisma 스키마 동기화 확인
+npx prisma db pull  # DB → Prisma 스키마
+npx prisma db push  # Prisma 스키마 → DB (개발 시에만 사용)
+```
+
+#### 마이그레이션 파일 예시
+
+Prisma는 `prisma/migrations/` 디렉토리에 SQL 마이그레이션 파일을 자동 생성합니다:
+
+```
+prisma/migrations/
+├── 20251128000001_init/
+│   └── migration.sql
+├── 20251128000002_add_indexes/
+│   └── migration.sql
+└── migration_lock.toml
 ```
 
 ---
 
-### 9.2 트리거 (자동 updatedAt 갱신)
+### 9.3 초기 데이터 삽입 (Prisma Seed)
 
-```sql
--- updatedAt 자동 갱신 함수
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updatedAt = NOW();
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- User 테이블 트리거
-CREATE TRIGGER trigger_user_updated_at
-BEFORE UPDATE ON "User"
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
--- Todo 테이블 트리거
-CREATE TRIGGER trigger_todo_updated_at
-BEFORE UPDATE ON "Todo"
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-
--- Holiday 테이블 트리거
-CREATE TRIGGER trigger_holiday_updated_at
-BEFORE UPDATE ON "Holiday"
-FOR EACH ROW
-EXECUTE FUNCTION update_updated_at_column();
-```
-
----
-
-### 9.3 초기 데이터 삽입
+Prisma는 `prisma/seed.ts` 파일을 통해 시드 데이터를 삽입합니다.
 
 #### 9.3.1 관리자 계정 생성
 
-```sql
--- 관리자 계정 (비밀번호: admin123, bcrypt 해시 예시)
-INSERT INTO "User" (email, password, username, role)
-VALUES (
-    'admin@igk-todolist.com',
-    '$2b$10$rQ8kHZQJ9X5nXZ8qZqZqZuZqZqZqZqZqZqZqZqZqZqZqZqZqZq', -- 실제 bcrypt 해시 필요
-    '관리자',
-    'admin'
-);
+```typescript
+// prisma/seed.ts
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  // 관리자 계정 생성
+  const hashedPassword = await bcrypt.hash('admin123', 10);
+
+  await prisma.user.upsert({
+    where: { email: 'admin@igk-todolist.com' },
+    update: {},
+    create: {
+      email: 'admin@igk-todolist.com',
+      password: hashedPassword,
+      username: '관리자',
+      role: 'admin',
+    },
+  });
+
+  console.log('관리자 계정 생성 완료');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
+```
+
+```bash
+# 시드 실행
+npx prisma db seed
 ```
 
 #### 9.3.2 국경일 데이터 삽입
 
-```sql
--- 2025년 대한민국 국경일
-INSERT INTO "Holiday" (title, date, description, isRecurring) VALUES
-('신정', '2025-01-01', '새해 첫날', true),
-('설날', '2025-01-29', '음력 1월 1일 (설)', true),
-('삼일절', '2025-03-01', '3·1운동 기념일', true),
-('어린이날', '2025-05-05', '어린이날', true),
-('석가탄신일', '2025-05-05', '부처님 오신 날', true),
-('현충일', '2025-06-06', '호국영령 추념일', true),
-('광복절', '2025-08-15', '대한민국 독립 기념일', true),
-('추석', '2025-10-06', '음력 8월 15일 (추석)', true),
-('개천절', '2025-10-03', '단군 건국 기념일', true),
-('한글날', '2025-10-09', '한글 창제 기념일', true),
-('크리스마스', '2025-12-25', '성탄절', true);
+```typescript
+// prisma/seed.ts에 추가
+const holidays = [
+  { title: '신정', date: new Date('2025-01-01'), description: '새해 첫날', isRecurring: true },
+  { title: '설날', date: new Date('2025-01-29'), description: '음력 1월 1일 (설)', isRecurring: true },
+  { title: '삼일절', date: new Date('2025-03-01'), description: '3·1운동 기념일', isRecurring: true },
+  { title: '어린이날', date: new Date('2025-05-05'), description: '어린이날', isRecurring: true },
+  { title: '석가탄신일', date: new Date('2025-05-05'), description: '부처님 오신 날', isRecurring: true },
+  { title: '현충일', date: new Date('2025-06-06'), description: '호국영령 추념일', isRecurring: true },
+  { title: '광복절', date: new Date('2025-08-15'), description: '대한민국 독립 기념일', isRecurring: true },
+  { title: '추석', date: new Date('2025-10-06'), description: '음력 8월 15일 (추석)', isRecurring: true },
+  { title: '개천절', date: new Date('2025-10-03'), description: '단군 건국 기념일', isRecurring: true },
+  { title: '한글날', date: new Date('2025-10-09'), description: '한글 창제 기념일', isRecurring: true },
+  { title: '크리스마스', date: new Date('2025-12-25'), description: '성탄절', isRecurring: true },
+];
+
+for (const holiday of holidays) {
+  await prisma.holiday.upsert({
+    where: {
+      // holidayId는 고유하므로 title과 date 조합으로 중복 확인
+      title_date: { title: holiday.title, date: holiday.date }
+    },
+    update: {},
+    create: holiday,
+  });
+}
+
+console.log('국경일 데이터 삽입 완료');
 ```
 
 ---
@@ -917,16 +1010,19 @@ ORDER BY deletedAt DESC;
 
 ---
 
-### 9.5 테이블 삭제 스크립트
+### 9.5 데이터베이스 초기화
 
-```sql
--- 순서 주의: 외래키 참조 순서의 역순으로 삭제
+Prisma를 사용하는 경우 다음 명령으로 데이터베이스를 초기화할 수 있습니다:
+
+```bash
+# 모든 마이그레이션 되돌리기 및 데이터 삭제
+npx prisma migrate reset
+
+# 또는 수동으로 테이블 삭제 (PostgreSQL)
+DROP TABLE IF EXISTS "_prisma_migrations" CASCADE;
 DROP TABLE IF EXISTS "Todo" CASCADE;
 DROP TABLE IF EXISTS "User" CASCADE;
 DROP TABLE IF EXISTS "Holiday" CASCADE;
-
--- 트리거 함수 삭제
-DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 ```
 
 ---
@@ -935,36 +1031,58 @@ DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 
 ### A. ERD 버전 관리
 
-| 버전 | 날짜       | 변경 내용         | 작성자 |
-| ---- | ---------- | ----------------- | ------ |
-| 1.0  | 2025-11-26 | 초안 작성 및 최종 | Claude |
+| 버전 | 날짜       | 변경 내용                                      | 작성자 |
+| ---- | ---------- | ---------------------------------------------- | ------ |
+| 1.0  | 2025-11-26 | 초안 작성 및 최종                              | Claude |
+| 1.1  | 2025-11-28 | Prisma 스키마 반영, 실제 DB 구조와 동기화 | Claude |
+
+**v1.1 주요 변경사항**:
+- UUID → TEXT 타입 변경 (Prisma String 매핑)
+- VARCHAR(n) → TEXT 변경 (Prisma 기본 매핑)
+- DATE → TIMESTAMP(3) 변경 (startDate, dueDate, Holiday.date)
+- ENUM → TEXT 변경 (애플리케이션 레벨 검증)
+- SQL DDL → Prisma 스키마 정의로 변경
+- 트리거 → @updatedAt 속성으로 변경
+- Holiday.isRecurring 기본값 true로 수정
 
 ---
 
-### B. 데이터베이스 마이그레이션 전략
+### B. Prisma 마이그레이션 전략
 
-**초기 구축**:
+**초기 구축** (Prisma 사용):
 
-1. User 테이블 생성
-2. Todo 테이블 생성 (외래키 설정)
-3. Holiday 테이블 생성
-4. 인덱스 생성
-5. 트리거 생성
-6. 초기 데이터 삽입
+1. `prisma/schema.prisma` 파일 작성
+2. `npx prisma migrate dev --name init` 실행
+3. Prisma가 자동으로 테이블, 인덱스, 외래키 생성
+4. `npx prisma db seed` 실행하여 초기 데이터 삽입
 
-**향후 변경 시**:
+**스키마 변경 시**:
 
-- 마이그레이션 스크립트 작성 (예: Flyway, Knex.js)
-- 백업 후 변경 적용
-- 롤백 스크립트 준비
+1. `prisma/schema.prisma` 수정
+2. `npx prisma migrate dev --name <변경_설명>` 실행
+3. Prisma가 자동으로 마이그레이션 SQL 생성 및 적용
+4. 필요시 `prisma/migrations/` 디렉토리에서 SQL 확인 및 수정
+
+**프로덕션 배포**:
+
+```bash
+npx prisma migrate deploy  # 프로덕션 DB에 마이그레이션 적용
+npx prisma generate        # Prisma Client 재생성
+```
+
+**롤백**:
+
+Prisma는 자동 롤백을 지원하지 않으므로, 수동으로 이전 마이그레이션 상태로 복구하거나 데이터베이스 백업을 사용해야 합니다.
 
 ---
 
 ### C. 참조 문서
 
+- [Prisma 공식 문서](https://www.prisma.io/docs)
+- [Prisma Schema Reference](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference)
+- [Prisma Migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate)
 - [PostgreSQL 15 공식 문서](https://www.postgresql.org/docs/15/)
-- [UUID 타입 가이드](https://www.postgresql.org/docs/current/datatype-uuid.html)
-- [인덱스 최적화 가이드](https://www.postgresql.org/docs/current/indexes.html)
+- [Prisma와 PostgreSQL 타입 매핑](https://www.prisma.io/docs/reference/database-reference/database-features#postgresql)
 
 ---
 

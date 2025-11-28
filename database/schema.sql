@@ -1,64 +1,57 @@
 -- igk_todolist_dev 데이터베이스 스키마 정의
-
--- 확장 기능 활성화 (UUID 생성용)
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- 이 스키마는 Prisma 스키마와 동기화되어 있습니다 (backend/prisma/schema.prisma)
+-- Prisma 마이그레이션을 사용하여 실제 DB를 관리하므로 이 파일은 참조용입니다
 
 -- 사용자 테이블
+-- Prisma에서 생성한 실제 구조를 반영
 CREATE TABLE IF NOT EXISTS "User" (
-    "userId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "email" VARCHAR(255) NOT NULL,
-    "password" VARCHAR(255) NOT NULL,
-    "username" VARCHAR(100) NOT NULL,
-    "role" VARCHAR(20) DEFAULT 'user',
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    "userId" TEXT PRIMARY KEY,  -- Prisma는 String 타입으로 UUID를 저장
+    "email" TEXT NOT NULL UNIQUE,
+    "password" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'user',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
 -- 할일 테이블
 CREATE TABLE IF NOT EXISTS "Todo" (
-    "todoId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "userId" UUID NOT NULL,
-    "title" VARCHAR(255) NOT NULL,
+    "todoId" TEXT PRIMARY KEY,
+    "userId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
     "content" TEXT,
-    "startDate" DATE,
-    "dueDate" DATE,
-    "status" VARCHAR(20) DEFAULT 'active',
-    "isCompleted" BOOLEAN DEFAULT FALSE,
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    "deletedAt" TIMESTAMP WITH TIME ZONE
+    "startDate" TIMESTAMP(3),  -- Prisma DateTime 매핑 (DATE가 아님)
+    "dueDate" TIMESTAMP(3),    -- Prisma DateTime 매핑 (DATE가 아님)
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "isCompleted" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Todo_userId_fkey"
+        FOREIGN KEY ("userId") REFERENCES "User"("userId")
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- 국경일 테이블
 CREATE TABLE IF NOT EXISTS "Holiday" (
-    "holidayId" UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    "title" VARCHAR(255) NOT NULL,
-    "date" DATE NOT NULL,
+    "holidayId" TEXT PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,  -- Prisma DateTime 매핑
     "description" TEXT,
-    "isRecurring" BOOLEAN DEFAULT FALSE,
-    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    "isRecurring" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL
 );
 
--- 유니크 인덱스: 이메일
-CREATE UNIQUE INDEX IF NOT EXISTS idx_user_email ON "User"("email");
+-- 인덱스
+-- User 테이블
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 
--- 인덱스: 할일 테이블 (userId, status)
-CREATE INDEX IF NOT EXISTS idx_todo_user_status ON "Todo"("userId", "status");
+-- Todo 테이블 - Prisma가 자동으로 외래키에 대한 인덱스를 생성하지 않으므로 성능을 위해 추가 권장
+-- CREATE INDEX IF NOT EXISTS "Todo_userId_idx" ON "Todo"("userId");
 
--- 인덱스: 할일 테이블 (dueDate)
-CREATE INDEX IF NOT EXISTS idx_todo_due_date ON "Todo"("dueDate");
-
--- 인덱스: 국경일 테이블 (date)
-CREATE INDEX IF NOT EXISTS idx_holiday_date ON "Holiday"("date");
-
--- 외래 키 제약 조건: Todo.userId -> User.userId
-ALTER TABLE "Todo"
-ADD CONSTRAINT fk_todo_user
-FOREIGN KEY ("userId") REFERENCES "User"("userId")
-ON DELETE CASCADE;
-
--- 체크 제약 조건: 마감일 >= 시작일
-ALTER TABLE "Todo"
-ADD CONSTRAINT chk_due_date_after_start
-CHECK ("dueDate" >= "startDate");
+-- 주석: Prisma 마이그레이션 시스템 사용 시
+-- 1. prisma/schema.prisma 파일을 수정
+-- 2. npx prisma migrate dev --name migration_name 실행
+-- 3. 이 schema.sql 파일은 문서화 목적으로만 수동 업데이트

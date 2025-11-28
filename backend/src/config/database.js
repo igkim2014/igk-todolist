@@ -1,3 +1,5 @@
+## 배포 자동화 검증 위해 변경 테스트
+
 const { PrismaClient } = require('@prisma/client');
 require('dotenv').config();
 
