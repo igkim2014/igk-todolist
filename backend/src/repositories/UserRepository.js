@@ -4,12 +4,12 @@
  * SOLID Principles: Single Responsibility, Dependency Inversion
  */
 
-const BaseRepository = require('./base/BaseRepository');
-const { v4: uuidv4 } = require('uuid');
+const BaseRepository = require("./base/BaseRepository");
+const { randomUUID } = require("crypto"); // ✅ uuid 대신 crypto.randomUUID 사용
 
 class UserRepository extends BaseRepository {
   constructor() {
-    super('User');
+    super("User");
   }
 
   /**
@@ -23,17 +23,17 @@ class UserRepository extends BaseRepository {
    * userId로 사용자 조회
    */
   async findByUserId(userId) {
-    return await this.findById(userId, 'userId');
+    return await this.findById(userId, "userId");
   }
 
   /**
    * 사용자 생성 (회원가입)
    */
   async createUser(userData) {
-    const { email, password, username, role = 'user' } = userData;
+    const { email, password, username, role = "user" } = userData;
 
     const newUser = {
-      userId: uuidv4(),
+      userId: randomUUID(), // ✅ uuidv4() → randomUUID()
       email,
       password,
       username,
@@ -62,7 +62,7 @@ class UserRepository extends BaseRepository {
    * 사용자 정보 업데이트
    */
   async updateUser(userId, updateData) {
-    const allowedFields = ['username', 'password'];
+    const allowedFields = ["username", "password"];
     const filteredData = {};
 
     Object.keys(updateData).forEach((key) => {
@@ -75,14 +75,14 @@ class UserRepository extends BaseRepository {
       return await this.findByUserId(userId);
     }
 
-    return await this.update(userId, filteredData, 'userId');
+    return await this.update(userId, filteredData, "userId");
   }
 
   /**
    * 사용자 삭제
    */
   async deleteUser(userId) {
-    return await this.delete(userId, 'userId');
+    return await this.delete(userId, "userId");
   }
 
   /**
