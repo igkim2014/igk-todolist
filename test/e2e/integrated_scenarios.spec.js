@@ -75,10 +75,14 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await page.fill('input[name="startDate"]', today);
         await page.fill('input[name="dueDate"]', today);
         await page.getByRole('button', { name: '추가', exact: true }).click();
+
+        // 모달이 닫힐 때까지 대기
+        await expect(page.getByRole('dialog')).not.toBeVisible();
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 할일 완료 처리
         const todoItem = page.locator('div').filter({ hasText: todoTitle }).first();
+        // 완료 버튼은 첫 번째 버튼 (체크박스 형태)
         const completeBtn = todoItem.locator('button').first();
         await completeBtn.click();
 
@@ -96,6 +100,9 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await page.fill('input[name="startDate"]', today);
         await page.fill('input[name="dueDate"]', today);
         await page.getByRole('button', { name: '추가', exact: true }).click();
+
+        // 모달이 닫힐 때까지 대기
+        await expect(page.getByRole('dialog')).not.toBeVisible();
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 할일 삭제
@@ -132,8 +139,8 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await page.getByRole('button', { name: /국경일/i }).click();
         await expect(page).toHaveURL(/.*\/holidays/);
 
-        // 국경일 페이지 헤더 확인
-        await expect(page.getByRole('heading', { name: /국경일/i })).toBeVisible();
+        // 국경일 페이지 헤더 확인 (Exact match to avoid ambiguity)
+        await expect(page.getByRole('heading', { name: '국경일', exact: true })).toBeVisible();
     });
 
     test('시나리오 3.2.1: 상세 정보 포함 할일 추가', async ({ page }) => {
@@ -155,6 +162,9 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await page.fill('input[name="dueDate"]', dueDateStr);
         await page.getByRole('button', { name: '추가', exact: true }).click();
 
+        // 모달이 닫힐 때까지 대기
+        await expect(page.getByRole('dialog')).not.toBeVisible();
+
         // 추가 확인
         await expect(page.getByText(todoTitle)).toBeVisible();
     });
@@ -170,6 +180,9 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await page.fill('input[name="startDate"]', today);
         await page.fill('input[name="dueDate"]', today);
         await page.getByRole('button', { name: '추가', exact: true }).click();
+
+        // 모달이 닫힐 때까지 대기
+        await expect(page.getByRole('dialog')).not.toBeVisible();
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 할일 수정
@@ -179,6 +192,9 @@ test.describe('igk-TodoList 통합 테스트', () => {
         // 내용 변경
         await page.fill('textarea[name="content"]', "수정된 내용 - 시험 범위: 1-10장");
         await page.getByRole('button', { name: /수정/i }).click();
+
+        // 모달이 닫힐 때까지 대기
+        await expect(page.getByRole('dialog')).not.toBeVisible();
 
         // 수정 확인
         await expect(page.getByText("수정된 내용")).toBeVisible();
@@ -195,6 +211,9 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await page.fill('input[name="startDate"]', today);
         await page.fill('input[name="dueDate"]', today);
         await page.getByRole('button', { name: '추가', exact: true }).click();
+
+        // 모달이 닫힐 때까지 대기
+        await expect(page.getByRole('dialog')).not.toBeVisible();
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 검색 수행
@@ -215,6 +234,9 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await page.fill('input[name="startDate"]', today);
         await page.fill('input[name="dueDate"]', today);
         await page.getByRole('button', { name: '추가', exact: true }).click();
+
+        // 모달이 닫힐 때까지 대기
+        await expect(page.getByRole('dialog')).not.toBeVisible();
         await expect(page.getByText(todoTitle)).toBeVisible();
 
         // 완료 처리

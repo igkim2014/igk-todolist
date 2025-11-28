@@ -89,12 +89,19 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1184,
+                      "duration": 1183,
                       "errors": [],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login successful.\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:26:04.032Z",
+                      "startTime": "2025-11-28T00:31:50.180Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -104,7 +111,7 @@
               ],
               "id": "8dcf0ddc165249eec017-d000210758a3a723c37e",
               "file": "integrated_scenarios.spec.js",
-              "line": 21,
+              "line": 47,
               "column": 9
             },
             {
@@ -123,7 +130,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30018,
+                      "duration": 30036,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -136,15 +143,22 @@
                           "location": {
                             "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
                             "column": 27,
-                            "line": 57
+                            "line": 87
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div').filter({ hasText: '완료테스트 1764289565905' }).first().locator('button').first()\u001b[22m\n\u001b[2m    - locator resolved to <button class=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    56 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n\u001b[0m \u001b[90m 55 |\u001b[39m         \u001b[36mconst\u001b[39m todoItem \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'div'\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m todoTitle })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m         \u001b[36mconst\u001b[39m completeBtn \u001b[33m=\u001b[39m todoItem\u001b[33m.\u001b[39mlocator(\u001b[32m'button'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 57 |\u001b[39m         \u001b[36mawait\u001b[39m completeBtn\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 58 |\u001b[39m\n \u001b[90m 59 |\u001b[39m         \u001b[90m// 완료 확인 (취소선 표시)\u001b[39m\n \u001b[90m 60 |\u001b[39m         \u001b[36mawait\u001b[39m expect(todoItem\u001b[33m.\u001b[39mlocator(\u001b[32m'h3'\u001b[39m))\u001b[33m.\u001b[39mtoHaveClass(\u001b[35m/line-through/\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:57:27\u001b[22m"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div').filter({ hasText: '완료테스트 1764289912058' }).first().locator('button').first()\u001b[22m\n\u001b[2m    - locator resolved to <button class=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    56 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n\u001b[0m \u001b[90m 85 |\u001b[39m         \u001b[90m// 완료 버튼은 첫 번째 버튼 (체크박스 형태)\u001b[39m\n \u001b[90m 86 |\u001b[39m         \u001b[36mconst\u001b[39m completeBtn \u001b[33m=\u001b[39m todoItem\u001b[33m.\u001b[39mlocator(\u001b[32m'button'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 87 |\u001b[39m         \u001b[36mawait\u001b[39m completeBtn\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 88 |\u001b[39m\n \u001b[90m 89 |\u001b[39m         \u001b[90m// 완료 확인 (취소선 표시)\u001b[39m\n \u001b[90m 90 |\u001b[39m         \u001b[36mawait\u001b[39m expect(todoItem\u001b[33m.\u001b[39mlocator(\u001b[32m'h3'\u001b[39m))\u001b[33m.\u001b[39mtoHaveClass(\u001b[35m/line-through/\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:87:27\u001b[22m"
                         }
                       ],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login successful.\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:26:05.279Z",
+                      "startTime": "2025-11-28T00:31:51.429Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -160,7 +174,7 @@
               ],
               "id": "8dcf0ddc165249eec017-399cfb32f5a420388e3e",
               "file": "integrated_scenarios.spec.js",
-              "line": 41,
+              "line": 67,
               "column": 9
             },
             {
@@ -178,32 +192,36 @@
                     {
                       "workerIndex": 1,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 6268,
+                      "status": "timedOut",
+                      "duration": 30027,
                       "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('삭제테스트 1764289596502')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('삭제테스트 1764289596502')\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('삭제테스트 1764289596502')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('삭제테스트 1764289596502')\u001b[22m\n\n    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:88:49",
-                        "location": {
-                          "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                          "column": 49,
-                          "line": 88
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 86 |\u001b[39m\n \u001b[90m 87 |\u001b[39m         \u001b[90m// 휴지통에 있는지 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 88 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(todoTitle))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 89 |\u001b[39m\n \u001b[90m 90 |\u001b[39m         \u001b[90m// 복원\u001b[39m\n \u001b[90m 91 |\u001b[39m         \u001b[36mconst\u001b[39m trashItem \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'div'\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m todoTitle })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
                           "location": {
                             "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                            "column": 49,
-                            "line": 88
+                            "column": 62,
+                            "line": 125
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('삭제테스트 1764289596502')\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByText('삭제테스트 1764289596502')\u001b[22m\n\n\n\u001b[0m \u001b[90m 86 |\u001b[39m\n \u001b[90m 87 |\u001b[39m         \u001b[90m// 휴지통에 있는지 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 88 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(todoTitle))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 89 |\u001b[39m\n \u001b[90m 90 |\u001b[39m         \u001b[90m// 복원\u001b[39m\n \u001b[90m 91 |\u001b[39m         \u001b[36mconst\u001b[39m trashItem \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'div'\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m todoTitle })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:88:49\u001b[22m"
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div').filter({ hasText: '삭제테스트 1764289943143' }).first().getByRole('button', { name: /복원/i })\u001b[22m\n\n\n\u001b[0m \u001b[90m 123 |\u001b[39m         \u001b[90m// 복원\u001b[39m\n \u001b[90m 124 |\u001b[39m         \u001b[36mconst\u001b[39m trashItem \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'div'\u001b[39m)\u001b[33m.\u001b[39mfilter({ hasText\u001b[33m:\u001b[39m todoTitle })\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 125 |\u001b[39m         \u001b[36mawait\u001b[39m trashItem\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/복원/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 126 |\u001b[39m\n \u001b[90m 127 |\u001b[39m         \u001b[90m// 휴지통에서 사라졌는지 확인\u001b[39m\n \u001b[90m 128 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(todoTitle))\u001b[33m.\u001b[39mnot\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:125:62\u001b[22m"
                         }
                       ],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login successful.\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:26:35.786Z",
+                      "startTime": "2025-11-28T00:32:22.285Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -211,12 +229,7 @@
                           "contentType": "text/markdown",
                           "path": "C:\\test\\igk-todolist\\test\\e2e\\test-results\\integrated_scenarios-igk-T-1c45e-합-테스트-시나리오-2-1-3-할일-삭제-및-복원-chromium\\error-context.md"
                         }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                        "column": 49,
-                        "line": 88
-                      }
+                      ]
                     }
                   ],
                   "status": "unexpected"
@@ -224,7 +237,7 @@
               ],
               "id": "8dcf0ddc165249eec017-dc1f4fab8b523789fd76",
               "file": "integrated_scenarios.spec.js",
-              "line": 63,
+              "line": 93,
               "column": 9
             },
             {
@@ -243,31 +256,38 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 1061,
+                      "duration": 9176,
                       "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /국경일/i })\nExpected: visible\nError: strict mode violation: getByRole('heading', { name: /국경일/i }) resolved to 2 elements:\n    1) <h1 class=\"text-2xl font-bold text-gray-900 dark:text-white\">국경일</h1> aka getByRole('heading', { name: '국경일', exact: true })\n    2) <h3 class=\"mt-4 text-lg font-medium text-gray-900 dark:text-white\">국경일이 없습니다</h3> aka getByRole('heading', { name: '국경일이 없습니다' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /국경일/i })\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /국경일/i })\nExpected: visible\nError: strict mode violation: getByRole('heading', { name: /국경일/i }) resolved to 2 elements:\n    1) <h1 class=\"text-2xl font-bold text-gray-900 dark:text-white\">국경일</h1> aka getByRole('heading', { name: '국경일', exact: true })\n    2) <h3 class=\"mt-4 text-lg font-medium text-gray-900 dark:text-white\">국경일이 없습니다</h3> aka getByRole('heading', { name: '국경일이 없습니다' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /국경일/i })\u001b[22m\n\n    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:110:67",
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32",
                         "location": {
                           "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                          "column": 67,
-                          "line": 110
+                          "column": 32,
+                          "line": 34
                         },
-                        "snippet": "\u001b[0m \u001b[90m 108 |\u001b[39m\n \u001b[90m 109 |\u001b[39m         \u001b[90m// 국경일 페이지 헤더 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 110 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/국경일/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 111 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 112 |\u001b[39m\n \u001b[90m 113 |\u001b[39m     test(\u001b[32m'시나리오 3.2.1: 상세 정보 포함 할일 추가'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
                             "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                            "column": 67,
-                            "line": 110
+                            "column": 32,
+                            "line": 34
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /국경일/i })\nExpected: visible\nError: strict mode violation: getByRole('heading', { name: /국경일/i }) resolved to 2 elements:\n    1) <h1 class=\"text-2xl font-bold text-gray-900 dark:text-white\">국경일</h1> aka getByRole('heading', { name: '국경일', exact: true })\n    2) <h3 class=\"mt-4 text-lg font-medium text-gray-900 dark:text-white\">국경일이 없습니다</h3> aka getByRole('heading', { name: '국경일이 없습니다' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /국경일/i })\u001b[22m\n\n\n\u001b[0m \u001b[90m 108 |\u001b[39m\n \u001b[90m 109 |\u001b[39m         \u001b[90m// 국경일 페이지 헤더 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 110 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'heading'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/국경일/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 111 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 112 |\u001b[39m\n \u001b[90m 113 |\u001b[39m     test(\u001b[32m'시나리오 3.2.1: 상세 정보 포함 할일 추가'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:110:67\u001b[22m"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32\u001b[22m"
                         }
                       ],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login failed. Attempting registration...\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:26:42.618Z",
+                      "startTime": "2025-11-28T00:32:53.248Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -278,8 +298,8 @@
                       ],
                       "errorLocation": {
                         "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                        "column": 67,
-                        "line": 110
+                        "column": 32,
+                        "line": 34
                       }
                     }
                   ],
@@ -288,12 +308,12 @@
               ],
               "id": "8dcf0ddc165249eec017-6610b2ec42b8fbfa7380",
               "file": "integrated_scenarios.spec.js",
-              "line": 104,
+              "line": 137,
               "column": 9
             },
             {
               "title": "시나리오 3.2.1: 상세 정보 포함 할일 추가",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -306,23 +326,60 @@
                     {
                       "workerIndex": 3,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1174,
-                      "errors": [],
-                      "stdout": [],
+                      "status": "failed",
+                      "duration": 9193,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32",
+                        "location": {
+                          "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                          "column": 32,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                            "column": 32,
+                            "line": 34
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login failed. Attempting registration...\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:26:44.219Z",
+                      "startTime": "2025-11-28T00:33:03.351Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\test\\igk-todolist\\test\\e2e\\test-results\\integrated_scenarios-igk-T-4c3fb-트-시나리오-3-2-1-상세-정보-포함-할일-추가-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                        "column": 32,
+                        "line": 34
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "8dcf0ddc165249eec017-a7e9ba12d2ac0db81cc3",
               "file": "integrated_scenarios.spec.js",
-              "line": 113,
+              "line": 146,
               "column": 9
             },
             {
@@ -338,31 +395,41 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 4,
                       "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30015,
+                      "status": "failed",
+                      "duration": 9245,
                       "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32",
+                        "location": {
+                          "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                          "column": 32,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        },
-                        {
                           "location": {
                             "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                            "column": 57,
-                            "line": 155
+                            "column": 32,
+                            "line": 34
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /수정/i })\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 px-3 py-1.5 text-sm\">수정</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    55 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n\u001b[0m \u001b[90m 153 |\u001b[39m         \u001b[90m// 내용 변경\u001b[39m\n \u001b[90m 154 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'textarea[name=\"content\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m\"수정된 내용 - 시험 범위: 1-10장\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 155 |\u001b[39m         \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/수정/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 156 |\u001b[39m\n \u001b[90m 157 |\u001b[39m         \u001b[90m// 수정 확인\u001b[39m\n \u001b[90m 158 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m\"수정된 내용\"\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:155:57\u001b[22m"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32\u001b[22m"
                         }
                       ],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login failed. Attempting registration...\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:26:45.453Z",
+                      "startTime": "2025-11-28T00:33:13.477Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -370,7 +437,12 @@
                           "contentType": "text/markdown",
                           "path": "C:\\test\\igk-todolist\\test\\e2e\\test-results\\integrated_scenarios-igk-TodoList-통합-테스트-시나리오-3-2-2-할일-수정-chromium\\error-context.md"
                         }
-                      ]
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                        "column": 32,
+                        "line": 34
+                      }
                     }
                   ],
                   "status": "unexpected"
@@ -378,12 +450,12 @@
               ],
               "id": "8dcf0ddc165249eec017-9164686fc9e40d9962bc",
               "file": "integrated_scenarios.spec.js",
-              "line": 136,
+              "line": 172,
               "column": 9
             },
             {
               "title": "시나리오: 할일 검색",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -394,25 +466,62 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1316,
-                      "errors": [],
-                      "stdout": [],
+                      "status": "failed",
+                      "duration": 9262,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32",
+                        "location": {
+                          "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                          "column": 32,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                            "column": 32,
+                            "line": 34
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login failed. Attempting registration...\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:27:15.937Z",
+                      "startTime": "2025-11-28T00:33:23.635Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\test\\igk-todolist\\test\\e2e\\test-results\\integrated_scenarios-igk-TodoList-통합-테스트-시나리오-할일-검색-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                        "column": 32,
+                        "line": 34
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "8dcf0ddc165249eec017-93625094be17dcdddc51",
               "file": "integrated_scenarios.spec.js",
-              "line": 161,
+              "line": 203,
               "column": 9
             },
             {
@@ -428,31 +537,41 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30016,
+                      "status": "failed",
+                      "duration": 9266,
                       "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32",
+                        "location": {
+                          "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                          "column": 32,
+                          "line": 34
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        },
-                        {
                           "location": {
                             "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
-                            "column": 27,
-                            "line": 197
+                            "column": 32,
+                            "line": 34
                           },
-                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div').filter({ hasText: '필터테스트 1764289637964' }).first().locator('button').first()\u001b[22m\n\u001b[2m    - locator resolved to <button class=\"p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is not visible\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    56 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is not visible\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\n\n\u001b[0m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:197:27\u001b[22m"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mpage\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nExpected pattern: \u001b[32m/\\/login/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:5173/register\"\u001b[39m\nTimeout: 5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveURL\" with timeout 5000ms\u001b[22m\n\u001b[2m    9 × unexpected value \"http://localhost:5173/register\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 32 |\u001b[39m\n \u001b[90m 33 |\u001b[39m             \u001b[90m// 회원가입 후 로그인 페이지로 이동 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 34 |\u001b[39m             \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/login/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m             \u001b[90m// 다시 로그인 시도\u001b[39m\n \u001b[90m 37 |\u001b[39m             \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"email\"]'\u001b[39m\u001b[33m,\u001b[39m user\u001b[33m.\u001b[39memail)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js:34:32\u001b[22m"
                         }
                       ],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "Attempting login for test9@test.com...\n"
+                        },
+                        {
+                          "text": "Login failed. Attempting registration...\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-28T00:27:17.315Z",
+                      "startTime": "2025-11-28T00:33:33.793Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -460,7 +579,12 @@
                           "contentType": "text/markdown",
                           "path": "C:\\test\\igk-todolist\\test\\e2e\\test-results\\integrated_scenarios-igk-TodoList-통합-테스트-시나리오-필터-기능---완료된-할일-chromium\\error-context.md"
                         }
-                      ]
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\test\\igk-todolist\\test\\e2e\\integrated_scenarios.spec.js",
+                        "column": 32,
+                        "line": 34
+                      }
                     }
                   ],
                   "status": "unexpected"
@@ -468,7 +592,7 @@
               ],
               "id": "8dcf0ddc165249eec017-c8fa67a10a73745f0940",
               "file": "integrated_scenarios.spec.js",
-              "line": 182,
+              "line": 227,
               "column": 9
             }
           ]
@@ -478,11 +602,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-11-28T00:26:03.556Z",
-    "duration": 103837.991,
-    "expected": 3,
+    "startTime": "2025-11-28T00:31:49.701Z",
+    "duration": 113533.814,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 5,
+    "unexpected": 7,
     "flaky": 0
   }
 }
