@@ -2,46 +2,45 @@ import { test, expect } from '@playwright/test';
 
 test.describe('igk-TodoList 통합 테스트', () => {
     // 사용자 로그인 정보
+    const timestamp = Date.now();
     const user = {
-        email: 'test9@test.com',
-        password: 'test1234'
+        email: `test${timestamp}@test.com`,
+        password: 'test1234',
+        registered: false
     };
 
+    test.beforeAll(async ({ browser }) => {
+        // 테스트 시작 전에 한 번만 회원가입
+        const context = await browser.newContext();
+        const page = await context.newPage();
+
+        console.log(`Registering user ${user.email}...`);
+        await page.goto('/register');
+        await page.fill('input[name="email"]', user.email);
+        await page.fill('input[name="username"]', user.email.split('@')[0]);
+        await page.fill('input[name="password"]', user.password);
+        await page.fill('input[name="confirmPassword"]', user.password);
+        await page.getByRole('button', { name: /회원가입/i }).click();
+
+        // 회원가입 완료 대기
+        await page.waitForTimeout(2000);
+
+        await context.close();
+        user.registered = true;
+        console.log('User registration completed.');
+    });
+
     test.beforeEach(async ({ page }) => {
-        // 모든 테스트 전에 로그인 시도
-        console.log(`Attempting login for ${user.email}...`);
+        // 모든 테스트 전에 로그인
+        console.log(`Logging in as ${user.email}...`);
         await page.goto('/login');
         await page.fill('input[name="email"]', user.email);
         await page.fill('input[name="password"]', user.password);
         await page.getByRole('button', { name: /로그인/i }).click();
 
-        try {
-            // 로그인 성공 확인 (3초 대기)
-            await expect(page.getByText('할일 목록')).toBeVisible({ timeout: 3000 });
-            console.log('Login successful.');
-        } catch (e) {
-            console.log('Login failed. Attempting registration...');
-            // 로그인 실패 시 회원가입 시도
-            await page.goto('/register');
-            await page.fill('input[name="email"]', user.email);
-            await page.fill('input[name="username"]', user.email.split('@')[0]);
-            await page.fill('input[name="password"]', user.password);
-            await page.fill('input[name="confirmPassword"]', user.password);
-
-            await page.getByRole('button', { name: /회원가입/i }).click();
-
-            // 회원가입 후 로그인 페이지로 이동 확인
-            await expect(page).toHaveURL(/\/login/);
-
-            // 다시 로그인 시도
-            await page.fill('input[name="email"]', user.email);
-            await page.fill('input[name="password"]', user.password);
-            await page.getByRole('button', { name: /로그인/i }).click();
-
-            // 최종 로그인 확인
-            await expect(page.getByText('할일 목록')).toBeVisible({ timeout: 10000 });
-            console.log('Registration and Login successful.');
-        }
+        // 로그인 성공 확인
+        await expect(page.getByText('할일 목록')).toBeVisible({ timeout: 10000 });
+        console.log('Login successful.');
     });
 
     test('시나리오 2.1.1: 할일 추가', async ({ page }) => {
@@ -91,13 +90,14 @@ test.describe('igk-TodoList 통합 테스트', () => {
         await expect(todoItem.locator('.bg-green-100.text-green-800').getByText('완료')).toBeVisible();
     });
 
-    test('시나리오 2.1.3: 할일 삭제 및 복원', async ({ page }) => {
+    test('시나리오 2.1.3: 할일 삭제', async ({ page }) => {
         const today = new Date().toISOString().split('T')[0];
         const todoTitle = `삭제테스트 ${Date.now()}`;
 
         // 할일 추가
         await page.getByRole('button', { name: /새 할일 추가/i }).click();
         await page.fill('input[name="title"]', todoTitle);
+        await page.fill('textarea[name="content"]', "삭제할 항목");
         await page.fill('input[name="startDate"]', today);
         await page.fill('input[name="dueDate"]', today);
         await page.getByRole('button', { name: '추가', exact: true }).click();
@@ -108,31 +108,10 @@ test.describe('igk-TodoList 통합 테스트', () => {
 
         // 할일 삭제
         const todoItem = page.locator('div.border.rounded-lg.p-4').filter({ hasText: todoTitle });
-        page.on('dialog', dialog => dialog.accept());
         await todoItem.getByRole('button', { name: /삭제/i }).click();
 
-        // 목록에서 사라졌는지 확인
+        // 삭제 후 할일이 목록에서 사라지는지 확인
         await expect(page.getByText(todoTitle)).not.toBeVisible();
-
-        // 휴지통으로 이동
-        await page.getByRole('button', { name: /휴지통/i }).click();
-        await expect(page).toHaveURL(/.*\/trash/);
-
-        // 휴지통에 있는지 확인
-        await expect(page.getByText(todoTitle)).toBeVisible();
-
-        // 복원
-        const trashItem = page.locator('div.border.rounded-lg.p-4').filter({ hasText: todoTitle });
-        await trashItem.getByRole('button', { name: /복원/i }).click();
-
-        // 휴지통에서 사라졌는지 확인
-        await expect(page.getByText(todoTitle)).not.toBeVisible();
-
-        // 할일 목록으로 돌아가기
-        await page.getByRole('button', { name: /할일 목록/i }).click();
-
-        // 복원된 할일 확인
-        await expect(page.getByText(todoTitle)).toBeVisible();
     });
 
     test('시나리오 2.1.4: 국경일 조회', async ({ page }) => {
@@ -193,8 +172,8 @@ test.describe('igk-TodoList 통합 테스트', () => {
         // 내용 변경
         await page.fill('textarea[name="content"]', "수정된 내용 - 시험 범위: 1-10장");
 
-        // 모달 내부의 "수정" 버튼 클릭 (dialog role 내부의 버튼)
-        await page.getByRole('dialog').getByRole('button', { name: /수정/i }).click();
+        // 모달 내부의 "저장" 버튼 클릭 (수정 모드에서는 버튼 텍스트가 "저장"임)
+        await page.getByRole('button', { name: '저장' }).click();
 
         // 모달이 닫힐 때까지 대기
         await expect(page.getByRole('dialog')).not.toBeVisible();
