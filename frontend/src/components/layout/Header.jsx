@@ -8,7 +8,7 @@ const Header = ({ onMenuToggle }) => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const { isDarkMode, toggleDarkMode } = useUiStore();
-  
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -17,6 +17,8 @@ const Header = ({ onMenuToggle }) => {
       console.error('로그아웃 실패:', error);
     }
   };
+
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
 
   return (
     <header className="bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -34,46 +36,57 @@ const Header = ({ onMenuToggle }) => {
 
         {/* 오른쪽 섹션 */}
         <div className="flex items-center space-x-3">
-          <button 
+          <button
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={toggleDarkMode}
           >
             {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
-          
+
           <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
             <Search className="h-5 w-5" />
           </button>
-          
+
           <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
             <Bell className="h-5 w-5" />
           </button>
-          
+
           {/* 프로필 드롭다운 */}
           <div className="relative">
-            <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
               <User className="h-5 w-5" />
               <span className="hidden sm:inline text-sm font-medium text-gray-700 dark:text-gray-200">
                 {user?.username}
               </span>
             </button>
-            
+
             {/* 드롭다운 메뉴 - 간단한 버전 */}
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 dark:bg-gray-800 dark:border dark:border-gray-700">
-              <button
-                onClick={() => navigate('/profile')}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                프로필
-              </button>
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 flex items-center"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                로그아웃
-              </button>
-            </div>
+            {isProfileOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 dark:bg-gray-800 dark:border dark:border-gray-700">
+                <button
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    navigate('/profile');
+                  }}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                >
+                  프로필
+                </button>
+                <button
+                  onClick={() => {
+                    setIsProfileOpen(false);
+                    handleLogout();
+                  }}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 flex items-center"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  로그아웃
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,0 +1,84 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "igk-TodoList" [level=1] [ref=e7]
+      - generic [ref=e8]:
+        - button [ref=e9] [cursor=pointer]:
+          - img [ref=e10]
+        - button [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+        - button [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - button "user_1764289375144" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - generic [ref=e25]: user_1764289375144
+  - generic [ref=e26]:
+    - complementary [ref=e27]:
+      - navigation [ref=e29]:
+        - button "홈" [ref=e30] [cursor=pointer]:
+          - img [ref=e31]
+          - generic [ref=e34]: 홈
+        - button "할일 목록" [ref=e35] [cursor=pointer]:
+          - img [ref=e36]
+          - generic [ref=e39]: 할일 목록
+        - button "휴지통" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: 휴지통
+        - button "국경일" [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+          - generic [ref=e48]: 국경일
+        - button "프로필" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - generic [ref=e53]: 프로필
+    - main [ref=e54]:
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - heading "할일 목록" [level=1] [ref=e58]
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - textbox "할일 검색..." [ref=e62]
+              - button "검색" [ref=e63] [cursor=pointer]:
+                - img [ref=e64]
+                - text: 검색
+            - button "새 할일 추가" [ref=e67] [cursor=pointer]:
+              - img [ref=e68]
+              - text: 새 할일 추가
+        - generic [ref=e69]:
+          - button "전체 0" [ref=e70] [cursor=pointer]
+          - button "진행 중 0" [ref=e71] [cursor=pointer]
+          - button "완료 0" [ref=e72] [cursor=pointer]
+        - generic [ref=e73]:
+          - img [ref=e75]
+          - heading "할일이 없습니다" [level=3] [ref=e78]
+          - paragraph [ref=e79]: 새 할일을 추가하여 시작해보세요.
+          - button "할일 추가하기" [ref=e81] [cursor=pointer]
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - heading "새 할일 추가" [level=2] [ref=e85]
+            - button [ref=e86] [cursor=pointer]:
+              - img [ref=e87]
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - generic [ref=e93]: 제목 * *
+              - textbox "할일 제목을 입력하세요" [ref=e95]: 팀장님께 보고서 제출
+            - generic [ref=e96]:
+              - generic [ref=e97]: 내용
+              - textbox "할일 내용을 입력하세요" [ref=e98]: 오전 11시까지 제출 필요
+            - generic [ref=e99]:
+              - generic [ref=e100]:
+                - generic [ref=e101]: 시작일
+                - generic [ref=e102]:
+                  - textbox [ref=e103]: 2025-11-28
+                  - img
+              - generic [ref=e104]:
+                - generic [ref=e105]: 만료일
+                - generic [ref=e106]:
+                  - textbox [active] [ref=e107]: 2025-11-28
+                  - img
+            - generic [ref=e108]:
+              - button "취소" [ref=e109] [cursor=pointer]
+              - button "추가" [ref=e110] [cursor=pointer]
+```

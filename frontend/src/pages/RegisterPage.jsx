@@ -26,7 +26,7 @@ const RegisterPage = () => {
       ...prev,
       [name]: value,
     }));
-    
+
     // 실시간 유효성 검사
     if (errors[name]) {
       setErrors((prev) => ({
@@ -38,47 +38,48 @@ const RegisterPage = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     // 이메일 검사
     if (!formData.email) {
       newErrors.email = '이메일을 입력해주세요.';
     } else if (!isValidEmail(formData.email)) {
       newErrors.email = '올바른 이메일 형식이 아닙니다.';
     }
-    
+
     // 사용자 이름 검사
     if (!formData.username) {
       newErrors.username = '사용자 이름을 입력해주세요.';
     } else if (!isValidUsername(formData.username)) {
       newErrors.username = '사용자 이름은 2자 이상 20자 이하이어야 합니다.';
     }
-    
+
     // 비밀번호 검사
     if (!formData.password) {
       newErrors.password = '비밀번호를 입력해주세요.';
     } else if (!isStrongPassword(formData.password)) {
       newErrors.password = '비밀번호는 8자 이상이어야 하며, 영문과 숫자를 포함해야 합니다.';
     }
-    
+
     // 비밀번호 확인 검사
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = '비밀번호를 다시 입력해주세요.';
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
     }
-    
+
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const newErrors = validateForm();
+    console.log('RegisterPage submit:', formData);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
+
     try {
       await register(formData.email, formData.password, formData.username);
       navigate('/login');
@@ -142,7 +143,7 @@ const RegisterPage = () => {
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
-          
+
           <p className="text-sm text-gray-500 dark:text-gray-400">최소 8자 이상, 영문과 숫자를 포함하세요</p>
 
           <div className="relative">
@@ -166,9 +167,9 @@ const RegisterPage = () => {
             </button>
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full mt-4" 
+          <Button
+            type="submit"
+            className="w-full mt-4"
             isLoading={isLoading}
             disabled={isLoading}
           >

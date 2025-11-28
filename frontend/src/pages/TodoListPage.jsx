@@ -127,11 +127,10 @@ const TodoListPage = () => {
           <button
             key={key}
             onClick={() => handleFilterChange(key === 'all' ? 'all' : key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              filters.status === (key === 'all' ? 'all' : key)
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${filters.status === (key === 'all' ? 'all' : key)
                 ? 'bg-white text-green-600 shadow-sm dark:bg-gray-600 dark:text-white'
                 : 'text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-600'
-            }`}
+              }`}
           >
             {label}
           </button>
@@ -163,7 +162,7 @@ const TodoListPage = () => {
           {todos
             .filter(todo =>
               filters.status === 'all'
-                ? true
+                ? todo.status !== TODO_STATUS.DELETED
                 : filters.status === TODO_STATUS.COMPLETED
                   ? todo.isCompleted
                   : !todo.isCompleted && todo.status !== TODO_STATUS.DELETED
@@ -175,29 +174,26 @@ const TodoListPage = () => {
               return (
                 <div
                   key={todo.todoId}
-                  className={`border rounded-lg p-4 bg-white dark:bg-gray-800 dark:border-gray-700 ${
-                    isOverdue ? 'border-red-300 bg-red-50 dark:bg-red-900/20' : 'border-gray-200'
-                  }`}
+                  className={`border rounded-lg p-4 bg-white dark:bg-gray-800 dark:border-gray-700 ${isOverdue ? 'border-red-300 bg-red-50 dark:bg-red-900/20' : 'border-gray-200'
+                    }`}
                 >
                   <div className="flex items-start gap-3">
                     <button
                       onClick={() => handleCompleteTodo(todo.todoId)}
-                      className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded-full border flex items-center justify-center ${
-                        todo.isCompleted
+                      className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded-full border flex items-center justify-center ${todo.isCompleted
                           ? 'bg-green-500 border-green-500'
                           : 'border-gray-300 dark:border-gray-600'
-                      }`}
+                        }`}
                     >
                       {todo.isCompleted && <CheckCircle className="h-4 w-4 text-white" />}
                     </button>
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className={`font-medium truncate ${
-                          todo.isCompleted
+                        <h3 className={`font-medium truncate ${todo.isCompleted
                             ? 'text-gray-500 dark:text-gray-400 line-through'
                             : 'text-gray-900 dark:text-white'
-                        }`}>
+                          }`}>
                           {todo.title}
                         </h3>
                         <Badge

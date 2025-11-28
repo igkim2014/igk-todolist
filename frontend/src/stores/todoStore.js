@@ -74,9 +74,9 @@ const useTodoStore = create(
       try {
         const response = await todoService.createTodo(todoData);
         const { todos } = get();
-        set({ 
+        set({
           todos: [response.data, ...todos],
-          isLoading: false 
+          isLoading: false
         });
         return response.data;
       } catch (error) {
@@ -93,12 +93,12 @@ const useTodoStore = create(
       try {
         const response = await todoService.updateTodo(id, updateData);
         const { todos } = get();
-        const updatedTodos = todos.map(todo => 
+        const updatedTodos = todos.map(todo =>
           todo.todoId === id ? response.data : todo
         );
-        set({ 
+        set({
           todos: updatedTodos,
-          isLoading: false 
+          isLoading: false
         });
         return response.data;
       } catch (error) {
@@ -115,12 +115,12 @@ const useTodoStore = create(
       try {
         const response = await todoService.completeTodo(id);
         const { todos } = get();
-        const updatedTodos = todos.map(todo => 
+        const updatedTodos = todos.map(todo =>
           todo.todoId === id ? response.data : todo
         );
-        set({ 
+        set({
           todos: updatedTodos,
-          isLoading: false 
+          isLoading: false
         });
         return response.data;
       } catch (error) {
@@ -209,7 +209,7 @@ const useTodoStore = create(
         [TODO_STATUS.ACTIVE]: todos.filter(todo => todo.status === TODO_STATUS.ACTIVE).length,
         [TODO_STATUS.COMPLETED]: todos.filter(todo => todo.status === TODO_STATUS.COMPLETED).length,
         [TODO_STATUS.DELETED]: todos.filter(todo => todo.status === TODO_STATUS.DELETED).length,
-        all: todos.length
+        all: todos.filter(todo => todo.status !== TODO_STATUS.DELETED).length
       };
     }
   }))

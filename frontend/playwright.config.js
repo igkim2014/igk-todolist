@@ -1,9 +1,9 @@
 // playwright.config.js
-const { defineConfig } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
-module.exports = defineConfig({
-  // Look for test files in the "test/e2e" directory, relative to this configuration file
-  testDir: '../test/e2e',
+export default defineConfig({
+  // Look for test files in the current directory
+  testDir: './',
 
   // Run all tests in parallel
   fullyParallel: true,
@@ -32,15 +32,13 @@ module.exports = defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: {
-        ...require('@playwright/test').devices['Desktop Chrome']
-      },
+      use: { ...devices['Desktop Chrome'] },
     },
   ],
 
   // Run your local dev server before starting the tests
   webServer: {
-    command: 'cd ../frontend && npm run dev',
+    command: 'cd .. && npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
