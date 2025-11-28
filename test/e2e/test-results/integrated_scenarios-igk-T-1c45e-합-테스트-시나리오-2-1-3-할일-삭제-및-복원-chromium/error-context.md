@@ -1,0 +1,49 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "igk-TodoList" [level=1] [ref=e7]
+      - generic [ref=e8]:
+        - button [ref=e9] [cursor=pointer]:
+          - img [ref=e10]
+        - button [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+        - button [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - button "test9" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - generic [ref=e25]: test9
+  - generic [ref=e26]:
+    - complementary [ref=e27]:
+      - navigation [ref=e29]:
+        - button "홈" [ref=e30] [cursor=pointer]:
+          - img [ref=e31]
+          - generic [ref=e34]: 홈
+        - button "할일 목록" [ref=e35] [cursor=pointer]:
+          - img [ref=e36]
+          - generic [ref=e39]: 할일 목록
+        - button "휴지통" [active] [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: 휴지통
+        - button "국경일" [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+          - generic [ref=e48]: 국경일
+        - button "프로필" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - generic [ref=e53]: 프로필
+    - main [ref=e54]:
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - heading "휴지통" [level=1] [ref=e59]
+            - paragraph [ref=e60]: 삭제된 할일 (0개) - 30일 후 자동으로 영구 삭제됩니다
+          - button "새 할일 추가" [ref=e61] [cursor=pointer]:
+            - img [ref=e62]
+            - text: 새 할일 추가
+        - generic [ref=e65]:
+          - img [ref=e67]
+          - heading "휴지통이 비어 있습니다" [level=3] [ref=e70]
+          - paragraph [ref=e71]: 삭제된 할일이 없습니다.
+```
