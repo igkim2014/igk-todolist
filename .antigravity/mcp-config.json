@@ -46,6 +46,13 @@
         "@henkey/postgres-mcp-server",
         "postgres://postgres:postgres@localhost:5432/postgres"
       ]
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=jvnggziboyqlikxvualt",
+      "headers": {
+        "Authorization": "Bearer sbp_411d1ee0b5cea9ad7a9bed8aefa455b5a04e4880"
+      }
     }
   }
 }
