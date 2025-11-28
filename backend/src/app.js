@@ -26,6 +26,11 @@ app.use('/api', apiLimiter);
 // Routes
 app.use('/api', routes);
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the IGK backend API. Please use /api endpoint for API calls.' });
+});
+
 // Error Handling
 app.use(errorMiddleware);
 
