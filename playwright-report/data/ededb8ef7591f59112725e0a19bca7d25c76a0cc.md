@@ -1,0 +1,95 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "igk-TodoList" [level=1] [ref=e7]
+      - generic [ref=e8]:
+        - button [ref=e9] [cursor=pointer]:
+          - img [ref=e10]
+        - button [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+        - button [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+        - button "test9" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - generic [ref=e25]: test9
+  - generic [ref=e26]:
+    - complementary [ref=e27]:
+      - navigation [ref=e29]:
+        - button "홈" [ref=e30] [cursor=pointer]:
+          - img [ref=e31]
+          - generic [ref=e34]: 홈
+        - button "할일 목록" [ref=e35] [cursor=pointer]:
+          - img [ref=e36]
+          - generic [ref=e39]: 할일 목록
+        - button "휴지통" [ref=e40] [cursor=pointer]:
+          - img [ref=e41]
+          - generic [ref=e44]: 휴지통
+        - button "국경일" [ref=e45] [cursor=pointer]:
+          - img [ref=e46]
+          - generic [ref=e48]: 국경일
+        - button "프로필" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - generic [ref=e53]: 프로필
+    - main [ref=e54]:
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - heading "할일 목록" [level=1] [ref=e58]
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - textbox "할일 검색..." [ref=e62]
+              - button "검색" [ref=e63] [cursor=pointer]:
+                - img [ref=e64]
+                - text: 검색
+            - button "새 할일 추가" [ref=e67] [cursor=pointer]:
+              - img [ref=e68]
+              - text: 새 할일 추가
+        - generic [ref=e69]:
+          - button "전체 1" [ref=e70] [cursor=pointer]
+          - button "진행 중 1" [ref=e71] [cursor=pointer]
+          - button "완료 0" [ref=e72] [cursor=pointer]
+        - generic [ref=e75]:
+          - button [ref=e76] [cursor=pointer]
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - heading "수정테스트 1764290401968" [level=3] [ref=e79]
+              - generic [ref=e80]: 진행 중
+            - paragraph [ref=e81]: 초기 내용
+            - generic [ref=e83]:
+              - img [ref=e84]
+              - generic [ref=e86]: 2025-11-28 ~ 2025-11-28
+          - generic [ref=e87]:
+            - button "수정" [ref=e88] [cursor=pointer]
+            - button "삭제" [ref=e89] [cursor=pointer]
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - heading "할일 수정" [level=2] [ref=e93]
+            - button [ref=e94] [cursor=pointer]:
+              - img [ref=e95]
+          - generic [ref=e99]:
+            - generic [ref=e100]:
+              - generic [ref=e101]: 제목 * *
+              - textbox "할일 제목을 입력하세요" [ref=e103]: 수정테스트 1764290401968
+            - generic [ref=e104]:
+              - generic [ref=e105]: 내용
+              - textbox "할일 내용을 입력하세요" [active] [ref=e106]: "수정된 내용 - 시험 범위: 1-10장"
+            - generic [ref=e107]:
+              - generic [ref=e108]:
+                - generic [ref=e109]: 시작일
+                - generic [ref=e110]:
+                  - textbox [ref=e111]
+                  - img
+              - generic [ref=e112]:
+                - generic [ref=e113]: 만료일
+                - generic [ref=e114]:
+                  - textbox [ref=e115]
+                  - img
+            - generic [ref=e116]:
+              - checkbox "완료로 표시" [ref=e117]
+              - generic [ref=e118]: 완료로 표시
+            - generic [ref=e119]:
+              - button "취소" [ref=e120] [cursor=pointer]
+              - button "저장" [ref=e121] [cursor=pointer]
+```
