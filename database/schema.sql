@@ -1,17 +1,16 @@
 -- igk_todolist_dev 데이터베이스 스키마 정의
--- 이 스키마는 Prisma 스키마와 동기화되어 있습니다 (backend/prisma/schema.prisma)
--- Prisma 마이그레이션을 사용하여 실제 DB를 관리하므로 이 파일은 참조용입니다
+-- 이 스키마는 pg 라이브러리를 사용하여 PostgreSQL에 직접 접근합니다
+-- Repository 패턴과 Clean Architecture를 적용하여 데이터 접근 계층을 구현했습니다
 
 -- 사용자 테이블
--- Prisma에서 생성한 실제 구조를 반영
 CREATE TABLE IF NOT EXISTS "User" (
-    "userId" TEXT PRIMARY KEY,  -- Prisma는 String 타입으로 UUID를 저장
+    "userId" TEXT PRIMARY KEY,  -- UUID (JavaScript uuid 라이브러리에서 생성)
     "email" TEXT NOT NULL UNIQUE,
     "password" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'user',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 할일 테이블
@@ -20,12 +19,12 @@ CREATE TABLE IF NOT EXISTS "Todo" (
     "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT,
-    "startDate" TIMESTAMP(3),  -- Prisma DateTime 매핑 (DATE가 아님)
-    "dueDate" TIMESTAMP(3),    -- Prisma DateTime 매핑 (DATE가 아님)
+    "startDate" TIMESTAMP(3),
+    "dueDate" TIMESTAMP(3),
     "status" TEXT NOT NULL DEFAULT 'active',
     "isCompleted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Todo_userId_fkey"
@@ -37,21 +36,32 @@ CREATE TABLE IF NOT EXISTS "Todo" (
 CREATE TABLE IF NOT EXISTS "Holiday" (
     "holidayId" TEXT PRIMARY KEY,
     "title" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,  -- Prisma DateTime 매핑
+    "date" TIMESTAMP(3) NOT NULL,
     "description" TEXT,
     "isRecurring" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 인덱스
 -- User 테이블
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 
--- Todo 테이블 - Prisma가 자동으로 외래키에 대한 인덱스를 생성하지 않으므로 성능을 위해 추가 권장
--- CREATE INDEX IF NOT EXISTS "Todo_userId_idx" ON "Todo"("userId");
+-- Todo 테이블 - 성능 최적화를 위한 인덱스 (선택사항)
+-- CREATE INDEX IF NOT EXISTS "Todo_userId_status_idx" ON "Todo"("userId", "status");
+-- CREATE INDEX IF NOT EXISTS "Todo_dueDate_idx" ON "Todo"("dueDate");
+-- CREATE INDEX IF NOT EXISTS "Todo_deletedAt_idx" ON "Todo"("deletedAt");
 
--- 주석: Prisma 마이그레이션 시스템 사용 시
--- 1. prisma/schema.prisma 파일을 수정
--- 2. npx prisma migrate dev --name migration_name 실행
--- 3. 이 schema.sql 파일은 문서화 목적으로만 수동 업데이트
+-- Holiday 테이블 - 성능 최적화를 위한 인덱스 (선택사항)
+-- CREATE INDEX IF NOT EXISTS "Holiday_date_idx" ON "Holiday"("date");
+
+-- 주석: 데이터베이스 관리 방법
+-- 1. 스키마 변경이 필요한 경우 이 schema.sql 파일을 수정합니다
+-- 2. PostgreSQL에 직접 DDL을 실행하거나 마이그레이션 스크립트를 작성합니다
+-- 3. Repository 코드를 업데이트합니다
+-- 4. Service 레이어에서 비즈니스 로직 검증을 추가합니다
+--
+-- 참고:
+-- - updatedAt은 Repository에서 UPDATE 시 CURRENT_TIMESTAMP로 수동 갱신됩니다
+-- - UUID는 애플리케이션(JavaScript uuid 라이브러리)에서 생성됩니다
+-- - 데이터 검증(role, status, dueDate >= startDate)은 Service 레이어에서 수행합니다
