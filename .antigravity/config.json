@@ -1,34 +1,76 @@
 {
+  "security": {
+    "auth": {
+      "selectedType": "qwen-oauth"
+    }
+  },
   "mcpServers": {
-    "shadcn": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "shadcn@latest", "mcp"]
-    },
-    "context7": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@upstash/context7-mcp"]
-    },
-    "playwright": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"]
-    },
-    "chrome-devtools": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest"]
-    },
     "postgresql-mcp": {
       "command": "cmd",
       "args": [
         "/c",
         "npx",
         "-y",
-        "@henkey/postgres-mcp-server",
-        "postgres://postgres:postgres@localhost:5432/postgres"
+        "@henkey/postgres-mcp-server"
+      ]
+    },
+    "shadcn": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "shadcn@latest",
+        "mcp"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "context7": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "playwright": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    },
+    "chrome-devtools": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "chrome-devtools-mcp@latest"
       ]
     },
     "supabase": {
-      "type": "http",
-      "url": "https://mcp.supabase.com/mcp"
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_411d1ee0b5cea9ad7a9bed8aefa455b5a04e4880"
+      ]
     }
-  }
+  },
+  "$version": 2
 }

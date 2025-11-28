@@ -1,58 +1,34 @@
-const { prisma } = require('../config/database');
+/**
+ * Holiday Service
+ * Clean Architecture - Use Case Layer
+ * SOLID Principles: Dependency Inversion (의존성 역전)
+ */
+
+const holidayRepository = require('../repositories/HolidayRepository');
 
 const getHolidays = async (year, month) => {
-  const whereClause = {};
-
-  if (year) {
-    whereClause.date = {
-      gte: new Date(year, 0, 1),  // January 1st of the year
-      lt: new Date(year + 1, 0, 1)  // January 1st of the next year
-    };
+  if (year && month) {
+    return await holidayRepository.findByMonth(year, month);
+  } else if (year) {
+    return await holidayRepository.findByYear(year);
+  } else {
+    return await holidayRepository.findAllHolidays();
   }
-
-  if (month && year) {
-    // Refine the date range if both year and month are provided
-    whereClause.date = {
-      gte: new Date(year, month - 1, 1),  // First day of the month
-      lt: new Date(year, month, 1)  // First day of the next month
-    };
-  }
-
-  const holidays = await prisma.holiday.findMany({
-    where: whereClause,
-    orderBy: {
-      date: 'asc'
-    }
-  });
-  return holidays;
 };
 
 const createHoliday = async (holidayData) => {
   const { title, date, description, isRecurring } = holidayData;
-  const holiday = await prisma.holiday.create({
-    data: {
-      title,
-      date: new Date(date),
-      description,
-      isRecurring: isRecurring !== undefined ? isRecurring : true
-    }
+
+  return await holidayRepository.createHoliday({
+    title,
+    date,
+    description,
+    isRecurring: isRecurring !== undefined ? isRecurring : true
   });
-  return holiday;
 };
 
 const updateHoliday = async (holidayId, updateData) => {
-  const { title, date, description, isRecurring } = updateData;
-  const holiday = await prisma.holiday.update({
-    where: {
-      holidayId: holidayId
-    },
-    data: {
-      title: title !== undefined ? title : undefined,
-      date: date !== undefined ? new Date(date) : undefined,
-      description: description !== undefined ? description : undefined,
-      isRecurring: isRecurring !== undefined ? isRecurring : undefined
-    }
-  });
+  const holiday = await holidayRepository.updateHoliday(holidayId, updateData);
 
   if (!holiday) {
     const error = new Error('국경일을 찾을 수 없습니다');
@@ -60,6 +36,7 @@ const updateHoliday = async (holidayId, updateData) => {
     error.code = 'NOT_FOUND';
     throw error;
   }
+
   return holiday;
 };
 

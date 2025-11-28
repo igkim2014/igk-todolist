@@ -1,12 +1,16 @@
-const { prisma } = require('../config/database');
+/**
+ * Auth Service
+ * Clean Architecture - Use Case Layer
+ * SOLID Principles: Dependency Inversion (의존성 역전)
+ */
+
+const userRepository = require('../repositories/UserRepository');
 const { hashPassword, comparePassword } = require('../utils/passwordHelper');
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwtHelper');
 
 const register = async (email, password, username) => {
   // Check if user already exists
-  const existingUser = await prisma.user.findUnique({
-    where: { email: email }
-  });
+  const existingUser = await userRepository.findByEmail(email);
 
   if (existingUser) {
     const error = new Error('이미 사용 중인 이메일입니다');
@@ -16,28 +20,20 @@ const register = async (email, password, username) => {
   }
 
   const hashedPassword = await hashPassword(password);
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      username
-    },
-    select: {
-      userId: true,
-      email: true,
-      username: true,
-      role: true
-    }
+  const user = await userRepository.createUser({
+    email,
+    password: hashedPassword,
+    username
   });
 
-  return user;
+  // 비밀번호 제외한 사용자 정보 반환
+  const { password: _, ...userWithoutPassword } = user;
+  return userWithoutPassword;
 };
 
 const login = async (email, password) => {
   // Find user by email
-  const user = await prisma.user.findUnique({
-    where: { email: email }
-  });
+  const user = await userRepository.findByEmail(email);
 
   if (!user) {
     const error = new Error('이메일 또는 비밀번호가 올바르지 않습니다');
@@ -76,9 +72,7 @@ const refreshAccessToken = async (refreshToken) => {
     const decoded = verifyRefreshToken(refreshToken);
 
     // Check if user still exists
-    const user = await prisma.user.findUnique({
-      where: { userId: decoded.userId }
-    });
+    const user = await userRepository.findByUserId(decoded.userId);
 
     if (!user) {
       throw new Error('User not found');

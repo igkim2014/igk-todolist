@@ -1,19 +1,14 @@
-const { prisma } = require('../config/database');
+/**
+ * User Service
+ * Clean Architecture - Use Case Layer
+ * SOLID Principles: Dependency Inversion (의존성 역전)
+ */
+
+const userRepository = require('../repositories/UserRepository');
 const { hashPassword } = require('../utils/passwordHelper');
 
 const getProfile = async (userId) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      userId: userId
-    },
-    select: {
-      userId: true,
-      email: true,
-      username: true,
-      role: true,
-      createdAt: true
-    }
-  });
+  const user = await userRepository.getProfile(userId);
 
   if (!user) {
     const error = new Error('사용자를 찾을 수 없습니다');
@@ -27,9 +22,7 @@ const getProfile = async (userId) => {
 const updateProfile = async (userId, updateData) => {
   const { username, password } = updateData;
 
-  let updateFields = {
-    updatedAt: new Date()
-  };
+  let updateFields = {};
 
   if (username) {
     updateFields.username = username;
@@ -40,22 +33,11 @@ const updateProfile = async (userId, updateData) => {
     updateFields.password = hashedPassword;
   }
 
-  const updatedUser = await prisma.user.update({
-    where: {
-      userId: userId
-    },
-    data: updateFields,
-    select: {
-      userId: true,
-      email: true,
-      username: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true
-    }
-  });
+  const updatedUser = await userRepository.updateUser(userId, updateFields);
 
-  return updatedUser;
+  // 비밀번호 제외한 정보만 반환
+  const { password: _, ...userWithoutPassword } = updatedUser;
+  return userWithoutPassword;
 };
 
 module.exports = {

@@ -1,42 +1,15 @@
-/* 배포 자동화 검증 위해 변경 테스트 */
+/**
+ * Database Configuration
+ * Clean Architecture - Infrastructure Layer
+ *
+ * pg 라이브러리를 사용한 PostgreSQL 연결
+ */
 
-const { PrismaClient } = require("@prisma/client");
-require("dotenv").config();
-
-// Initialize Prisma Client with connection pool configuration
-const prisma = new PrismaClient({
-  log: ["query", "info", "warn", "error"],
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-    },
-  },
-});
-
-const testConnection = async () => {
-  try {
-    await prisma.$connect();
-    console.log("Database connected successfully with Prisma");
-    return true;
-  } catch (err) {
-    console.error("Database connection failed:", err.message);
-    return false;
-  } finally {
-    await prisma.$disconnect();
-  }
-};
-
-// Function to get connection pool statistics (simulating pg.Pool information)
-const getConnectionStats = () => {
-  // Prisma doesn't expose direct pool stats like pg.Pool, but we can return connection status
-  return {
-    status: "connected", // This would be determined by an actual check
-    // For a real pg.Pool implementation, we would return actual connection pool metrics
-  };
-};
+const { pool, testConnection, close, getConnectionStats } = require('../database/pool');
 
 module.exports = {
-  prisma,
+  pool,
   testConnection,
+  close,
   getConnectionStats,
 };

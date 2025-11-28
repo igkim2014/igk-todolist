@@ -1,26 +1,18 @@
-const { prisma } = require('../config/database');
+/**
+ * Trash Service
+ * Clean Architecture - Use Case Layer
+ * SOLID Principles: Dependency Inversion (의존성 역전)
+ */
+
+const todoRepository = require('../repositories/TodoRepository');
 
 const getTrash = async (userId) => {
-  const todos = await prisma.todo.findMany({
-    where: {
-      userId: userId,
-      status: 'deleted'
-    },
-    orderBy: {
-      deletedAt: 'desc'
-    }
-  });
-  return todos;
+  return await todoRepository.findDeletedByUserId(userId);
 };
 
 const permanentlyDelete = async (todoId, userId) => {
-  // Check if the todo exists and is in deleted status
-  const todo = await prisma.todo.findUnique({
-    where: {
-      todoId: todoId,
-      userId: userId
-    }
-  });
+  // 할일 존재 확인
+  const todo = await todoRepository.findByTodoIdAndUserId(todoId, userId);
 
   if (!todo) {
     const error = new Error('할일을 찾을 수 없습니다');
@@ -36,13 +28,8 @@ const permanentlyDelete = async (todoId, userId) => {
     throw error;
   }
 
-  // Permanently delete the todo
-  await prisma.todo.delete({
-    where: {
-      todoId: todoId,
-      userId: userId
-    }
-  });
+  // 영구 삭제
+  await todoRepository.hardDeleteTodo(todoId, userId);
 
   return true;
 };
@@ -51,4 +38,3 @@ module.exports = {
   getTrash,
   permanentlyDelete,
 };
-
